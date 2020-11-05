@@ -1,0 +1,8 @@
+{
+  "editor.detectIndentation": false,
+  "editor.tabSize": 2,
+  "prettier.arrowParens": "always",
+  "prettier.trailingComma": "all",
+  "prettier.printWidth": 140,
+  "prettier.singleQuote": true
+}

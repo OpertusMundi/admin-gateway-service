@@ -1,0 +1,190 @@
+{
+  "account": {
+    "form": {
+      "section": {
+        "user": "User Data"
+      },
+      "field": {
+        "active": "Active",
+        "username": "Username",
+        "email": "Email",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "roles": "Roles",
+        "phone": "Phone",
+        "mobile": "Mobile",
+        "password": "Password",
+        "passwordMatch": "Verify password"
+      }
+    },
+    "manager": {
+      "filter": {
+        "name": "Username"
+      },
+      "header": {
+        "actions": "Actions",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "username": "Username"
+      },
+      "last-update": "Last updated: ",
+      "tooltip": {
+        "delete": "Delete",
+        "edit": "Edit"
+      }
+    }
+  },
+  "company": {
+    "title": "OpertusMundi",
+    "website": "https://www.opertusmundi.eu/"
+  },
+  "contract": {
+    "master": {
+      "title": "Master contract editor",
+      "section": "Section"
+    }
+  },
+  "enum": {
+    "role": {
+      "ADMIN": "Administrator",
+      "DEVELOPER": "Developer",
+      "USER": "User"
+    }
+  },
+  "error": {
+    "BasicMessageCode.InternalServerError": "Unknown error has occurred while execution the request",
+    "BasicMessageCode.Unauthorized": "Access denied",
+    "BasicMessageCode.RecordNotFound": "Record was not found",
+    "BasicMessageCode.ForeignKeyConstraint": "There are one or more references to this record from other records. Operation was cancelled",
+    "BasicMessageCode.Validation": "One or more record fields are invalid",
+    "BasicMessageCode.Validation.UniqueNameConstraint": "Value {value} for field {field} already exists",
+    "BasicMessageCode.Validation.ReferenceNotFound": "Reference for field {field} was not found",
+    "BasicMessageCode.Validation.Required": "Field {field} is required",
+    "BasicMessageCode.Validation.PasswordMismatch": "Field {field} must have the same value with field Password",
+    "BasicMessageCode.NotImplemented": "Operation is not implemented!",
+    "BasicMessageCode.CannotDeleteSelf": "Cannot delete the current account",
+    "BasicMessageCode.CannotRevokeLastAdmin": "You must assign a new administrator before changing user roles",
+    "insert-success": "Record has been saved",
+    "delete-failure": "Delete operation has failed",
+    "delete-success": "Record has been deleted",
+    "update-failure": "Update operation has failed",
+    "geolocation-cancel": "The operation has been cancelled by the user",
+    "geolocation-error": "Location detection has failed",
+    "filesystem.size.less-than": "File size must be less than {size}",
+    "filesystem.type-not-supported": "File type is not supported",
+    "filesystem.read-failed": "Failed to read file",
+    "FILESYSTEM_LOAD": "Failed to load user remote file system",
+    "http-status-code": {
+      "401": {
+        "title": "Oops! You shouldn't be here.",
+        "description": "The page you are looking for was not found or you do not have the required permission.",
+        "button": "Back"
+      },
+      "403": {
+        "title": "Oops! You shouldn't be here.",
+        "description": "The page you are looking for was not found or you do not have the required permission.",
+        "button": "Back"
+      },
+      "404": {
+        "title": "Oops! You're lost.",
+        "description": "The page you are looking for was not found.",
+        "button": "Back"
+      },
+      "500": {
+        "title": "Oops! Something has gone wrong!",
+        "description": "An error has occurred. Please try again later.",
+        "button": "Back"
+      }
+    }
+  },
+  "links": {
+    "account": {
+      "explorer": "Users",
+      "create": "Create",
+      "update": "Edit"
+    },
+    "admin": "Admin",
+    "consumer-manager": "Manage Consumers",
+    "contract": {
+      "master": {
+        "title": "Master Contract"
+      }
+    },
+    "dashboard": "Overview",
+    "map": "Map",
+    "message-manager": "Messages",
+    "order-manager": "Orders",
+    "profile": "Profile",
+    "provider-manager": "Manage Providers",
+    "settings": "Settings"
+  },
+  "locales": {
+    "en": "English",
+    "el": "Greek"
+  },
+  "login": {
+    "failure": "Username or password is wrong",
+    "forgot-password": "Forgot your password?",
+    "login": "Login",
+    "password": "Password",
+    "subtitle": "Sign into my account",
+    "title": "Sign-in",
+    "username": "Username"
+  },
+  "menu": {
+    "logout": "Logout",
+    "profile": "Profile",
+    "settings": "Settings"
+  },
+  "message": {
+    "password-changed": "Password has been updated",
+    "avatar-changed": "Profile image has been updated"
+  },
+  "profile": {
+    "form": {
+      "avatar-image-title": "Select image",
+      "set-user-password": "Change user password"
+    }
+  },
+  "provider-manager": {},
+  "table": {
+    "previous-page": "Previous page",
+    "next-page": "Next page",
+    "rows-displayed": "{from}-{to} of {count}",
+    "rows-per-page": "Rows per page:",
+    "loading-data": "Loading Data ...",
+    "no-data": "No records found"
+  },
+  "validation": {
+    "invalid": "Invalid value",
+    "required": "Field is required",
+    "mismatch": "Values for fields {field1} and {field2} must be the same",
+    "out-of-range": "Value must be in the interval [{min} , {max}]"
+  },
+  "view": {
+    "shared": {
+      "autocomplete": {
+        "loading-data": "Loading Data ...",
+        "no-options": "No records found",
+        "prompt": "Type at least 3 characters for searching ..."
+      },
+      "action": {
+        "cancel": "Cancel",
+        "close": "Close",
+        "create": "Create",
+        "no": "No",
+        "reset": "New Search",
+        "save": "Save",
+        "search": "Search",
+        "yes": "Yes"
+      },
+      "dialog": {
+        "title": "Application Message"
+      },
+      "message": {
+        "cancel-confirm": "All changes will be discarded. Would you like to continue?",
+        "delete-confirm": "Record {name} will be deleted. Would you like to continue?"
+      }
+    }
+  }
+}
