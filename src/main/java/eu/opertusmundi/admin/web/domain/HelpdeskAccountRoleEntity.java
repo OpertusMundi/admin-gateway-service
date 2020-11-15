@@ -19,25 +19,25 @@ import javax.validation.constraints.NotNull;
 
 import eu.opertusmundi.admin.web.model.EnumRole;
 
-@Entity(name = "AccountRole")
+@Entity(name = "HelpdeskAccountRole")
 @Table(
     schema = "admin", name = "`account_role`",
     uniqueConstraints = {
         @UniqueConstraint(name = "uq_account_role", columnNames = {"`account`", "`role`"})
     })
-public class AccountRoleEntity
+public class HelpdeskAccountRoleEntity
 {
     @Id()
     @Column(name = "`id`")
     @SequenceGenerator(
-        sequenceName = "`admin.account_role_id_seq`", name = "account_role_id_seq", allocationSize = 1)
-    @GeneratedValue(generator = "account_role_id_seq", strategy = GenerationType.SEQUENCE)
+        sequenceName = "`admin.account_role_id_seq`", name = "admin_account_role_id_seq", allocationSize = 1)
+    @GeneratedValue(generator = "admin_account_role_id_seq", strategy = GenerationType.SEQUENCE)
     int Integer;
 
     @NotNull
     @ManyToOne
     @JoinColumn(name = "`account`", nullable = false)
-    AccountEntity account;
+    HelpdeskAccountEntity account;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -49,17 +49,17 @@ public class AccountRoleEntity
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "`granted_by`")
-    AccountEntity grantedBy;
+    HelpdeskAccountEntity grantedBy;
 
-    AccountRoleEntity() {}
+    HelpdeskAccountRoleEntity() {}
 
-    public AccountRoleEntity(AccountEntity account, EnumRole role)
+    public HelpdeskAccountRoleEntity(HelpdeskAccountEntity account, EnumRole role)
     {
         this(account, role, null, null);
     }
 
-    public AccountRoleEntity(
-        AccountEntity account, EnumRole role, ZonedDateTime grantedAt, AccountEntity grantedBy)
+    public HelpdeskAccountRoleEntity(
+        HelpdeskAccountEntity account, EnumRole role, ZonedDateTime grantedAt, HelpdeskAccountEntity grantedBy)
     {
         this.account = account;
         this.role = role;
@@ -67,7 +67,7 @@ public class AccountRoleEntity
         this.grantedBy = grantedBy;
     }
 
-    public AccountEntity getAccount()
+    public HelpdeskAccountEntity getAccount()
     {
         return this.account;
     }
@@ -82,7 +82,7 @@ public class AccountRoleEntity
         return this.grantedAt;
     }
 
-    public AccountEntity getGrantedBy()
+    public HelpdeskAccountEntity getGrantedBy()
     {
         return this.grantedBy;
     }

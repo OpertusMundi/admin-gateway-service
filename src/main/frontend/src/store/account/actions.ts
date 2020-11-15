@@ -8,6 +8,7 @@ import {
   SET_FILTER,
   RESET_FILTER,
   SEARCH_INIT,
+  SEARCH_FAILURE,
   SEARCH_COMPLETE,
   ADD_SELECTED,
   REMOVE_SELECTED,
@@ -56,6 +57,12 @@ export function setSorting(sorting: Sorting[]): AccountActions {
 export function searchInit(): AccountActions {
   return {
     type: SEARCH_INIT,
+  };
+}
+
+export function searchFailure(): AccountActions {
+  return {
+    type: SEARCH_FAILURE,
   };
 }
 

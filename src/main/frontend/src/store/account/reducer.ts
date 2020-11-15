@@ -21,6 +21,7 @@ import {
   AccountManagerState,
   SAVE_COMPLETE,
   SAVE_INIT,
+  SEARCH_FAILURE,
 } from 'store/account/types';
 
 const initialState: AccountManagerState = {
@@ -33,7 +34,7 @@ const initialState: AccountManagerState = {
     size: 10,
   },
   sorting: [{
-    id: 'username',
+    id: 'email',
     order: 'asc',
   }],
   result: null,
@@ -102,6 +103,18 @@ export function accountReducer(
         selected: [],
         response: null,
         loading: true,
+      };
+
+    case SEARCH_FAILURE:
+      return {
+        ...state,
+        result: null,
+        pagination: {
+          page: 0,
+          size: state.pagination.size,
+        },
+        lastUpdated: moment(),
+        loading: false,
       };
 
     case SEARCH_COMPLETE:

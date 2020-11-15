@@ -3,7 +3,7 @@ import { ThunkAction } from 'redux-thunk'
 // Redux
 import { RootState } from 'store';
 import { AccountActions } from './types';
-import { searchInit, searchComplete, setSorting, setPager, saveInit, saveComplete } from './actions';
+import { searchInit, searchComplete, searchFailure, setSorting, setPager, saveInit, saveComplete } from './actions';
 
 // Services
 import AccountApi from 'service/account';
@@ -17,7 +17,7 @@ type ThunkResult<R> = ThunkAction<Promise<R>, RootState, unknown, AccountActions
 
 export const find = (
   pageRequest?: PageRequest, sorting?: Sorting[]
-): ThunkResult<PageResult<Account>> => async (dispatch, getState) => {
+): ThunkResult<PageResult<Account> | null> => async (dispatch, getState) => {
   // Get query form state (filters are always set synchronously)
   const query = getState().account.explorer.query;
 
@@ -46,9 +46,13 @@ export const find = (
   const response = await api.find(query, pageRequest, sorting);
 
   // Update state
-  dispatch(searchComplete(response.data.result));
+  if (response.data.success) {
+    dispatch(searchComplete(response.data.result));
+    return response.data.result;
+  }
 
-  return response.data.result;
+  dispatch(searchFailure());
+  return null;
 }
 
 export const update = (

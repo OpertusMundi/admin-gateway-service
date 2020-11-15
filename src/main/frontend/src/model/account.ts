@@ -14,7 +14,6 @@ interface AccountBase {
   mobile: string;
   phone: string;
   roles: EnumRole[];
-  username: string;
 }
 
 export interface AccountCommand extends AccountBase {

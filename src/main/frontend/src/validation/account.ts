@@ -17,9 +17,6 @@ export function accountValidator(intl: IntlShape, values: AccountCommand): Accou
   const errors: AccountErrors = {};
 
   // User
-  if (!values.username) {
-    errors.username = _t({ id: 'validation.required' });
-  }
   if (!values.email) {
     errors.email = _t({ id: 'validation.required' });
   }

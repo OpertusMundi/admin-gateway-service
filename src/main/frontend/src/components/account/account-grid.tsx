@@ -107,7 +107,7 @@ class AccountManager extends React.Component<AccountManagerProps, AccountManager
           this.api.remove(record.id)
             .then((response) => {
               if (response.data.success) {
-                this.props.find();
+                this.find();
 
                 message.info('error.delete-success');
               } else {
@@ -128,7 +128,15 @@ class AccountManager extends React.Component<AccountManagerProps, AccountManager
   }
 
   componentDidMount() {
-    this.props.find();
+    this.find();
+  }
+
+  find(): void {
+    this.props.find().then((result) => {
+      if (!result) {
+        message.errorHtml("Find operation has failed", () => (<Icon path={mdiCommentAlertOutline} size="3rem" />));
+      }
+    });
   }
 
   createRow(): void {
@@ -153,7 +161,7 @@ class AccountManager extends React.Component<AccountManagerProps, AccountManager
 
   setSorting(sorting: Sorting[]): void {
     this.props.setSorting(sorting);
-    this.props.find();
+    this.find();
   }
 
   render() {
@@ -249,7 +257,7 @@ class AccountManager extends React.Component<AccountManagerProps, AccountManager
         }
         open={confirm}
       >
-        <FormattedMessage id="view.shared.message.delete-confirm" values={{ name: record.username }} />
+        <FormattedMessage id="view.shared.message.delete-confirm" values={{ name: record.email }} />
       </Dialog>
     );
   }

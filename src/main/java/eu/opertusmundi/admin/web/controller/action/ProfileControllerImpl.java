@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import eu.opertusmundi.admin.web.model.dto.AccountDto;
 import eu.opertusmundi.admin.web.model.dto.ProfileCommandDto;
-import eu.opertusmundi.admin.web.repository.AccountRepository;
+import eu.opertusmundi.admin.web.repository.HelpdeskAccountRepository;
 import eu.opertusmundi.common.model.RestResponse;
 
 @RestController
@@ -18,13 +18,13 @@ import eu.opertusmundi.common.model.RestResponse;
 public class ProfileControllerImpl extends BaseController implements ProfileController {
 
 	@Autowired
-	AccountRepository accountRepository;
+	HelpdeskAccountRepository accountRepository;
 
 	@Override
 	public RestResponse<?> getProfile(Authentication authentication) {
 		final String username = authentication.getName();
 
-		final AccountDto account = this.accountRepository.findOneByUsername(username).get().toDto();
+		final AccountDto account = this.accountRepository.findOneByEmail(username).get().toDto();
 
 		if (account == null) {
 			return RestResponse.accessDenied();

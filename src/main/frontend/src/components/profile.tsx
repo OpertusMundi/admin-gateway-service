@@ -173,13 +173,13 @@ class Profile extends React.Component<ProfileFormProps, ProfileFormState> {
   }
 
   get userName(): string {
-    const { username, firstName, lastName } = this.props.profile as Account;
+    const { email, firstName, lastName } = this.props.profile as Account;
 
     if (firstName || lastName) {
       return `${firstName} ${lastName}`;
     }
 
-    return username;
+    return email;
   }
 
   get avatarDisabled(): boolean {

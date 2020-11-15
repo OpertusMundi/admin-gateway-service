@@ -32,21 +32,20 @@ import lombok.Getter;
 import lombok.Setter;
 
 
-@Entity(name = "Account")
+@Entity(name = "HelpdeskAccount")
 @Table(
     schema = "admin", name = "`account`",
     uniqueConstraints = {
-        @UniqueConstraint(name = "uq_account_email", columnNames = {"`email`"}),
         @UniqueConstraint(name = "uq_account_key", columnNames = {"`key`"}),
-        @UniqueConstraint(name = "uq_account_username", columnNames = {"`username`"}),
+        @UniqueConstraint(name = "uq_account_email", columnNames = {"`email`"}),
     }
 )
-public class AccountEntity {
+public class HelpdeskAccountEntity {
 
     @Id
     @Column(name = "`id`", updatable = false)
-    @SequenceGenerator(sequenceName = "`admin.account_id_seq`", name = "account_id_seq", allocationSize = 1)
-    @GeneratedValue(generator = "account_id_seq", strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(sequenceName = "`admin.account_id_seq`", name = "admin_account_id_seq", allocationSize = 1)
+    @GeneratedValue(generator = "admin_account_id_seq", strategy = GenerationType.SEQUENCE)
     @lombok.Getter
     Integer id ;
 
@@ -55,12 +54,6 @@ public class AccountEntity {
     @Column(name = "key", updatable = false, columnDefinition = "uuid")
     @Getter
     private final UUID key = UUID.randomUUID();
-
-    @NotNull
-    @Column(name = "`username`", nullable = false, length = 120)
-    @Getter
-    @Setter
-    String username;
 
     @Column(name = "`active`")
     @Getter
@@ -147,28 +140,39 @@ public class AccountEntity {
     @OneToMany(
         mappedBy = "account", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true
     )
-    List<AccountRoleEntity> roles = new ArrayList<>();
+    List<HelpdeskAccountRoleEntity> roles = new ArrayList<>();
 
-    public AccountEntity() {}
+    public HelpdeskAccountEntity() {
 
-    public AccountEntity(int id) {
-    	this.id = id;
     }
 
-    public AccountEntity(String username) {
-    	this.username = username;
+    public HelpdeskAccountEntity(int id) {
+        this.id = id;
+    }
+
+    public HelpdeskAccountEntity(String email) {
+        this.email    = email;
+    }
+
+    public void setName(String firstname, String lastname) {
+        this.firstName = firstname;
+        this.lastName  = lastname;
+    }
+
+    public String getUserName() {
+        return this.email;
     }
 
     public Set<EnumRole> getRoles() {
         final EnumSet<EnumRole> r = EnumSet.noneOf(EnumRole.class);
-        for (final AccountRoleEntity ar: this.roles) {
+        for (final HelpdeskAccountRoleEntity ar: this.roles) {
             r.add(ar.role);
         }
         return r;
     }
 
     public boolean hasRole(EnumRole role) {
-        for (final AccountRoleEntity ar: this.roles) {
+        for (final HelpdeskAccountRoleEntity ar: this.roles) {
             if (role == ar.role) {
                 return true;
             }
@@ -176,15 +180,15 @@ public class AccountEntity {
         return false;
     }
 
-    public void grant(EnumRole role, AccountEntity grantedBy) {
+    public void grant(EnumRole role, HelpdeskAccountEntity grantedBy) {
         if (!this.hasRole(role)) {
-            this.roles.add(new AccountRoleEntity(this, role, ZonedDateTime.now(), grantedBy));
+            this.roles.add(new HelpdeskAccountRoleEntity(this, role, ZonedDateTime.now(), grantedBy));
         }
     }
 
     public void revoke(EnumRole role) {
-        AccountRoleEntity target = null;
-        for (final AccountRoleEntity ar: this.roles) {
+        HelpdeskAccountRoleEntity target = null;
+        for (final HelpdeskAccountRoleEntity ar: this.roles) {
             if (role == ar.role) {
                 target = ar;
                 break;
@@ -230,7 +234,6 @@ public class AccountEntity {
 		a.setModifiedOn(this.modifiedOn);
 		a.setPhone(this.phone);
 		a.setRoles(this.getRoles());
-		a.setUsername(this.username);
 
 		return a;
 	}

@@ -14,13 +14,13 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import eu.opertusmundi.admin.web.domain.AccountEntity;
+import eu.opertusmundi.admin.web.domain.HelpdeskAccountEntity;
 import eu.opertusmundi.admin.web.model.EnumRole;
 import eu.opertusmundi.admin.web.model.dto.AccountCommandDto;
 import eu.opertusmundi.admin.web.model.dto.AccountDto;
 import eu.opertusmundi.admin.web.model.dto.AccountFormDataDto;
 import eu.opertusmundi.admin.web.model.dto.SetPasswordCommandDto;
-import eu.opertusmundi.admin.web.repository.AccountRepository;
+import eu.opertusmundi.admin.web.repository.HelpdeskAccountRepository;
 import eu.opertusmundi.admin.web.validation.AccountValidator;
 import eu.opertusmundi.admin.web.validation.PasswordValidator;
 import eu.opertusmundi.common.model.BasicMessageCode;
@@ -34,7 +34,7 @@ public class AccountControllerImpl extends BaseController implements AccountCont
 	private final List<String> sortableFields = Arrays.asList("username", "customer.name");
 
 	@Autowired
-	private AccountRepository accountRepository;
+	private HelpdeskAccountRepository accountRepository;
 
 	@Autowired
 	private AccountValidator accountValidator;
@@ -49,19 +49,19 @@ public class AccountControllerImpl extends BaseController implements AccountCont
 
 		final Direction direction = order.equalsIgnoreCase("desc") ? Direction.DESC : Direction.ASC;
 		if (!this.sortableFields.contains(orderBy)) {
-			orderBy = "username";
+			orderBy = "email";
 		}
 
 		final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, orderBy));
 
 		final String param = "%" + name + "%";
 
-		final Page<AccountEntity> entities = this.accountRepository.findAllByUsernameContains(
+		final Page<HelpdeskAccountEntity> entities = this.accountRepository.findAllByEmailContains(
 			param,
 			pageRequest
 		);
 
-		final Page<AccountDto> p = entities.map(AccountEntity::toDto);
+		final Page<AccountDto> p = entities.map(HelpdeskAccountEntity::toDto);
 
 		final long count = p.getTotalElements();
 		final List<AccountDto> records = p.stream().collect(Collectors.toList());
@@ -72,7 +72,7 @@ public class AccountControllerImpl extends BaseController implements AccountCont
 
 	@Override
 	public RestResponse<AccountFormDataDto> findOne(int id) {
-		final AccountEntity e = this.accountRepository.findById(id).orElse(null);
+		final HelpdeskAccountEntity e = this.accountRepository.findById(id).orElse(null);
 
 		if (e == null) {
 			return RestResponse.notFound();
@@ -115,7 +115,7 @@ public class AccountControllerImpl extends BaseController implements AccountCont
 
 	@Override
 	public RestResponse<Void> delete(int id) {
-		final AccountEntity e = this.accountRepository.findById(id).orElse(null);
+		final HelpdeskAccountEntity e = this.accountRepository.findById(id).orElse(null);
 
 		if(e == null) {
 			return RestResponse.notFound();
@@ -132,12 +132,12 @@ public class AccountControllerImpl extends BaseController implements AccountCont
 	@Override
 	public RestResponse<AccountDto> grantRole(@PathVariable int accountId, @PathVariable EnumRole roleId) {
 
-		final AccountEntity account = this.accountRepository.findById(accountId).orElse(null);
+		final HelpdeskAccountEntity account = this.accountRepository.findById(accountId).orElse(null);
 		if (account == null) {
 			return RestResponse.failure(BasicMessageCode.RecordNotFound, "Account was not found");
 		}
 
-		final AccountEntity grantedBy = this.accountRepository.findById(this.currentUserId()).orElse(null);
+		final HelpdeskAccountEntity grantedBy = this.accountRepository.findById(this.currentUserId()).orElse(null);
 
 		account.grant(roleId, grantedBy);
 
@@ -149,7 +149,7 @@ public class AccountControllerImpl extends BaseController implements AccountCont
 	@Override
 	public RestResponse<AccountDto> revokeRole(@PathVariable int accountId, @PathVariable EnumRole roleId) {
 
-		final AccountEntity account = this.accountRepository.findById(accountId).orElse(null);
+		final HelpdeskAccountEntity account = this.accountRepository.findById(accountId).orElse(null);
 		if (account == null) {
 			return RestResponse.failure(BasicMessageCode.RecordNotFound, "Account was not found");
 		}

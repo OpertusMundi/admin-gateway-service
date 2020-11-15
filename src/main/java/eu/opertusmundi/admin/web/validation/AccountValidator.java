@@ -6,18 +6,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-import eu.opertusmundi.admin.web.domain.AccountEntity;
+import eu.opertusmundi.admin.web.domain.HelpdeskAccountEntity;
 import eu.opertusmundi.admin.web.model.EnumRole;
 import eu.opertusmundi.admin.web.model.dto.AccountCommandDto;
 import eu.opertusmundi.admin.web.model.dto.AccountDto;
-import eu.opertusmundi.admin.web.repository.AccountRepository;
+import eu.opertusmundi.admin.web.repository.HelpdeskAccountRepository;
 import eu.opertusmundi.common.model.BasicMessageCode;
 
 @Component
 public class AccountValidator implements Validator {
 
 	@Autowired
-	AccountRepository accountRepository;
+	HelpdeskAccountRepository accountRepository;
 
 	@Override
     public boolean supports(Class<?> clazz) {
@@ -28,17 +28,8 @@ public class AccountValidator implements Validator {
     public void validate(Object obj, Errors e) {
 		final AccountCommandDto a = (AccountCommandDto) obj;
 
-		// Name must be unique
-		AccountEntity entity = a.getId() == null ? this.accountRepository.findOneByUsername(a.getUsername()).orElse(null) : this.accountRepository.findOneByUsernameAndIdNot(a.getUsername(), a.getId()).orElse(null);
-
-        if (entity != null) {
-            e.rejectValue(
-                "username", BasicMessageCode.ValidationNotUnique.key(), new Object[] {a.getUsername()}, "Username must be unique"
-            );
-        }
-
 		// Email must be unique
-		entity = a.getId() == null ? this.accountRepository.findOneByEmail(a.getEmail()).orElse(null) : this.accountRepository.findOneByEmailAndIdNot(a.getEmail(), a.getId()).orElse(null);
+        HelpdeskAccountEntity entity = a.getId() == null ? this.accountRepository.findOneByEmail(a.getEmail()).orElse(null) : this.accountRepository.findOneByEmailAndIdNot(a.getEmail(), a.getId()).orElse(null);
 
 		if (entity != null) {
 			e.rejectValue(

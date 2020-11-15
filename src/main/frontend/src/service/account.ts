@@ -23,7 +23,6 @@ export default class AccountApi extends Api {
       mobile: '',
       phone: '',
       roles: [],
-      username: '',
       password: '',
       passwordMatch: '',
     };

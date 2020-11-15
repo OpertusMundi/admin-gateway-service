@@ -26,6 +26,7 @@ export const SET_FILTER = 'account/manager/SET_FILTER';
 export const RESET_FILTER = 'account/manager/RESET_FILTER';
 
 export const SEARCH_INIT = 'account/manager/SEARCH_INIT';
+export const SEARCH_FAILURE = 'account/manager/SEARCH_FAILURE';
 export const SEARCH_COMPLETE = 'account/manager/SEARCH_COMPLETE';
 
 export const SAVE_INIT = 'account/manager/SAVE_INIT';
@@ -64,6 +65,10 @@ export interface SearchInitAction {
   type: typeof SEARCH_INIT;
 }
 
+export interface SearchFailureAction {
+  type: typeof SEARCH_FAILURE;
+}
+
 export interface SearchCompleteAction {
   type: typeof SEARCH_COMPLETE;
   result: PageResult<Account>;
@@ -100,6 +105,7 @@ export type AccountActions =
   | SetFilterAction
   | ResetFilterAction
   | SearchInitAction
+  | SearchFailureAction
   | SearchCompleteAction
   | SetSelectedAction
   | RemoveFromSelectionAction

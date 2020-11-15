@@ -12,10 +12,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import eu.opertusmundi.admin.web.domain.AccountEntity;
+import eu.opertusmundi.admin.web.domain.HelpdeskAccountEntity;
 import eu.opertusmundi.admin.web.model.EnumRole;
 import eu.opertusmundi.admin.web.model.dto.AccountDto;
-import eu.opertusmundi.admin.web.repository.AccountRepository;
+import eu.opertusmundi.admin.web.repository.HelpdeskAccountRepository;
 
 @Service
 public class DefaultUserDetailsService implements UserDetailsService
@@ -57,7 +57,7 @@ public class DefaultUserDetailsService implements UserDetailsService
         @Override
         public String getUsername()
         {
-            return this.account.getUsername();
+            return this.account.getEmail();
         }
 
         @Override
@@ -94,12 +94,12 @@ public class DefaultUserDetailsService implements UserDetailsService
     }
 
     @Autowired
-    private AccountRepository accountRepository;
+    private HelpdeskAccountRepository accountRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
     {
-		final AccountEntity accountEntity = this.accountRepository.findOneByUsername(username).orElse(null);
+		final HelpdeskAccountEntity accountEntity = this.accountRepository.findOneByEmail(username).orElse(null);
 		if (accountEntity == null) {
 			throw new UsernameNotFoundException(username);
 		}

@@ -23,9 +23,9 @@
       },
       "header": {
         "actions": "Actions",
+        "email": "Username",
         "firstName": "First name",
-        "lastName": "Last name",
-        "username": "Username"
+        "lastName": "Last name"
       },
       "last-update": "Last updated: ",
       "tooltip": {

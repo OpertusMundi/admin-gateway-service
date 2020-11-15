@@ -75,8 +75,6 @@ const fieldMapper: FieldMapperFunc = (field: string): string | null => {
       return 'account.form.field.password';
     case 'passwordMatch':
       return 'account.form.field.passwordMatch';
-    case 'username':
-      return 'account.form.field.username';
   }
 
   return null;
@@ -360,21 +358,7 @@ class AccountForm extends React.Component<AccountFormProps, AccountState> {
                           label={_t({ id: 'account.form.field.lastName' })}
                         />
                       </Grid>
-                      <Grid item xs={6} className={classes.item}>
-                        <Field
-                          component={TextField}
-                          name="username"
-                          type="text"
-                          fullWidth
-                          inputProps={{
-                            id: 'username',
-                            maxLength: 80,
-                          }}
-                          label={_t({ id: 'account.form.field.username' })}
-                          disabled={!!id}
-                        />
-                      </Grid>
-                      <Grid item xs={6} className={classes.item}>
+                      <Grid item xs={12} className={classes.item}>
                         <Field
                           component={TextField}
                           name="email"

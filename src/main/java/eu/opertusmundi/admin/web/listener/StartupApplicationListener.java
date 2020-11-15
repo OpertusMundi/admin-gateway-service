@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import eu.opertusmundi.admin.web.model.EnumRole;
 import eu.opertusmundi.admin.web.model.dto.AccountCommandDto;
-import eu.opertusmundi.admin.web.repository.AccountRepository;
+import eu.opertusmundi.admin.web.repository.HelpdeskAccountRepository;
 
 @Profile({"development", "production"})
 @Component
@@ -39,7 +39,7 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
     private String lastname;
 
 	@Autowired
-	AccountRepository accountRepository;
+	HelpdeskAccountRepository accountRepository;
 
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -70,7 +70,6 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 			command.setFirstName(this.firstname);
 			command.setLastName(this.lastname);
 			command.setLocale("en");
-			command.setUsername(this.username);
 			command.setPassword(password);
 
 			final EnumRole[] roleArray = { EnumRole.USER, EnumRole.ADMIN };

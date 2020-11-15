@@ -44,9 +44,6 @@ public abstract class AccountBaseDto implements Serializable {
 
     private Set<EnumRole> roles;
 
-    @NotEmpty
-    private String username;
-
     public boolean hasRole(EnumRole role) {
         return this.roles.contains(role);
     }

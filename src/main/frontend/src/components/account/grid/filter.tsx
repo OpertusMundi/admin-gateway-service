@@ -11,9 +11,16 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 
+// Icons
+import Icon from '@mdi/react';
+import { mdiCommentAlertOutline } from '@mdi/js';
+
 // Model
 import { PageRequest, PageResult, Sorting } from 'model/response';
 import { Account, AccountQuery } from 'model/account';
+
+// Services
+import message from 'service/message';
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -42,7 +49,7 @@ interface AccountFiltersProps extends WithStyles<typeof styles> {
   resetFilter: () => void,
   find: (
     pageRequest?: PageRequest, sorting?: Sorting[]
-  ) => Promise<PageResult<Account>>,
+  ) => Promise<PageResult<Account> | null>,
   create: () => void,
   disabled: boolean,
 }
@@ -57,15 +64,23 @@ class AccountFilters extends React.Component<AccountFiltersProps> {
     this.create = this.create.bind(this);
   }
 
+  find(): void {
+    this.props.find({ page: 0, size: 10 }).then((result) => {
+      if (!result) {
+        message.errorHtml("Find operation has failed", () => (<Icon path={mdiCommentAlertOutline} size="3rem" />));
+      }
+    });
+  }
+
   clear(): void {
     this.props.resetFilter();
-    this.props.find({ page: 0, size: 10 });
+    this.find();
   }
 
   search(e: React.FormEvent): void {
     e.preventDefault();
 
-    this.props.find({ page: 0, size: 10 });
+    this.find();
   }
 
   create(): void {

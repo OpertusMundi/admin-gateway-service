@@ -16,7 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import eu.opertusmundi.admin.web.domain.AccountEntity;
+import eu.opertusmundi.admin.web.domain.HelpdeskAccountEntity;
 import eu.opertusmundi.admin.web.model.EnumRole;
 import eu.opertusmundi.admin.web.model.dto.AccountCommandDto;
 import eu.opertusmundi.admin.web.model.dto.AccountDto;
@@ -24,35 +24,31 @@ import eu.opertusmundi.admin.web.model.dto.ProfileCommandDto;
 
 @Repository
 @Transactional(readOnly = true)
-public interface AccountRepository extends JpaRepository<AccountEntity, Integer> {
+public interface HelpdeskAccountRepository extends JpaRepository<HelpdeskAccountEntity, Integer> {
 
-	@Query("SELECT count(a) FROM Account a INNER JOIN a.roles r WHERE r.role = :role")
+	@Query("SELECT count(a) FROM HelpdeskAccount a INNER JOIN a.roles r WHERE r.role = :role")
 	long countByRole(@Param("role") EnumRole role);
 
-	Optional<AccountEntity> findOneByUsername(String username);
+	Optional<HelpdeskAccountEntity> findOneByEmail(String email);
 
-	Optional<AccountEntity> findOneByUsernameAndIdNot(String username, Integer id);
+	Optional<HelpdeskAccountEntity> findOneByEmailAndIdNot(String email, Integer id);
 
-	Optional<AccountEntity> findOneByEmail(String email);
-
-	Optional<AccountEntity> findOneByEmailAndIdNot(String email, Integer id);
-
-	@Query("select count(a) from Account a inner join a.roles r where r.role = :role")
+	@Query("select count(a) from HelpdeskAccount a inner join a.roles r where r.role = :role")
 	Optional<Long> countUsersWithRole(@Param("role") EnumRole role);
 
-	@Query("SELECT a FROM Account a WHERE a.username like :username")
-	Page<AccountEntity> findAllByUsernameContains(
-		@Param("username")String username,
+	@Query("SELECT a FROM HelpdeskAccount a WHERE a.email like :email")
+	Page<HelpdeskAccountEntity> findAllByEmailContains(
+		@Param("email")String email,
 		Pageable pageable
 	);
 
 	@Modifying
-	@Query("UPDATE Account a SET a.active = :active WHERE a.id = :id")
+	@Query("UPDATE HelpdeskAccount a SET a.active = :active WHERE a.id = :id")
 	@Transactional(readOnly = false)
 	void setActive(@Param("id") Integer id, @Param("active") boolean active);
 
 	@Modifying
-	@Query("UPDATE Account a SET a.blocked = :blocked WHERE a.id = :id")
+	@Query("UPDATE HelpdeskAccount a SET a.blocked = :blocked WHERE a.id = :id")
 	@Transactional(readOnly = false)
 	void setBlocked(@Param("id") Integer id, @Param("blocked") boolean blocked);
 
@@ -60,7 +56,7 @@ public interface AccountRepository extends JpaRepository<AccountEntity, Integer>
 	default AccountDto setPassword(Integer id, String password) {
 
 		// Retrieve entity from repository
-		final AccountEntity accountEntity = this.findById(id).orElse(null);
+		final HelpdeskAccountEntity accountEntity = this.findById(id).orElse(null);
 
 		if (accountEntity == null) {
 			throw new EntityNotFoundException();
@@ -77,9 +73,9 @@ public interface AccountRepository extends JpaRepository<AccountEntity, Integer>
 	@Transactional(readOnly = false)
 	default AccountDto saveFrom(Integer creatorId, AccountCommandDto command) {
         final ZonedDateTime now     = ZonedDateTime.now();
-        final AccountEntity creator = creatorId == null ? null : this.findById(creatorId).orElse(null);
+        final HelpdeskAccountEntity creator = creatorId == null ? null : this.findById(creatorId).orElse(null);
 
-		AccountEntity accountEntity = null;
+		HelpdeskAccountEntity accountEntity = null;
 
 		if (command.getId() != null) {
 			// Retrieve entity from repository
@@ -90,12 +86,11 @@ public interface AccountRepository extends JpaRepository<AccountEntity, Integer>
 			}
 		} else {
 			// Create a new entity
-			accountEntity = new AccountEntity();
+			accountEntity = new HelpdeskAccountEntity();
 
             accountEntity.setCreatedOn(now);
             accountEntity.setEmail(command.getEmail());
             accountEntity.setEmailVerified(false);
-            accountEntity.setUsername(command.getUsername());
 
             final PasswordEncoder encoder = new BCryptPasswordEncoder();
             accountEntity.setPassword(encoder.encode(command.getPassword()));
@@ -132,7 +127,7 @@ public interface AccountRepository extends JpaRepository<AccountEntity, Integer>
 
 	@Transactional(readOnly = false)
 	default AccountDto saveProfile(ProfileCommandDto command) {
-		AccountEntity accountEntity = null;
+		HelpdeskAccountEntity accountEntity = null;
 
 		if (command.getId() != null) {
 			// Retrieve entity from repository

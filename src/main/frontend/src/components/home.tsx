@@ -237,13 +237,13 @@ class Home extends React.Component<HomeProps, HomeState> {
   }
 
   get userName(): string {
-    const { username, firstName, lastName } = this.props.profile as Account;
+    const { email, firstName, lastName } = this.props.profile as Account;
 
     if (firstName || lastName) {
       return `${firstName} ${lastName}`;
     }
 
-    return username;
+    return email;
   }
 
   get avatar(): string {

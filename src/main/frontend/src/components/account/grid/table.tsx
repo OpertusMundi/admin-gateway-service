@@ -50,15 +50,15 @@ function accountColumns(intl: IntlShape, classes: WithStyles<typeof styles>): Co
           </div>
         ),
     }, {
-      header: intl.formatMessage({ id: 'account.manager.header.username' }),
-      id: 'username',
+      header: intl.formatMessage({ id: 'account.manager.header.email' }),
+      id: 'email',
       width: 250,
       sortable: true,
       cell: (
         rowIndex: number, column: Column<Account>, row: Account, handleAction?: cellActionHandler<Account>
       ): React.ReactNode => (
           <Link to={buildPath(DynamicRoutes.AccountUpdate, [row.id + ''])} className={classes.classes.link}>
-            {row.username}
+            {row.email}
           </Link>
         ),
     }, {
@@ -95,7 +95,7 @@ interface FieldTableProps extends WithStyles<typeof styles> {
   deleteRow: (id: number) => void,
   find: (
     pageRequest?: PageRequest, sorting?: Sorting[]
-  ) => Promise<PageResult<Account>>,
+  ) => Promise<PageResult<Account> | null>,
   query: AccountQuery,
   result: PageResult<Account> | null,
   pagination: PageRequest,
