@@ -141,7 +141,7 @@ class MaterialTable<R> extends React.Component<MaterialTableProps<R>> {
     const _t = this.props.intl.formatMessage;
 
     const columnCount = columns.filter(c => !c.hidden).length;
-    console.log(pagination);
+
     return (
       <div>
         <Table className={classes.table}>

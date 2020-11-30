@@ -25,6 +25,7 @@ import {
   mdiMapOutline,
   mdiPackageVariantClosed,
   mdiSignatureFreehand,
+  mdiTextBoxCheckOutline,
   mdiViewDashboardOutline,
 } from '@mdi/js';
 
@@ -62,6 +63,7 @@ const Profile = '/profile';
 const ProviderManager = '/providers'
 const Settings = '/settings';
 const AccountManager = '/users';
+const DraftManager = '/drafts';
 
 export const StaticRoutes = {
   Dashboard,
@@ -74,6 +76,7 @@ export const StaticRoutes = {
   ProviderManager,
   Settings,
   AccountManager,
+  DraftManager,
 };
 
 /**
@@ -203,6 +206,13 @@ const routes: RouteRegistry = {
     title: 'links.account.explorer',
     defaultTitle: 'User Management',
     roles: [EnumRole.ADMIN],
+    links: [Dashboard],
+  },
+  [DraftManager]: {
+    icon: (className?: string) => (<Icon path={mdiTextBoxCheckOutline} size="1.5rem" className={className} />),
+    description: 'Manage provider draft assets',
+    title: 'links.draft.explorer',
+    defaultTitle: 'Draft Management',
     links: [Dashboard],
   },
   // Dynamic

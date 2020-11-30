@@ -48,6 +48,7 @@ import {
   mdiMapOutline,
   mdiPackageVariantClosed,
   mdiSignatureFreehand,
+  mdiTextBoxCheckOutline,
   mdiTools,
   mdiViewDashboardOutline,
 } from '@mdi/js';
@@ -65,6 +66,7 @@ import AccountForm from 'components/account/account-form';
 import AccountManager from 'components/account/account-grid';
 import Breadcrumb from './breadcrumb';
 import DashboardComponent from 'components/dashboard';
+import AssetDraftManager from 'components/draft/draft-grid';
 import ContractForm from 'components/contract/contract-form';
 import MapViewerComponent from 'components/map-viewer';
 import MapViewerConfigComponent from 'components/map-viewer-config';
@@ -512,6 +514,14 @@ class Home extends React.Component<HomeProps, HomeState> {
               </ListItem>
 
               <ListItem button
+                onClick={(e) => this.onNavigate(e, StaticRoutes.DraftManager)}>
+                <ListItemIcon>
+                  <Icon path={mdiTextBoxCheckOutline} size="1.5rem" />
+                </ListItemIcon>
+                <ListItemText primary={_t({ id: 'links.draft-manager' })} />
+              </ListItem>
+
+              <ListItem button
                 onClick={(e) => this.onNavigate(e, StaticRoutes.ConsumerManager)}>
                 <ListItemIcon>
                   <Icon path={mdiFaceAgent} size="1.5rem" />
@@ -534,7 +544,6 @@ class Home extends React.Component<HomeProps, HomeState> {
                 </ListItemIcon>
                 <ListItemText primary={_t({ id: 'links.message-manager' })} />
               </ListItem>
-
 
               <ListItem button
                 onClick={(e) => this.onNavigate(e, StaticRoutes.ContractMaster)}>
@@ -596,6 +605,7 @@ class Home extends React.Component<HomeProps, HomeState> {
               {/* Static */}
               <Route path={StaticRoutes.Dashboard} component={DashboardComponent} />
               <Route path={StaticRoutes.ContractMaster} component={ContractForm} />
+              <Route path={StaticRoutes.DraftManager} component={AssetDraftManager} />
               <Route path={StaticRoutes.Map} component={MapViewerComponent} />
               <Route path={StaticRoutes.Profile} component={Profile} />
               <Route path={StaticRoutes.Settings} component={PlaceHolder} />

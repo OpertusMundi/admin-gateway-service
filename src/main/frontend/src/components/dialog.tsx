@@ -11,6 +11,9 @@ import { iconFunc } from 'model/types';
 export const EnumDialogAction = {
   Yes: 'Yes',
   No: 'No',
+  Accept: 'Accept',
+  Reject: 'Reject',
+  Cancel: 'Cancel',
 };
 
 interface DialogState {

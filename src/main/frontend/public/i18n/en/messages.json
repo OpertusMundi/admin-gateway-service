@@ -44,6 +44,44 @@
       "section": "Section"
     }
   },
+  "draft": {
+    "manager": {
+      "chip": {
+        "DRAFT": "Draft",
+        "SUBMITTED": "Submitted",
+        "PENDING_HELPDESK_REVIEW": "Pending Review HelpDesk",
+        "HELPDESK_REJECTED": "Rejected HelpDesk",
+        "PENDING_PROVIDER_REVIEW": "Pending Review Provider",
+        "PROVIDER_REJECTED": "Rejected Provider",
+        "POST_PROCESSING": "Post-Processing",
+        "PUBLISHED": "Published"
+      },
+      "filter": {
+        "asset-status": "Asset Status"
+      },
+      "header": {
+        "actions": "Actions",
+        "createdOn": "Created On",
+        "modifiedOn": "Modified On",
+        "provider": "Publisher",
+        "status": "Status",
+        "title": "Title",
+        "version": "Version"
+      },
+      "last-update": "Last updated: ",
+      "tooltip": {
+        "review": "Review",
+        "view": "Preview in Marketplace"
+      }
+    },
+    "message": {
+      "accept-success":"Draft has been accepted",
+      "accept-failure":"Operation has failed",
+      "reject-success":"Draft has been rejected",
+      "reject-failure":"Operation has failed",
+      "review-draft": "Accept draft {title} with version {version}. Would you like to continue?"
+    }
+  },
   "enum": {
     "role": {
       "ADMIN": "Administrator",
@@ -111,6 +149,7 @@
       }
     },
     "dashboard": "Overview",
+    "draft-manager": "Asset Drafts",
     "map": "Map",
     "message-manager": "Messages",
     "order-manager": "Orders",
@@ -169,10 +208,12 @@
         "prompt": "Type at least 3 characters for searching ..."
       },
       "action": {
+        "accept": "Accept",
         "cancel": "Cancel",
         "close": "Close",
         "create": "Create",
         "no": "No",
+        "reject": "Reject",
         "reset": "New Search",
         "save": "Save",
         "search": "Search",

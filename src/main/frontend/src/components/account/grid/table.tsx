@@ -136,7 +136,7 @@ class AccountTable extends React.Component<FieldTableProps> {
 
   render() {
     const { intl, classes, result, setPager, pagination, find, selected, sorting, setSorting, loading } = this.props;
-    console.log(result);
+
     return (
       <MaterialTable<Account>
         intl={intl}

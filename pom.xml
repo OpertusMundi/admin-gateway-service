@@ -24,6 +24,8 @@
 
 		<commons-collections4.version>4.4</commons-collections4.version>
 		<commons-io.version>2.7</commons-io.version>
+		<org.camunda.bpm.version>7.13.0</org.camunda.bpm.version>
+		<org.jadira.usertype.core.version>6.0.1.GA</org.jadira.usertype.core.version>
 	</properties>
 
 	<profiles>
@@ -35,8 +37,17 @@
 		</profile>
 	</profiles>
 
-	<repositories>
-	</repositories>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<dependencies>
 
@@ -54,6 +65,11 @@
 		</dependency>
 
 		<dependency>
+    		<groupId>org.springframework.boot</groupId>
+    		<artifactId>spring-boot-starter-jdbc</artifactId>
+  		</dependency>
+
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
@@ -63,6 +79,11 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.session</groupId>
+			<artifactId>spring-session-jdbc</artifactId>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
@@ -83,34 +104,59 @@
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 
-		<!-- Logging -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-log4j2</artifactId>
 		</dependency>
 	
-		<!-- JDBC session -->
-
 		<dependency>
-			<groupId>org.springframework.session</groupId>
-			<artifactId>spring-session-jdbc</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-properties-migrator</artifactId>
+			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Hibernate -->
+        <!-- Testing -->
 		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-java8</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+		<!-- Spring Cloud -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+		</dependency>
+		
+		<dependency>
+		    <groupId>javax.ws.rs</groupId>
+		    <artifactId>javax.ws.rs-api</artifactId>
+		    <version>2.1.1</version>
 		</dependency>
 
+		<!-- If packaging to WAR, mark dependency on embedded server as provided -->
 
-		<!-- Jackson serializers -->
-
+		<!--
 		<dependency>
-			<groupId>com.fasterxml.jackson.datatype</groupId>
-			<artifactId>jackson-datatype-jsr310</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
 		</dependency>
-
-		<!-- JDBC-compliant drivers -->
+  		-->	
+		
+		<!-- JDBC drivers -->
 
 		<dependency>
 			<groupId>org.postgresql</groupId>
@@ -118,12 +164,48 @@
 			<scope>runtime</scope>
 		</dependency>
 
-    	<dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>runtime</scope>
+		<!-- log4j2 lifecycle hooks in web context -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-web</artifactId>
+		</dependency>
+		
+        <!-- Geometry types -->
+        <dependency>
+            <groupId>org.locationtech.jts</groupId>
+            <artifactId>jts</artifactId>
+            <version>${org.locationtech.jts.version}</version>
+            <type>pom</type>
         </dependency>
 
+        <dependency>
+            <groupId>org.locationtech.spatial4j</groupId>
+            <artifactId>spatial4j</artifactId>
+            <version>${org.locationtech.jts.spatial4j.version}</version>
+        </dependency>
+		
+        <!-- Serialization -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+
+		<dependency>
+			<groupId>org.jadira.usertype</groupId>
+			<artifactId>usertype.core</artifactId>
+			<version>${org.jadira.usertype.core.version}</version>
+		</dependency>
+		
 		<!-- Utilities -->
 
 		<dependency>
@@ -148,83 +230,25 @@
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
 
-		<!-- Testing -->
-
+		<!-- Camunda dependencies (no engine is configured, instead we use DTO definitions -->
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.junit.vintage</groupId>
-					<artifactId>junit-vintage-engine</artifactId>
-				</exclusion>
-			</exclusions>
+		    <groupId>org.camunda.bpm</groupId>
+		    <artifactId>camunda-engine</artifactId>
+		    <version>${org.camunda.bpm.version}</version>
+		    <scope>provided</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- PostGIS / Spatial data dependencies -->
-
-		<dependency>
-			<groupId>org.locationtech.spatial4j</groupId>
-			<artifactId>spatial4j</artifactId>
-			<version>0.7</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.bedatadriven</groupId>
-			<artifactId>jackson-datatype-jts</artifactId>
-			<version>${jackson-datatype-jts.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.geotools</groupId>
-			<artifactId>gt-geometry</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.geotools</groupId>
-			<artifactId>gt-epsg-wkt</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-spatial</artifactId>
-		</dependency>
-
-		<!-- Caching -->
-
-		<dependency>
-			<groupId>com.github.ben-manes.caffeine</groupId>
-			<artifactId>caffeine</artifactId>
-		</dependency>
-		
-		<!-- HTTP client -->
-		
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-        </dependency>
-
+	    <dependency>
+	      <groupId>org.camunda.bpm</groupId>
+	      <artifactId>camunda-engine-rest-core</artifactId>
+	      <version>${org.camunda.bpm.version}</version>
+	    </dependency>
+	    
 		<!-- Auditing, health, and metrics -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
-
-		<!-- If packaging to WAR, mark dependency on embedded server as provided -->
-		<!--
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-tomcat</artifactId>
-			<scope>provided</scope>
-		</dependency>
- 		-->
  		
 	</dependencies>
 

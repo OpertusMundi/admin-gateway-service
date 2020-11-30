@@ -9,6 +9,7 @@ import { history } from 'routing';
 
 import { accountReducer } from './account/reducer';
 import { configurationReducer } from './config/reducer';
+import { draftReducer } from './draft/reducer';
 import { mapViewerReducer } from './map/reducer';
 import { messageReducer } from './i18n/reducer';
 import { securityReducer } from './security/reducer';
@@ -20,6 +21,7 @@ export const rootReducer = Redux.combineReducers({
     explorer: accountReducer,
   }),
   config: configurationReducer,
+  draft: draftReducer,
   i18n: messageReducer,
   map: mapViewerReducer,
   security: securityReducer,
