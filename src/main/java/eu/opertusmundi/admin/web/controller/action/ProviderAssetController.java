@@ -15,9 +15,11 @@ import eu.opertusmundi.common.model.BaseResponse;
 import eu.opertusmundi.common.model.RestResponse;
 import eu.opertusmundi.common.model.asset.AssetDraftDto;
 import eu.opertusmundi.common.model.asset.AssetDraftReviewCommandDto;
+import eu.opertusmundi.common.model.asset.EnumProviderAssetDraftSortField;
 import eu.opertusmundi.common.model.asset.EnumProviderAssetDraftStatus;
 import eu.opertusmundi.common.model.catalogue.client.CatalogueClientCollectionResponse;
 import eu.opertusmundi.common.model.catalogue.client.CatalogueItemDto;
+import eu.opertusmundi.common.model.dto.EnumSortingOrder;
 
 @RequestMapping(path = "/action", produces = "application/json")
 @Secured({"ROLE_USER"})
@@ -41,8 +43,8 @@ public interface ProviderAssetController {
         @RequestParam(name = "provider", required = false) UUID providerKey,
         @RequestParam(name = "page", defaultValue = "0") int pageIndex,
         @RequestParam(name = "size", defaultValue = "10") int pageSize,
-        @RequestParam(name = "orderBy", defaultValue = "name") String orderBy,
-        @RequestParam(name = "order", defaultValue = "asc") String order
+        @RequestParam(name = "orderBy", defaultValue = "name") EnumProviderAssetDraftSortField orderBy,
+        @RequestParam(name = "order", defaultValue = "asc") EnumSortingOrder order
     );
 
     /**

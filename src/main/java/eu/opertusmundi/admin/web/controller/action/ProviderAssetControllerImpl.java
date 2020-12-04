@@ -13,7 +13,9 @@ import eu.opertusmundi.common.model.PageResultDto;
 import eu.opertusmundi.common.model.RestResponse;
 import eu.opertusmundi.common.model.asset.AssetDraftDto;
 import eu.opertusmundi.common.model.asset.AssetDraftReviewCommandDto;
+import eu.opertusmundi.common.model.asset.EnumProviderAssetDraftSortField;
 import eu.opertusmundi.common.model.asset.EnumProviderAssetDraftStatus;
+import eu.opertusmundi.common.model.dto.EnumSortingOrder;
 import eu.opertusmundi.common.service.AssetDraftException;
 import eu.opertusmundi.common.service.ProviderAssetService;
 
@@ -27,7 +29,8 @@ public class ProviderAssetControllerImpl implements ProviderAssetController {
 
     @Override
     public RestResponse<?> findAllDraft(
-        Set<EnumProviderAssetDraftStatus> status, UUID providerKey, int pageIndex, int pageSize, String orderBy, String order
+        Set<EnumProviderAssetDraftStatus> status, UUID providerKey, int pageIndex, int pageSize,
+        EnumProviderAssetDraftSortField orderBy, EnumSortingOrder order
     ) {
         try {
             final PageResultDto<AssetDraftDto> result = this.providerAssetService.findAllDraft(
