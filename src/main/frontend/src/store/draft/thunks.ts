@@ -10,13 +10,13 @@ import DraftApi from 'service/draft';
 
 // Model
 import { PageRequest, Sorting, PageResult, SimpleResponse } from 'model/response';
-import { AssetDraft } from 'model/draft';
+import { EnumSortField, AssetDraft } from 'model/draft';
 
 // Helper thunk result type
 type ThunkResult<R> = ThunkAction<Promise<R>, RootState, unknown, DraftActions>;
 
 export const find = (
-  pageRequest?: PageRequest, sorting?: Sorting[]
+  pageRequest?: PageRequest, sorting?: Sorting<EnumSortField>[]
 ): ThunkResult<PageResult<AssetDraft> | null> => async (dispatch, getState) => {
   // Get query form state (filters are always set synchronously)
   const query = getState().draft.query;

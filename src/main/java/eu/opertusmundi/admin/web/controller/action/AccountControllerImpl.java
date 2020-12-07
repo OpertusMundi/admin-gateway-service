@@ -1,6 +1,5 @@
 package eu.opertusmundi.admin.web.controller.action;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +18,7 @@ import eu.opertusmundi.admin.web.model.EnumRole;
 import eu.opertusmundi.admin.web.model.dto.AccountCommandDto;
 import eu.opertusmundi.admin.web.model.dto.AccountDto;
 import eu.opertusmundi.admin.web.model.dto.AccountFormDataDto;
+import eu.opertusmundi.admin.web.model.dto.EnumAccountSortField;
 import eu.opertusmundi.admin.web.model.dto.SetPasswordCommandDto;
 import eu.opertusmundi.admin.web.repository.HelpdeskAccountRepository;
 import eu.opertusmundi.admin.web.validation.AccountValidator;
@@ -26,12 +26,11 @@ import eu.opertusmundi.admin.web.validation.PasswordValidator;
 import eu.opertusmundi.common.model.BasicMessageCode;
 import eu.opertusmundi.common.model.PageResultDto;
 import eu.opertusmundi.common.model.RestResponse;
+import eu.opertusmundi.common.model.dto.EnumSortingOrder;
 
 @RestController
 @Secured({ "ROLE_ADMIN", "ROLE_USER" })
 public class AccountControllerImpl extends BaseController implements AccountController {
-
-	private final List<String> sortableFields = Arrays.asList("username", "customer.name");
 
 	@Autowired
 	private HelpdeskAccountRepository accountRepository;
@@ -44,15 +43,11 @@ public class AccountControllerImpl extends BaseController implements AccountCont
 
 	@Override
 	public RestResponse<PageResultDto<AccountDto>> find(
-		int page, int size, String name, String orderBy, String order
+		int page, int size, String name, EnumAccountSortField orderBy, EnumSortingOrder order
 	) {
 
-		final Direction direction = order.equalsIgnoreCase("desc") ? Direction.DESC : Direction.ASC;
-		if (!this.sortableFields.contains(orderBy)) {
-			orderBy = "email";
-		}
-
-		final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, orderBy));
+        final Direction   direction   = order == EnumSortingOrder.DESC ? Direction.DESC : Direction.ASC;
+        final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, orderBy.getValue()));
 
 		final String param = "%" + name + "%";
 

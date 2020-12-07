@@ -44,7 +44,7 @@ public interface ProviderAssetController {
         @RequestParam(name = "page", defaultValue = "0") int pageIndex,
         @RequestParam(name = "size", defaultValue = "10") int pageSize,
         @RequestParam(name = "orderBy", defaultValue = "name") EnumProviderAssetDraftSortField orderBy,
-        @RequestParam(name = "order", defaultValue = "asc") EnumSortingOrder order
+        @RequestParam(name = "order", defaultValue = "ASC") EnumSortingOrder order
     );
 
     /**

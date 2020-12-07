@@ -1,5 +1,5 @@
 import { PageResult, Sorting, ObjectResponse } from 'model/response';
-import { Account, AccountQuery } from 'model/account';
+import { EnumSortField, Account, AccountQuery } from 'model/account';
 
 import {
   AccountActions,
@@ -47,7 +47,7 @@ export function resetFilter(): AccountActions {
   };
 }
 
-export function setSorting(sorting: Sorting[]): AccountActions {
+export function setSorting(sorting: Sorting<EnumSortField>[]): AccountActions {
   return {
     type: SET_SORTING,
     sorting,

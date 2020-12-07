@@ -2,7 +2,7 @@ import { AxiosRequestConfig } from 'axios';
 
 import { Api } from 'utils/api';
 import { ObjectResponse, PageRequest, Sorting, AxiosObjectResponse, AxiosPageResponse, PageResult, AxiosSimpleResponse } from 'model/response';
-import { Account, AccountQuery, AccountFormData, AccountCommand, SetPasswordCommand, ProfileCommand } from 'model/account';
+import { EnumSortField, Account, AccountQuery, AccountFormData, AccountCommand, SetPasswordCommand, ProfileCommand } from 'model/account';
 
 export default class AccountApi extends Api {
 
@@ -28,7 +28,7 @@ export default class AccountApi extends Api {
     };
   }
 
-  public async find(query: Partial<AccountQuery>, pageRequest: PageRequest, sorting: Sorting[]): Promise<AxiosPageResponse<Account>> {
+  public async find(query: Partial<AccountQuery>, pageRequest: PageRequest, sorting: Sorting<EnumSortField>[]): Promise<AxiosPageResponse<Account>> {
     const { page, size } = pageRequest;
     const { id: field, order } = sorting[0];
 

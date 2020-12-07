@@ -24,7 +24,8 @@ import {
   DraftManagerState,
 } from 'store/draft/types';
 
-import { EnumDraftStatus } from 'model/draft';
+import { Order } from 'model/response';
+import { EnumSortField, EnumDraftStatus } from 'model/draft';
 
 const initialState: DraftManagerState = {
   loading: false,
@@ -37,8 +38,8 @@ const initialState: DraftManagerState = {
     size: 10,
   },
   sorting: [{
-    id: 'modifiedOn',
-    order: 'desc',
+    id: EnumSortField.MODIFIED_ON,
+    order: Order.DESC,
   }],
   result: null,
   selected: [],

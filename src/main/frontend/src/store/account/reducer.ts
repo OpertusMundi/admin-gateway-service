@@ -2,6 +2,9 @@ import _ from 'lodash';
 
 import moment from 'utils/moment-localized';
 
+import { Order } from 'model/response';
+import { EnumSortField } from 'model/account';
+
 import {
   LOGOUT_INIT,
 } from 'store/security/types';
@@ -34,8 +37,8 @@ const initialState: AccountManagerState = {
     size: 10,
   },
   sorting: [{
-    id: 'email',
-    order: 'asc',
+    id: EnumSortField.EMAIL,
+    order: Order.ASC,
   }],
   result: null,
   selected: [],

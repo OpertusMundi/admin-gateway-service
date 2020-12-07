@@ -1,5 +1,5 @@
 import { PageResult, Sorting, SimpleResponse } from 'model/response';
-import { AssetDraft, AssetDraftQuery } from 'model/draft';
+import { EnumSortField, AssetDraft, AssetDraftQuery } from 'model/draft';
 
 import {
   DraftActions,
@@ -47,7 +47,7 @@ export function resetFilter(): DraftActions {
   };
 }
 
-export function setSorting(sorting: Sorting[]): DraftActions {
+export function setSorting(sorting: Sorting<EnumSortField>[]): DraftActions {
   return {
     type: SET_SORTING,
     sorting,

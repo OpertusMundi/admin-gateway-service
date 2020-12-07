@@ -2,6 +2,12 @@ import { Moment } from 'moment';
 
 import { EnumRole } from 'model/role';
 
+export enum EnumSortField {
+  EMAIL = 'EMAIL',
+  FIRST_NAME = 'FIRST_NAME',
+  LAST_NAME = 'LAST_NAME',
+}
+
 interface AccountBase {
   active: boolean;
   blocked: boolean;

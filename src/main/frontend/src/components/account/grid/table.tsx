@@ -15,7 +15,7 @@ import { mdiPencilOutline, mdiTrashCanOutline } from '@mdi/js';
 import MaterialTable, { cellActionHandler, Column } from 'components/material-table';
 
 import { buildPath, DynamicRoutes } from 'model/routes';
-import { Account, AccountQuery } from 'model/account';
+import { EnumSortField, Account, AccountQuery } from 'model/account';
 import { PageRequest, PageResult, Sorting } from 'model/response';
 
 enum EnumAction {
@@ -23,14 +23,14 @@ enum EnumAction {
   Edit = 'edit',
 };
 
-function accountColumns(intl: IntlShape, classes: WithStyles<typeof styles>): Column<Account>[] {
+function accountColumns(intl: IntlShape, classes: WithStyles<typeof styles>): Column<Account, EnumSortField>[] {
   return (
     [{
       header: intl.formatMessage({ id: 'account.manager.header.actions' }),
       id: 'actions',
       width: 80,
       cell: (
-        rowIndex: number, column: Column<Account>, row: Account, handleAction?: cellActionHandler<Account>
+        rowIndex: number, column: Column<Account, EnumSortField>, row: Account, handleAction?: cellActionHandler<Account, EnumSortField>
       ): React.ReactNode => (
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <Tooltip title={intl.formatMessage({ id: 'account.manager.tooltip.edit' })}>
@@ -54,8 +54,9 @@ function accountColumns(intl: IntlShape, classes: WithStyles<typeof styles>): Co
       id: 'email',
       width: 250,
       sortable: true,
+      sortColumn: EnumSortField.EMAIL,
       cell: (
-        rowIndex: number, column: Column<Account>, row: Account, handleAction?: cellActionHandler<Account>
+        rowIndex: number, column: Column<Account, EnumSortField>, row: Account, handleAction?: cellActionHandler<Account, EnumSortField>
       ): React.ReactNode => (
           <Link to={buildPath(DynamicRoutes.AccountUpdate, [row.id + ''])} className={classes.classes.link}>
             {row.email}
@@ -66,12 +67,13 @@ function accountColumns(intl: IntlShape, classes: WithStyles<typeof styles>): Co
       id: 'firstName',
       accessor: 'firstName',
       sortable: true,
+      sortColumn: EnumSortField.FIRST_NAME,
     }, {
       header: intl.formatMessage({ id: 'account.manager.header.lastName' }),
       id: 'lastName',
       accessor: 'lastName',
       sortable: true,
-
+      sortColumn: EnumSortField.LAST_NAME,
     }]);
 }
 
@@ -94,18 +96,18 @@ interface FieldTableProps extends WithStyles<typeof styles> {
   intl: IntlShape,
   deleteRow: (id: number) => void,
   find: (
-    pageRequest?: PageRequest, sorting?: Sorting[]
+    pageRequest?: PageRequest, sorting?: Sorting<EnumSortField>[]
   ) => Promise<PageResult<Account> | null>,
   query: AccountQuery,
   result: PageResult<Account> | null,
   pagination: PageRequest,
   selected: Account[],
   setPager: (page: number, size: number) => void,
-  setSorting: (sorting: Sorting[]) => void,
+  setSorting: (sorting: Sorting<EnumSortField>[]) => void,
   addToSelection: (rows: Account[]) => void,
   removeFromSelection: (rows: Account[]) => void,
   resetSelection: () => void;
-  sorting: Sorting[];
+  sorting: Sorting<EnumSortField>[];
   updateRow: (id: number) => void;
   loading?: boolean;
 }
@@ -118,7 +120,7 @@ class AccountTable extends React.Component<FieldTableProps> {
     this.handleAction = this.handleAction.bind(this);
   }
 
-  handleAction(action: string, index: number, column: Column<Account>, row: Account): void {
+  handleAction(action: string, index: number, column: Column<Account, EnumSortField>, row: Account): void {
     if (row.id) {
       switch (action) {
         case EnumAction.Delete:
@@ -138,7 +140,7 @@ class AccountTable extends React.Component<FieldTableProps> {
     const { intl, classes, result, setPager, pagination, find, selected, sorting, setSorting, loading } = this.props;
 
     return (
-      <MaterialTable<Account>
+      <MaterialTable<Account, EnumSortField>
         intl={intl}
         columns={accountColumns(intl, { classes })}
         rows={result ? result.items : []}

@@ -20,10 +20,13 @@ export interface PageRequest {
   size: number;
 }
 
-export type Order = 'asc' | 'desc';
+export enum Order {
+  ASC = 'ASC',
+  DESC = 'DESC',
+}
 
-export interface Sorting {
-  id: string;
+export interface Sorting<T> {
+  id: T | undefined;
   order: Order;
 }
 

@@ -189,6 +189,15 @@ export interface Publisher {
   rating: number | null;
 }
 
+export enum EnumSortField {
+  CREATED_ON = 'CREATED_ON',
+  MODIFIED_ON = 'MODIFIED_ON',
+  PROVIDER = 'PROVIDER',
+  STATUS = 'STATUS',
+  TITLE = 'TITLE',
+  VERSION = 'VERSION',
+}
+
 export interface AssetDraft {
   assetDraft: string;
   assetPublished: string;

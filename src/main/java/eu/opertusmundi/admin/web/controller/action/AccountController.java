@@ -16,9 +16,11 @@ import eu.opertusmundi.admin.web.model.EnumRole;
 import eu.opertusmundi.admin.web.model.dto.AccountCommandDto;
 import eu.opertusmundi.admin.web.model.dto.AccountDto;
 import eu.opertusmundi.admin.web.model.dto.AccountFormDataDto;
+import eu.opertusmundi.admin.web.model.dto.EnumAccountSortField;
 import eu.opertusmundi.admin.web.model.dto.SetPasswordCommandDto;
 import eu.opertusmundi.common.model.PageResultDto;
 import eu.opertusmundi.common.model.RestResponse;
+import eu.opertusmundi.common.model.dto.EnumSortingOrder;
 
 public interface AccountController {
 
@@ -27,8 +29,8 @@ public interface AccountController {
 		@RequestParam(name = "page", defaultValue = "0") int page,
 		@RequestParam(name = "size", defaultValue = "25") @Max(100) @Min(1) int size,
 		@RequestParam(name = "name", defaultValue = "") String name,
-		@RequestParam(name = "orderBy", defaultValue = "name") String orderBy,
-		@RequestParam(name = "order", defaultValue = "asc") String order
+		@RequestParam(name = "orderBy", defaultValue = "name") EnumAccountSortField orderBy,
+		@RequestParam(name = "order", defaultValue = "asc") EnumSortingOrder order
 	);
 
 	@GetMapping(value = { "/action/admin/accounts/{id}" })

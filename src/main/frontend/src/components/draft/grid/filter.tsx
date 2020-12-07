@@ -11,7 +11,7 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
 
-import Autocomplete, { AutocompleteChangeReason, AutocompleteChangeDetails } from '@material-ui/lab/Autocomplete';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 
 // Icons
 import Icon from '@mdi/react';
@@ -19,7 +19,7 @@ import { mdiCommentAlertOutline } from '@mdi/js';
 
 // Model
 import { PageRequest, PageResult, Sorting } from 'model/response';
-import { EnumDraftStatus, AssetDraft, AssetDraftQuery } from 'model/draft';
+import { EnumSortField, EnumDraftStatus, AssetDraft, AssetDraftQuery } from 'model/draft';
 
 // Services
 import message from 'service/message';
@@ -50,7 +50,7 @@ interface AssetDraftFiltersProps extends WithStyles<typeof styles> {
   setFilter: (query: Partial<AssetDraftQuery>) => void,
   resetFilter: () => void,
   find: (
-    pageRequest?: PageRequest, sorting?: Sorting[]
+    pageRequest?: PageRequest, sorting?: Sorting<EnumSortField>[]
   ) => Promise<PageResult<AssetDraft> | null>,
   disabled: boolean,
 }

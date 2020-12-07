@@ -13,7 +13,12 @@ import {
   Sorting,
 } from 'model/response';
 
-import { AssetDraftQuery, AssetDraft, AssetDraftReviewCommand } from 'model/draft';
+import { 
+  AssetDraftQuery, 
+  AssetDraft, 
+  AssetDraftReviewCommand,
+  EnumSortField,
+} from 'model/draft';
 
 export default class DraftApi extends Api {
 
@@ -21,7 +26,7 @@ export default class DraftApi extends Api {
     super(config);
   }
 
-  public async find(query: Partial<AssetDraftQuery>, pageRequest: PageRequest, sorting: Sorting[]): Promise<AxiosPageResponse<AssetDraft>> {
+  public async find(query: Partial<AssetDraftQuery>, pageRequest: PageRequest, sorting: Sorting<EnumSortField>[]): Promise<AxiosPageResponse<AssetDraft>> {
     const { page, size } = pageRequest;
     const { id: field, order } = sorting[0];
 

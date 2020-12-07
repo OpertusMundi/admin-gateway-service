@@ -21,6 +21,7 @@ import Icon from '@mdi/react';
 import { mdiLoading } from '@mdi/js';
 
 // Model
+import { Order } from 'model/response';
 import { Sorting } from 'model/response';
 
 const styles = (theme: Theme) => createStyles({
@@ -59,22 +60,23 @@ const styles = (theme: Theme) => createStyles({
 
 export type cellAccessor<R> = (row: R) => any;
 
-export type cellActionHandler<R> = (key: string, index: number, column: Column<R>, row: R) => void;
+export type cellActionHandler<R, S> = (key: string, index: number, column: Column<R, S>, row: R) => void;
 
-export type cellRenderer<R> = (index: number, column: Column<R>, row: R, handleAction?: cellActionHandler<R>) => React.ReactNode;
+export type cellRenderer<R, S> = (index: number, column: Column<R, S>, row: R, handleAction?: cellActionHandler<R, S>) => React.ReactNode;
 
-export interface Column<R> {
+export interface Column<R, S> {
   accessor?: string,
   className?: string,
-  cell?: cellRenderer<R>;
+  cell?: cellRenderer<R, S>;
   header: string;
   headerClassName?: string;
-  headerStyle?: React.CSSProperties,
+  headerStyle?: React.CSSProperties;
   hidden?: boolean;
   id: string,
   selected?: boolean;
   sortable?: boolean;
-  style?: React.CSSProperties,
+  sortColumn?: S;
+  style?: React.CSSProperties;
   width?: number | string;
 }
 
@@ -85,10 +87,10 @@ export interface PaginationOptions {
   count: number,
 }
 
-interface MaterialTableProps<R> extends WithStyles<typeof styles> {
+interface MaterialTableProps<R, S> extends WithStyles<typeof styles> {
   intl: IntlShape;
-  columns: Column<R>[];
-  handleAction?: cellActionHandler<R>;
+  columns: Column<R, S>[];
+  handleAction?: cellActionHandler<R, S>;
   handleChangePage?: (page: number) => void;
   handleChangeRowsPerPage?: (value: number) => void;
   handleRowClick?: (index: number, row: R) => void;
@@ -96,14 +98,14 @@ interface MaterialTableProps<R> extends WithStyles<typeof styles> {
   pagination?: PaginationOptions,
   rows: R[];
   selected: R[];
-  sorting?: Sorting[];
-  setSorting: (sorting: Sorting[]) => void,
+  sorting?: Sorting<S>[];
+  setSorting: (sorting: Sorting<S>[]) => void,
   loading?: boolean;
 };
 
-class MaterialTable<R> extends React.Component<MaterialTableProps<R>> {
+class MaterialTable<R, S> extends React.Component<MaterialTableProps<R, S>> {
 
-  resolveValue(index: number, column: Column<R>, row: R, handleAction?: cellActionHandler<R>) {
+  resolveValue(index: number, column: Column<R, S>, row: R, handleAction?: cellActionHandler<R, S>) {
     // Custom rendering function that accepts as arguments 
     if (typeof column.cell === 'function') {
       return column.cell.bind(this)(index, column, row, handleAction);
@@ -150,14 +152,14 @@ class MaterialTable<R> extends React.Component<MaterialTableProps<R>> {
               {columns
                 .filter(c => !c.hidden)
                 .map(c => {
-                  const { header, headerClassName, headerStyle, id, sortable, width } = c;
+                  const { header, headerClassName, headerStyle, id, sortable, width, sortColumn } = c;
                   const style = headerStyle ? { ...headerStyle } : {};
 
                   if (width) {
                     style.width = width;
                   }
                   if (sorting && sortable) {
-                    const s = sorting.find(s => s.id === id) || null;
+                    const s = sorting.find(s => s.id === sortColumn) || null;
 
                     if (s) {
                       return (
@@ -165,12 +167,12 @@ class MaterialTable<R> extends React.Component<MaterialTableProps<R>> {
                           key={id}
                           className={headerClassName ? headerClassName + ' ' + classes.cell : classes.cell}
                           style={style}
-                          sortDirection={s.order}
+                          sortDirection={s.order === Order.ASC ? 'asc' : 'desc'}
                         >
                           <TableSortLabel
                             active={true}
-                            direction={s.order}
-                            onClick={() => setSorting([{ id, order: s.order === 'asc' ? 'desc' : 'asc' }])}
+                            direction={s.order === Order.ASC ? 'asc' : 'desc'}
+                            onClick={() => setSorting([{ id: sortColumn, order: s.order === Order.ASC ? Order.DESC : Order.ASC }])}
                           >
                             {header}
                           </TableSortLabel>
@@ -185,7 +187,7 @@ class MaterialTable<R> extends React.Component<MaterialTableProps<R>> {
                       className={`${headerClassName ? headerClassName : ''} ${classes.cell}  ${sortable ? classes.sortable : ''}`}
                       style={style}
                       sortDirection={false}
-                      onClick={() => sortable ? setSorting([{ id, order: 'asc' }]) : null}
+                      onClick={() => sortable ? setSorting([{ id: sortColumn, order: Order.ASC }]) : null}
                     >
                       {header}
                     </TableCell>
@@ -274,7 +276,7 @@ class MaterialTable<R> extends React.Component<MaterialTableProps<R>> {
 // See: https://stackoverflow.com/questions/52567697/generic-type-arguments-in-jsx-elements-with-withstyles
 
 // Apply styles
-type GenericWithStyles = <R>(props: Omit<MaterialTableProps<R>, 'classes'>) => JSX.Element;
+type GenericWithStyles = <R, S>(props: Omit<MaterialTableProps<R, S>, 'classes'>) => JSX.Element;
 
 const styledComponent = withStyles(styles)(MaterialTable) as GenericWithStyles;
 

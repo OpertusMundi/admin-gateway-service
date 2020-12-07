@@ -2,7 +2,7 @@ import { Moment } from 'moment';
 
 import { LogoutInitAction } from 'store/security/types';
 import { PageResult, PageRequest, Sorting, SimpleResponse } from 'model/response';
-import { AssetDraftQuery, AssetDraft } from 'model/draft';
+import { EnumSortField, AssetDraftQuery, AssetDraft } from 'model/draft';
 
 // State
 export interface DraftManagerState {
@@ -12,7 +12,7 @@ export interface DraftManagerState {
   query: AssetDraftQuery;
   result: PageResult<AssetDraft> | null;
   selected: AssetDraft[];
-  sorting: Sorting[];
+  sorting: Sorting<EnumSortField>[];
   response: SimpleResponse | null;
 }
 
@@ -48,7 +48,7 @@ export interface ResetPagerAction {
 
 export interface SetSortingAction {
   type: typeof SET_SORTING;
-  sorting: Sorting[];
+  sorting: Sorting<EnumSortField>[];
 }
 
 export interface SetFilterAction {

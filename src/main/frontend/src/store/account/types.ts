@@ -2,7 +2,7 @@ import { Moment } from 'moment';
 
 import { LogoutInitAction } from 'store/security/types';
 import { PageResult, PageRequest, Sorting, ObjectResponse } from 'model/response';
-import { Account, AccountQuery } from 'model/account';
+import { EnumSortField, Account, AccountQuery } from 'model/account';
 
 // State
 export interface AccountManagerState {
@@ -12,7 +12,7 @@ export interface AccountManagerState {
   query: AccountQuery;
   result: PageResult<Account> | null;
   selected: Account[];
-  sorting: Sorting[];
+  sorting: Sorting<EnumSortField>[];
   response: ObjectResponse<Account> | null;
 }
 
@@ -49,7 +49,7 @@ export interface ResetPagerAction {
 
 export interface SetSortingAction {
   type: typeof SET_SORTING;
-  sorting: Sorting[];
+  sorting: Sorting<EnumSortField>[];
 }
 
 export interface SetFilterAction {

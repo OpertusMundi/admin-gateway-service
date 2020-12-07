@@ -33,7 +33,7 @@ import { localizeErrorCodes } from 'utils/error';
 // Model
 import { DynamicRoutes, buildPath } from 'model/routes';
 import { PageRequest, Sorting, SimpleResponse } from 'model/response';
-import { Account } from 'model/account';
+import { Account, EnumSortField } from 'model/account';
 
 // Components
 import Dialog, { DialogAction, EnumDialogAction } from 'components/dialog';
@@ -159,7 +159,7 @@ class AccountManager extends React.Component<AccountManagerProps, AccountManager
     }
   }
 
-  setSorting(sorting: Sorting[]): void {
+  setSorting(sorting: Sorting<EnumSortField>[]): void {
     this.props.setSorting(sorting);
     this.find();
   }
@@ -209,7 +209,7 @@ class AccountManager extends React.Component<AccountManagerProps, AccountManager
               pagination={pagination}
               selected={selected}
               setPager={setPager}
-              setSorting={(sorting: Sorting[]) => this.setSorting(sorting)}
+              setSorting={(sorting: Sorting<EnumSortField>[]) => this.setSorting(sorting)}
               addToSelection={addToSelection}
               removeFromSelection={removeFromSelection}
               resetSelection={resetSelection}
@@ -270,7 +270,7 @@ const mapState = (state: RootState) => ({
 
 const mapDispatch = {
   addToSelection,
-  find: (pageRequest?: PageRequest, sorting?: Sorting[]) => find(pageRequest, sorting),
+  find: (pageRequest?: PageRequest, sorting?: Sorting<EnumSortField>[]) => find(pageRequest, sorting),
   removeFromSelection,
   resetFilter,
   resetSelection,

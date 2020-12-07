@@ -1,7 +1,5 @@
 import React from 'react';
 
-import { Link } from 'react-router-dom';
-
 import { injectIntl, IntlShape, FormattedTime } from 'react-intl';
 
 import { createStyles, WithStyles } from '@material-ui/core';
@@ -16,20 +14,15 @@ import {
   mdiCommentTextOutline,
   mdiCogTransferOutline,
   mdiBookOpenVariant,
-  mdiPencilOutline,
-  mdiTrashCanOutline,
-  mdiNewBox,
   mdiTrayFull,
   mdiCloseOctagon,
   mdiLeadPencil,
-  mdiCardSearchOutline,
   mdiMagnify,
 } from '@mdi/js';
 
 import MaterialTable, { cellActionHandler, Column } from 'components/material-table';
 
-import { buildPath, DynamicRoutes } from 'model/routes';
-import { AssetDraft, AssetDraftQuery, EnumDraftStatus } from 'model/draft';
+import { EnumSortField, AssetDraft, AssetDraftQuery, EnumDraftStatus } from 'model/draft';
 import { PageRequest, PageResult, Sorting } from 'model/response';
 
 enum EnumAction {
@@ -78,14 +71,14 @@ function statusToChip(value: EnumDraftStatus, classes: WithStyles<typeof styles>
   );
 }
 
-function accountColumns(intl: IntlShape, classes: WithStyles<typeof styles>): Column<AssetDraft>[] {
+function draftColumns(intl: IntlShape, classes: WithStyles<typeof styles>): Column<AssetDraft, EnumSortField>[] {
   return (
     [{
       header: intl.formatMessage({ id: 'account.manager.header.actions' }),
       id: 'actions',
       width: 80,
       cell: (
-        rowIndex: number, column: Column<AssetDraft>, row: AssetDraft, handleAction?: cellActionHandler<AssetDraft>
+        rowIndex: number, column: Column<AssetDraft, EnumSortField>, row: AssetDraft, handleAction?: cellActionHandler<AssetDraft, EnumSortField>
       ): React.ReactNode => (
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <Tooltip title={intl.formatMessage({ id: 'draft.manager.tooltip.view' })}>
@@ -95,7 +88,7 @@ function accountColumns(intl: IntlShape, classes: WithStyles<typeof styles>): Co
                 <Icon path={mdiMagnify} className={classes.classes.rowIcon} />
               </i>
             </Tooltip>
-            {row.status == EnumDraftStatus.PENDING_HELPDESK_REVIEW &&
+            {row.status === EnumDraftStatus.PENDING_HELPDESK_REVIEW &&
               <Tooltip title={intl.formatMessage({ id: 'draft.manager.tooltip.review' })}>
                 <i
                   onClick={() => handleAction ? handleAction(EnumAction.Review, rowIndex, column, row) : null}
@@ -111,32 +104,36 @@ function accountColumns(intl: IntlShape, classes: WithStyles<typeof styles>): Co
       id: 'status',
       width: 250,
       sortable: true,
+      sortColumn: EnumSortField.STATUS,
       cell: (
-        rowIndex: number, column: Column<AssetDraft>, row: AssetDraft, handleAction?: cellActionHandler<AssetDraft>
+        rowIndex: number, column: Column<AssetDraft, EnumSortField>, row: AssetDraft, handleAction?: cellActionHandler<AssetDraft, EnumSortField>
       ): React.ReactNode => statusToChip(row.status, classes, intl)
     }, {
       header: intl.formatMessage({ id: 'draft.manager.header.provider' }),
       id: 'account.profile.provider.name',
       accessor: 'publisher.name',
       sortable: true,
+      sortColumn: EnumSortField.PROVIDER,
     }, {
       header: intl.formatMessage({ id: 'draft.manager.header.title' }),
       id: 'title',
       accessor: 'title',
       sortable: true,
-
+      sortColumn: EnumSortField.TITLE,
     }, {
       header: intl.formatMessage({ id: 'draft.manager.header.version' }),
       id: 'version',
       accessor: 'version',
       sortable: true,
+      sortColumn: EnumSortField.VERSION,
     }, {
       header: intl.formatMessage({ id: 'draft.manager.header.modifiedOn' }),
       id: 'modifiedOn',
       accessor: 'modifiedOn',
       sortable: true,
+      sortColumn: EnumSortField.MODIFIED_ON,
       cell: (
-        rowIndex: number, column: Column<AssetDraft>, row: AssetDraft, handleAction?: cellActionHandler<AssetDraft>
+        rowIndex: number, column: Column<AssetDraft, EnumSortField>, row: AssetDraft, handleAction?: cellActionHandler<AssetDraft, EnumSortField>
       ): React.ReactNode => (
           <FormattedTime value={row.modifiedOn.toDate()} day='numeric' month='numeric' year='numeric' />
         ),
@@ -165,18 +162,18 @@ const styles = (theme: Theme) => createStyles({
 interface FieldTableProps extends WithStyles<typeof styles> {
   intl: IntlShape,
   find: (
-    pageRequest?: PageRequest, sorting?: Sorting[]
+    pageRequest?: PageRequest, sorting?: Sorting<EnumSortField>[]
   ) => Promise<PageResult<AssetDraft> | null>,
   query: AssetDraftQuery,
   result: PageResult<AssetDraft> | null,
   pagination: PageRequest,
   selected: AssetDraft[],
   setPager: (page: number, size: number) => void,
-  setSorting: (sorting: Sorting[]) => void,
+  setSorting: (sorting: Sorting<EnumSortField>[]) => void,
   addToSelection: (rows: AssetDraft[]) => void,
   removeFromSelection: (rows: AssetDraft[]) => void,
   resetSelection: () => void;
-  sorting: Sorting[];
+  sorting: Sorting<EnumSortField>[];
   reviewRow: (key: string) => void;
   viewRow: (providerKey: string, assetKey: string) => void;
   loading?: boolean;
@@ -190,7 +187,7 @@ class AssetDraftTable extends React.Component<FieldTableProps> {
     this.handleAction = this.handleAction.bind(this);
   }
 
-  handleAction(action: string, index: number, column: Column<AssetDraft>, row: AssetDraft): void {
+  handleAction(action: string, index: number, column: Column<AssetDraft, EnumSortField>, row: AssetDraft): void {
     if (row.key) {
       switch (action) {
         case EnumAction.Review:
@@ -210,9 +207,9 @@ class AssetDraftTable extends React.Component<FieldTableProps> {
     const { intl, classes, result, setPager, pagination, find, selected, sorting, setSorting, loading } = this.props;
 
     return (
-      <MaterialTable<AssetDraft>
+      <MaterialTable<AssetDraft, EnumSortField>
         intl={intl}
-        columns={accountColumns(intl, { classes })}
+        columns={draftColumns(intl, { classes })}
         rows={result ? result.items : []}
         pagination={{
           rowsPerPageOptions: [10, 20, 50],

@@ -17,7 +17,7 @@ import Typography from '@material-ui/core/Typography';
 
 // Icons
 import Icon from '@mdi/react';
-import { mdiCancel, mdiCheckOutline, mdiCommentAlertOutline, mdiTrashCan, mdiUndoVariant, mdiWindowClose } from '@mdi/js';
+import { mdiCheckOutline, mdiCommentAlertOutline, mdiUndoVariant, mdiWindowClose } from '@mdi/js';
 
 // Services
 import message from 'service/message';
@@ -32,9 +32,8 @@ import { find } from 'store/draft/thunks';
 import { localizeErrorCodes } from 'utils/error';
 
 // Model
-import { DynamicRoutes, buildPath } from 'model/routes';
 import { PageRequest, Sorting, SimpleResponse } from 'model/response';
-import { AssetDraft } from 'model/draft';
+import { EnumSortField, AssetDraft } from 'model/draft';
 
 // Components
 import Dialog, { DialogAction, EnumDialogAction } from 'components/dialog';
@@ -109,7 +108,7 @@ class AssetDraftManager extends React.Component<AccountManagerProps, AccountMana
   }
 
   confirmDialogHandler(action: DialogAction): void {
-    const { draft, reason, reasonRequired } = this.state;
+    const { draft, reason } = this.state;
 
     switch (action.key) {
       case EnumDialogAction.Accept: {
@@ -192,7 +191,7 @@ class AssetDraftManager extends React.Component<AccountManagerProps, AccountMana
     window.open(`https://api.dev.opertusmundi.eu/provider/${providerKey}/asset/${assetKey}`, "_blank");
   }
 
-  setSorting(sorting: Sorting[]): void {
+  setSorting(sorting: Sorting<EnumSortField>[]): void {
     this.props.setSorting(sorting);
     this.find();
   }
@@ -240,7 +239,7 @@ class AssetDraftManager extends React.Component<AccountManagerProps, AccountMana
               pagination={pagination}
               selected={selected}
               setPager={setPager}
-              setSorting={(sorting: Sorting[]) => this.setSorting(sorting)}
+              setSorting={(sorting: Sorting<EnumSortField>[]) => this.setSorting(sorting)}
               addToSelection={addToSelection}
               removeFromSelection={removeFromSelection}
               resetSelection={resetSelection}
@@ -327,7 +326,7 @@ const mapState = (state: RootState) => ({
 
 const mapDispatch = {
   addToSelection,
-  find: (pageRequest?: PageRequest, sorting?: Sorting[]) => find(pageRequest, sorting),
+  find: (pageRequest?: PageRequest, sorting?: Sorting<EnumSortField>[]) => find(pageRequest, sorting),
   removeFromSelection,
   resetFilter,
   resetSelection,

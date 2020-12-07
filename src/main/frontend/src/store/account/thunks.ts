@@ -10,13 +10,13 @@ import AccountApi from 'service/account';
 
 // Model
 import { PageRequest, Sorting, PageResult, ObjectResponse } from 'model/response';
-import { Account, AccountCommand } from 'model/account';
+import { EnumSortField, Account, AccountCommand } from 'model/account';
 
 // Helper thunk result type
 type ThunkResult<R> = ThunkAction<Promise<R>, RootState, unknown, AccountActions>;
 
 export const find = (
-  pageRequest?: PageRequest, sorting?: Sorting[]
+  pageRequest?: PageRequest, sorting?: Sorting<EnumSortField>[]
 ): ThunkResult<PageResult<Account> | null> => async (dispatch, getState) => {
   // Get query form state (filters are always set synchronously)
   const query = getState().account.explorer.query;

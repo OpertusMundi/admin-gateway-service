@@ -17,7 +17,7 @@ import { mdiCommentAlertOutline } from '@mdi/js';
 
 // Model
 import { PageRequest, PageResult, Sorting } from 'model/response';
-import { Account, AccountQuery } from 'model/account';
+import { EnumSortField, Account, AccountQuery } from 'model/account';
 
 // Services
 import message from 'service/message';
@@ -48,7 +48,7 @@ interface AccountFiltersProps extends WithStyles<typeof styles> {
   setFilter: (query: Partial<AccountQuery>) => void,
   resetFilter: () => void,
   find: (
-    pageRequest?: PageRequest, sorting?: Sorting[]
+    pageRequest?: PageRequest, sorting?: Sorting<EnumSortField>[]
   ) => Promise<PageResult<Account> | null>,
   create: () => void,
   disabled: boolean,

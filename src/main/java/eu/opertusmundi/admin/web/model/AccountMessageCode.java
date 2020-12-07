@@ -2,7 +2,7 @@ package eu.opertusmundi.admin.web.model;
 
 import eu.opertusmundi.common.model.MessageCode;
 
-public enum AccountErrorCode implements MessageCode
+public enum AccountMessageCode implements MessageCode
 {
     UNKNOWN,
     ACCOUNT_NOT_SET,
