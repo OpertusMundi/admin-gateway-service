@@ -32,8 +32,9 @@ export const mergeExtent = (features: Feature | Feature[] | Collection<Feature>)
     const extent = createEmpty();
 
     array.forEach((f) => {
-      if (f.getGeometry()) {
-        extend(extent, f.getGeometry().getExtent());
+      const e = f.getGeometry()?.getExtent() || null;
+      if (e) {
+        extend(extent, e);
       }
     });
 

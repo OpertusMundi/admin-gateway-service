@@ -124,12 +124,16 @@ class GeometryEditor extends React.Component<GeometryEditorProps, GeometryEditor
     if (onChange && feature?.getGeometry()) {
       const format = new GeoJSON();
 
-      const geojson = format.writeGeometryObject(feature.getGeometry(), {
-        dataProjection: 'EPSG:4326',
-        featureProjection: 'EPSG:3857',
-      });
+      const geometry = feature.getGeometry();
 
-      onChange(geojson);
+      if (geometry) {
+        const geojson = format.writeGeometryObject(geometry, {
+          dataProjection: 'EPSG:4326',
+          featureProjection: 'EPSG:3857',
+        });
+
+        onChange(geojson);
+      }
     }
   }
 

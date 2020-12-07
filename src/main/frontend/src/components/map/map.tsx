@@ -28,7 +28,7 @@ interface MapProps {
   keyboard?: boolean;
   maxZoom?: number;
   minZoom?: number;
-  moveEnd?: (data: { center: number[], zoom: number }) => void;
+  moveEnd?: (data: { center: number[], zoom: number | undefined }) => void;
   mouseWheelZoom?: boolean;
   onFocusOnly?: boolean;
   pinchRotate?: boolean;
@@ -232,7 +232,7 @@ class Map extends React.Component<MapProps> {
   get center(): number[] | null {
     const { map } = this.state;
     if (map) {
-      return map.getView().getCenter();
+      return map.getView().getCenter() || null;
     }
     return null;
   }
@@ -240,7 +240,7 @@ class Map extends React.Component<MapProps> {
   get zoom(): number | null {
     const { map } = this.state;
     if (map) {
-      return map.getView().getZoom();
+      return map.getView().getZoom() || null;
     }
     return null;
   }

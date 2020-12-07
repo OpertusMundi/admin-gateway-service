@@ -46,13 +46,17 @@ export function fromWKT(wkt: string): Geometry | null {
 }
 
 export function toWKT(feature: Feature): string | null {
-  if (!feature || !feature.getGeometry()) {
-    return null;
-  }
-  const format = new WKT();
+  const geometry = feature?.getGeometry();
 
-  return format.writeGeometry(feature.getGeometry(), {
-    dataProjection: 'EPSG:4326',
-    featureProjection: 'EPSG:3857'
-  });
+  if (!geometry) {
+    return null;
+  } else {
+    const format = new WKT();
+
+    return format.writeGeometry(geometry, {
+      dataProjection: 'EPSG:4326',
+      featureProjection: 'EPSG:3857'
+    });
+  }
+  
 }
