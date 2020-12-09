@@ -53,7 +53,7 @@ public class RestControllerAdvice {
 
 	private MessageCode exceptionToErrorCode(Exception ex) {
 		if (ex instanceof ApplicationException) {
-			return ((ApplicationException) ex).getErrorCode();
+			return ((ApplicationException) ex).getCode();
 		}
 		if (ex instanceof DataIntegrityViolationException) {
 			return BasicMessageCode.ForeignKeyConstraint;
