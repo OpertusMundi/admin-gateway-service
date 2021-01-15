@@ -69,7 +69,7 @@ opertus-mundi.default-admin.lastname =
 
 Admin application connects to several services using Feign clients. The following properties must be set:
 
-```
+```properties
 #
 # Spring Cloud Feign clients
 #
@@ -101,7 +101,7 @@ opertusmundi.feign.data-profiler.url=
 
 Admin application requires access to asset repository and user file system. The following directories must be accessible to the application:
 
-```
+```properties
 #
 # File system
 #
