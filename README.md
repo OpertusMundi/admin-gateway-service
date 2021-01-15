@@ -1,6 +1,6 @@
-# OpertusMundi HelpDesk Application
+# OpertusMundi Admin Application
 
-HelpDesk application for OpertusMundi marketplace
+Admin application for OpertusMundi marketplace
 
 ## Quickstart
 
@@ -79,7 +79,7 @@ Build the project:
 
 Run application (with an embedded Tomcat 9.x server) as a standalone application:
 
-    java -jar target/opertus-mundi-helpdesk-app-1.0.0.jar
+    java -jar target/opertus-mundi-admin-gateway-1.0.0.jar
 
 or using the Spring Boot plugin:
 
@@ -101,4 +101,4 @@ Ensure that the following section is not commented (to avoid packaging an embedd
 </dependency>    
 ```
 
-Rebuild, and deploy generated `target/opertus-mundi-helpdesk-app-1.0.0.war` on a Tomcat 9.x servlet container.
+Rebuild, and deploy generated `target/opertus-mundi-admin-gateway-1.0.0.war` on a Tomcat 9.x servlet container.
