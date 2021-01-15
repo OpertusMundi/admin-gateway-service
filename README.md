@@ -6,9 +6,9 @@ Admin application for OpertusMundi marketplace
 
 ### Configure the Web Application
 
-Copy configuration example files from `config-example/` into `src/main/resources/`, and edit to adjust to your needs.
+Copy configuration example files from `admin-gateway/config-example/` into `admin-gateway/src/main/resources/`, and edit to adjust to your needs.
 
-`cp -r config-example/* src/main/resources/`
+`cp -r admin-gateway/config-example/* admin-gateway/src/main/resources/`
 
 ### Database configuration
 
@@ -65,9 +65,58 @@ opertus-mundi.default-admin.firstname=
 opertus-mundi.default-admin.lastname =
 ```
 
+### Configure Feign clients
+
+Admin application connects to several services using Feign clients. The following properties must be set:
+
+```
+#
+# Spring Cloud Feign clients
+#
+
+# Catalogue service
+opertusmundi.feign.catalogue.name=catalogue
+opertusmundi.feign.catalogue.url=
+
+# BPM server
+opertusmundi.feign.bpm-server.name=bpm-server
+opertusmundi.feign.bpm-server.url=
+opertusmundi.feign.bpm-server.basic-auth.username=
+opertusmundi.feign.bpm-server.basic-auth.password=
+
+# Ingest service
+opertusmundi.feign.ingest.name=ingest-service
+opertusmundi.feign.ingest.url=
+
+# Transform service
+opertusmundi.feign.transform.name=transform-service
+opertusmundi.feign.transform.url=
+
+# Data Profiler service
+opertusmundi.feign.data-profiler.name=data-profiler-service
+opertusmundi.feign.data-profiler.url=
+```
+
+### Configure file system
+
+Admin application requires access to asset repository and user file system. The following directories must be accessible to the application:
+
+```
+#
+# File system
+#
+
+# Folder for creating temporary files
+opertusmundi.file-system.temp-dir=
+# Root folder for storing user file system
+opertusmundi.file-system.data-dir=
+# Root folder for storing files for the asset repository
+opertusmundi.file-system.asset-dir=
+```
+
 ### Configure the Web Client
 
-Details on configuring and running the web client application can be found [here](src/main/frontend/README.md).
+Details on configuring and running the web client application can be found [here](https://github.com/OpertusMundi/frontend-admin/blob/master/README.md).
 
 ### Build
 
@@ -79,11 +128,11 @@ Build the project:
 
 Run application (with an embedded Tomcat 9.x server) as a standalone application:
 
-    java -jar target/opertus-mundi-admin-gateway-1.0.0.jar
+    java -jar admin-gateway/target/opertus-mundi-admin-gateway-1.0.0.jar
 
 or using the Spring Boot plugin:
 
-    mvn spring-boot:run
+    cd admin-gateway && mvn spring-boot:run
 
 ### Run as WAR on a servlet container
 
@@ -101,4 +150,4 @@ Ensure that the following section is not commented (to avoid packaging an embedd
 </dependency>    
 ```
 
-Rebuild, and deploy generated `target/opertus-mundi-admin-gateway-1.0.0.war` on a Tomcat 9.x servlet container.
+Rebuild, and deploy generated `admin-gateway/target/opertus-mundi-admin-gateway-1.0.0.war` on a Tomcat 9.x servlet container.
