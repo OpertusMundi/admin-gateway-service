@@ -8,5 +8,7 @@
 .classpath
 .factorypath
 
+*.log
+
 **/*.*~
 **/*.~
