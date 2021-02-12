@@ -51,9 +51,6 @@ public interface SectionRepository extends JpaRepository<SectionEntity, Integer>
 	@Transactional(readOnly = false)
 	default SectionDto saveFrom(SectionDto s) {
 		
-
-		System.out.println("in SECTION SAVEFROM");
-		System.out.println(s.getContract());
 		SectionEntity sectionEntity = null;
 		sectionEntity = this.findById(s.getId()).orElse(null);
 		if (sectionEntity == null) {
@@ -67,11 +64,7 @@ public interface SectionRepository extends JpaRepository<SectionEntity, Integer>
 		}
 		
 		//final ContractEntity e = contractRepository.findById(s.getContract().getId()).get();
-		System.out.println("contract id: ");
-		System.out.println(s.getContract().getId());
 		sectionEntity.setContract(this.findContract(s.getContract().getId()).get());
-		System.out.println("section entity:");
-		System.out.println(sectionEntity);
 		sectionEntity.setTitle(s.getTitle());
 		sectionEntity.setIndex(s.getIndex());
 		sectionEntity.setIndent(s.getIndent());

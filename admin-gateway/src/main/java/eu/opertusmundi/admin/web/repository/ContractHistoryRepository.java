@@ -17,11 +17,11 @@ import eu.opertusmundi.common.model.ApplicationException;
 import eu.opertusmundi.common.model.BasicMessageCode;
 import eu.opertusmundi.admin.web.domain.ContractEntity;
 import eu.opertusmundi.admin.web.domain.ContractHistoryEntity;
+import eu.opertusmundi.admin.web.domain.HelpdeskAccountEntity;
 import eu.opertusmundi.admin.web.domain.SectionEntity;
 import eu.opertusmundi.admin.web.domain.SectionHistoryEntity;
 import eu.opertusmundi.admin.web.model.dto.ContractDto;
 import eu.opertusmundi.admin.web.model.dto.ContractHistoryDto;
-import eu.opertusmundi.common.domain.AccountEntity;
 
 @Repository
 @Transactional(readOnly = true)
@@ -39,8 +39,8 @@ public interface ContractHistoryRepository extends JpaRepository<ContractHistory
 	//	Sort sort
 	//);
 	
-	@Query("SELECT a FROM Account a WHERE a.id = :id")
-	    AccountEntity findAccountById(
+	@Query("SELECT a FROM HelpdeskAccount a WHERE a.id = :id")
+	    HelpdeskAccountEntity findAccountById(
 			@Param("id") int id);
 	
 	@Query("SELECT c FROM ContractHistory c WHERE c.parentId = :parentId AND c.version = :version ")
@@ -54,7 +54,7 @@ public interface ContractHistoryRepository extends JpaRepository<ContractHistory
 	
 	@Query("SELECT c FROM ContractHistory c WHERE c.account = :account")
 	List<ContractEntity> findHistoryContractsByAccount(
-		@Param("account") AccountEntity account);
+		@Param("account") HelpdeskAccountEntity account);
 	
 	@Query("SELECT c FROM ContractHistory c WHERE c.parentId = :parentId")
 	List<ContractHistoryEntity> findContractVersions(
@@ -62,11 +62,9 @@ public interface ContractHistoryRepository extends JpaRepository<ContractHistory
 	
 	@Transactional(readOnly = false)
 	default ContractHistoryDto saveFrom(ContractEntity s) {
-		System.out.println("**IN SAVEFROM CONTRACT HISTORY**");
 		System.out.println(s);
 		ContractHistoryEntity contractHistoryEntity = null;
 		contractHistoryEntity = this.findContractHistoryEntity(s, s.getVersion()).orElse(null);
-		System.out.println("HERE:" + contractHistoryEntity);
 		if (contractHistoryEntity == null) {
 			// Create a new entity
 			contractHistoryEntity = new ContractHistoryEntity();

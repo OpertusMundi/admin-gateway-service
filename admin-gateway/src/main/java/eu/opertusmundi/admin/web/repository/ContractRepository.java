@@ -17,6 +17,7 @@ import eu.opertusmundi.common.model.ApplicationException;
 import eu.opertusmundi.common.model.BasicMessageCode;
 import eu.opertusmundi.admin.web.domain.ContractEntity;
 import eu.opertusmundi.admin.web.domain.ContractHistoryEntity;
+import eu.opertusmundi.admin.web.domain.HelpdeskAccountEntity;
 import eu.opertusmundi.admin.web.domain.SectionEntity;
 import eu.opertusmundi.admin.web.model.dto.ContractDto;
 import eu.opertusmundi.common.domain.AccountEntity;
@@ -37,8 +38,8 @@ public interface ContractRepository extends JpaRepository<ContractEntity, Intege
 	//	Sort sort
 	//);
 	
-	@Query("SELECT a FROM Account a WHERE a.id = :id")
-	    AccountEntity findAccountById(
+	@Query("SELECT a FROM HelpdeskAccount a WHERE a.id = :id")
+	    HelpdeskAccountEntity findAccountById(
 			@Param("id") int id);
 	
 	@Query("SELECT s FROM Section s WHERE s.contract = :contract")
@@ -54,7 +55,7 @@ public interface ContractRepository extends JpaRepository<ContractEntity, Intege
 	
 	@Query("SELECT c FROM Contract c WHERE c.account = :account")
 	List<ContractEntity> findContractsByAccount(
-		@Param("account") AccountEntity account);
+		@Param("account") HelpdeskAccountEntity account);
 	
 	@Transactional(readOnly = false)
 	default ContractDto saveFrom(ContractDto s) {

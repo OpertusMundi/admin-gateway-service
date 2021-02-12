@@ -19,8 +19,8 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import eu.opertusmundi.common.domain.AccountEntity;
-import eu.opertusmundi.common.domain.AccountRoleEntity;
+import eu.opertusmundi.admin.web.domain.HelpdeskAccountEntity;
+import eu.opertusmundi.admin.web.domain.HelpdeskAccountRoleEntity;
 import eu.opertusmundi.admin.web.model.dto.ContractDto;
 
 
@@ -45,7 +45,7 @@ public class ContractEntity {
     @JoinColumn(name = "`account`", nullable = false)
     @lombok.Getter
     @lombok.Setter
-    AccountEntity account;
+    HelpdeskAccountEntity account;
 
     @Column(name = "`title`")
     @lombok.Getter()

@@ -20,13 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import eu.opertusmundi.admin.web.domain.ContractEntity;
 import eu.opertusmundi.admin.web.domain.ContractHistoryEntity;
-import eu.opertusmundi.common.domain.AccountEntity;
+import eu.opertusmundi.admin.web.domain.HelpdeskAccountEntity;
 import eu.opertusmundi.admin.web.domain.SectionEntity;
 import eu.opertusmundi.admin.web.domain.SectionHistoryEntity;
 import eu.opertusmundi.common.model.RestResponse;
-import eu.opertusmundi.common.repository.AccountRepository;
 import eu.opertusmundi.admin.web.repository.SectionRepository;
-import eu.opertusmundi.common.model.dto.AccountDto;
+import eu.opertusmundi.admin.web.model.dto.AccountDto;
 import eu.opertusmundi.admin.web.model.dto.ContractDto;
 import eu.opertusmundi.admin.web.model.dto.ContractHistoryDto;
 import eu.opertusmundi.admin.web.model.dto.SectionDto;
@@ -55,7 +54,7 @@ public class ContractControllerImpl extends BaseController implements ContractCo
 	private SectionHistoryRepository sectionHistoryRepository;
 
 	@Autowired
-	private AccountRepository accountRepo;
+	private HelpdeskAccountRepository helpdeskAccountRepo;
 	
 	
 	/*@Override
@@ -99,7 +98,7 @@ public class ContractControllerImpl extends BaseController implements ContractCo
 	@Override
 	public RestResponse<List<ContractDto>> findAll(){
 		
-		final Optional<AccountEntity> accountEntity = accountRepo.findOneByUsername(this.currentUserName());
+		final Optional<HelpdeskAccountEntity> accountEntity = helpdeskAccountRepo.findOneByEmail(this.currentUserName());
 		final List<ContractEntity> contracts = contractRepository.findContractsByAccount(accountEntity.get());
 		final List<ContractDto> contractsDto = new ArrayList<ContractDto>() ;
 		for(ContractEntity e : contracts) contractsDto.add(e.toDto());
@@ -111,7 +110,6 @@ public class ContractControllerImpl extends BaseController implements ContractCo
 
 	@Override
 	public RestResponse<ContractDto> create(ContractDto record, BindingResult validationResult) {
-		System.out.println("**IN CREATE**");
 		System.out.println(record);
 		if (validationResult.hasErrors()) {
 			return RestResponse.invalid(validationResult.getFieldErrors());
@@ -122,7 +120,7 @@ public class ContractControllerImpl extends BaseController implements ContractCo
 		//System.out.println(this.currentUserName());
 		
 		// Retrieve entity from repository
-		final AccountDto account = accountRepo.findOneByUsername(this.currentUserName()).get().toDto();
+		final AccountDto account = helpdeskAccountRepo.findOneByEmail(this.currentUserName()).get().toDto();
 
 		record.setAccount(account);
 		List<SectionDto> sections = record.getSections();
@@ -164,7 +162,7 @@ public class ContractControllerImpl extends BaseController implements ContractCo
 		
 		// increment version
 		record.setVersion("" + (Integer.parseInt(record.getVersion())+1));
-		final AccountDto account = accountRepo.findOneByUsername(this.currentUserName()).get().toDto();
+		final AccountDto account = helpdeskAccountRepo.findOneByEmail(this.currentUserName()).get().toDto();
 
 		record.setAccount(account);
 		List<SectionDto> sections = record.getSections();
@@ -178,12 +176,13 @@ public class ContractControllerImpl extends BaseController implements ContractCo
 		
 		//List<SectionEntity> contractSections = contractRepository.findSectionsByContract(e);
 		List<Integer> newSectionIds = new ArrayList<Integer>(); 
+		int newId;
 		for (SectionDto s : sections){
 			System.out.println(e);
 			System.out.println(record);
 			s.setContract(record);
-			sectionRepository.saveFrom(s);
-			newSectionIds.add(s.getId());
+			newId =  sectionRepository.saveFrom(s).getId();
+			newSectionIds.add(newId);
 		}
 		
 		List<Integer> prevSectionIds = contractRepository.findSectionsIdsByContract(e);

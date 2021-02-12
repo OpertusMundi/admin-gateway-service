@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import eu.opertusmundi.admin.web.domain.SectionEntity;
-import eu.opertusmundi.common.model.dto.AccountDto;
+import eu.opertusmundi.admin.web.model.dto.AccountDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;

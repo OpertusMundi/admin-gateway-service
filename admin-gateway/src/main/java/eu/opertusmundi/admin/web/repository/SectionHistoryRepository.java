@@ -59,7 +59,6 @@ public interface SectionHistoryRepository extends JpaRepository<SectionHistoryEn
 	default SectionHistoryDto saveFrom(SectionDto s, ContractHistoryEntity contract) {
 		
 
-		System.out.println("in SECTION SAVEFROM HISTORY");
 		System.out.println(s.getContract());
 		SectionHistoryEntity sectionHistoryEntity = null;
 		//sectionHistoryEntity = this.findSectionHistoryEntity(contract).orElse(null);
@@ -77,8 +76,6 @@ public interface SectionHistoryRepository extends JpaRepository<SectionHistoryEn
 		
 		//final ContractEntity e = contractRepository.findById(s.getContract().getId()).get();
 		sectionHistoryEntity.setContract(contract);
-		System.out.println("contract history entity:");
-		System.out.println(sectionHistoryEntity.getContract());
 		sectionHistoryEntity.setTitle(s.getTitle());
 		sectionHistoryEntity.setIndex(s.getIndex());
 		sectionHistoryEntity.setIndent(s.getIndent());
@@ -89,8 +86,6 @@ public interface SectionHistoryRepository extends JpaRepository<SectionHistoryEn
 		sectionHistoryEntity.setOptions(s.getOptions());
 		sectionHistoryEntity.setSummary(s.getSummary());
 		sectionHistoryEntity.setIcons(s.getIcons());
-		System.out.println("Section history options:");
-		System.out.println(sectionHistoryEntity.getOptions());
 		return saveAndFlush(sectionHistoryEntity).toDto();
 	}
 
