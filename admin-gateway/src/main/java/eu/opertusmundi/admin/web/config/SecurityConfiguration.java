@@ -48,7 +48,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
     {
         security.ignoring()
             .antMatchers(
-                "/i18n/**", "/images/**", "/static/**", "/i18n/**" 
+        		"manifest.json",
+                "asset-manifest.json",
+                "/i18n/**", 
+                "/images/**", 
+                "/static/**" 
 			);
     }
      
