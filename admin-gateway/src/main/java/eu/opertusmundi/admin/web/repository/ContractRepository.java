@@ -4,23 +4,18 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import eu.opertusmundi.common.model.ApplicationException;
-import eu.opertusmundi.common.model.BasicMessageCode;
 import eu.opertusmundi.admin.web.domain.ContractEntity;
-import eu.opertusmundi.admin.web.domain.ContractHistoryEntity;
 import eu.opertusmundi.admin.web.domain.HelpdeskAccountEntity;
 import eu.opertusmundi.admin.web.domain.SectionEntity;
 import eu.opertusmundi.admin.web.model.dto.ContractDto;
-import eu.opertusmundi.common.domain.AccountEntity;
+import eu.opertusmundi.common.model.ApplicationException;
+import eu.opertusmundi.common.model.BasicMessageCode;
 
 @Repository
 @Transactional(readOnly = true)
