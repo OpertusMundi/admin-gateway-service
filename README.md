@@ -70,30 +70,27 @@ opertus-mundi.default-admin.lastname =
 Admin application connects to several services using Feign clients. The following properties must be set:
 
 ```properties
-#
-# Spring Cloud Feign clients
-#
+# Global secret for signing JWT tokens shared by all services
+opertusmundi.feign.jwt.secret=
 
 # Catalogue service
-opertusmundi.feign.catalogue.name=catalogue
 opertusmundi.feign.catalogue.url=
 
 # BPM server
-opertusmundi.feign.bpm-server.name=bpm-server
 opertusmundi.feign.bpm-server.url=
 opertusmundi.feign.bpm-server.basic-auth.username=
 opertusmundi.feign.bpm-server.basic-auth.password=
 
+# Email service
+opertusmundi.feign.email-service.url=
+
 # Ingest service
-opertusmundi.feign.ingest.name=ingest-service
 opertusmundi.feign.ingest.url=
 
 # Transform service
-opertusmundi.feign.transform.name=transform-service
 opertusmundi.feign.transform.url=
 
 # Data Profiler service
-opertusmundi.feign.data-profiler.name=data-profiler-service
 opertusmundi.feign.data-profiler.url=
 ```
 
@@ -110,7 +107,9 @@ Admin application requires access to asset repository and user file system. The 
 opertusmundi.file-system.temp-dir=
 # Root folder for storing user file system
 opertusmundi.file-system.data-dir=
-# Root folder for storing files for the asset repository
+# Root folder for storing files for draft assets
+opertusmundi.file-system.draft-dir=
+# Root folder for storing files for assets
 opertusmundi.file-system.asset-dir=
 ```
 
