@@ -69,8 +69,6 @@ public interface SectionRepository extends JpaRepository<SectionEntity, Integer>
 		sectionEntity.setOptions(s.getOptions());
 		sectionEntity.setSummary(s.getSummary());
 		sectionEntity.setIcons(s.getIcons());
-		System.out.println("Section options:");
-		System.out.println(sectionEntity.getOptions());
 		return saveAndFlush(sectionEntity).toDto();
 	}
 

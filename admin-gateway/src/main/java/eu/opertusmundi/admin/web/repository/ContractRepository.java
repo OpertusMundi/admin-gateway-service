@@ -54,7 +54,6 @@ public interface ContractRepository extends JpaRepository<ContractEntity, Intege
 	
 	@Transactional(readOnly = false)
 	default ContractDto saveFrom(ContractDto s) {
-		System.out.println("**IN SAVEFROM**");
 		ContractEntity contractEntity = null;
 		if (s.getId() != null) {
 			// Retrieve entity from repository
@@ -71,17 +70,13 @@ public interface ContractRepository extends JpaRepository<ContractEntity, Intege
 			contractEntity = new ContractEntity();
 			contractEntity.setCreatedAt(ZonedDateTime.now());
 		}
-		//System.out.println(in );
-		System.out.println(s);
 		contractEntity.setTitle(s.getTitle());
 		contractEntity.setSubtitle(s.getSubtitle());
 		contractEntity.setId(s.getId());
 		contractEntity.setAccount(this.findAccountById(s.getAccount().getId()));
 		contractEntity.setState(s.getState());
 		contractEntity.setVersion(s.getVersion());
-		System.out.println(contractEntity.getState());
 		contractEntity.setModifiedAt(ZonedDateTime.now());
-		System.out.println(contractEntity.getCreatedAt());
 		return saveAndFlush(contractEntity).toDto();
 	}
 

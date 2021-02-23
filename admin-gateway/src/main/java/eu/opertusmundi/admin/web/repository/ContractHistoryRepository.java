@@ -57,7 +57,6 @@ public interface ContractHistoryRepository extends JpaRepository<ContractHistory
 	
 	@Transactional(readOnly = false)
 	default ContractHistoryDto saveFrom(ContractEntity s) {
-		System.out.println(s);
 		ContractHistoryEntity contractHistoryEntity = null;
 		contractHistoryEntity = this.findContractHistoryEntity(s, s.getVersion()).orElse(null);
 		if (contractHistoryEntity == null) {
@@ -66,17 +65,13 @@ public interface ContractHistoryRepository extends JpaRepository<ContractHistory
 			contractHistoryEntity.setCreatedAt(ZonedDateTime.now());
 
 		}
-		//System.out.println(in );
-		System.out.println(s);
 		contractHistoryEntity.setTitle(s.getTitle());
 		contractHistoryEntity.setSubtitle(s.getSubtitle());
 		contractHistoryEntity.setParentId(s);
 		contractHistoryEntity.setAccount(this.findAccountById(s.getAccount().getId()));
 		contractHistoryEntity.setState(s.getState());
 		contractHistoryEntity.setVersion(s.getVersion());
-		System.out.println(contractHistoryEntity.getState());
 		contractHistoryEntity.setModifiedAt(ZonedDateTime.now());
-		System.out.println(contractHistoryEntity.getCreatedAt());
 		return saveAndFlush(contractHistoryEntity).toDto();
 		
 	}

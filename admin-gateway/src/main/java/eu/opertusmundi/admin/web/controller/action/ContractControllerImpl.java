@@ -92,23 +92,18 @@ public class ContractControllerImpl extends BaseController implements ContractCo
 		final List<ContractEntity> contracts = contractRepository.findContractsByAccount(accountEntity.get());
 		final List<ContractDto> contractsDto = new ArrayList<ContractDto>() ;
 		for(ContractEntity e : contracts) contractsDto.add(e.toDto());
-		System.out.println("Contracts");
-		System.out.println(contractsDto);
 		return RestResponse.result(contractsDto);
 	}
 
 
 	@Override
 	public RestResponse<ContractDto> create(ContractDto record, BindingResult validationResult) {
-		System.out.println(record);
 		if (validationResult.hasErrors()) {
 			return RestResponse.invalid(validationResult.getFieldErrors());
 		}
 		
 		//final Optional<AccountEntity> accountEntity = accountRepo.findOneByUsername(this.currentUserName());
 
-		//System.out.println(this.currentUserName());
-		
 		// Retrieve entity from repository
 		final AccountDto account = helpdeskAccountRepo.findOneByEmail(this.currentUserName()).get().toDto();
 
@@ -116,16 +111,12 @@ public class ContractControllerImpl extends BaseController implements ContractCo
 		List<SectionDto> sections = record.getSections();
 		record.setSections(null);
 		ContractDto resultRecord = contractRepository.saveFrom(record);
-		System.out.println("Sections:");
-		System.out.println(sections);
 		// create sections
 		final ContractEntity e = contractRepository.findById(resultRecord.getId()).get();
 		record.setId(e.getId());
 		
 		//List<SectionEntity> contractSections = contractRepository.findSectionsByContract(e.getId());
 		for (SectionDto s : sections){
-			System.out.println(e);
-			System.out.println(record);
 			s.setContract(record);
 			sectionRepository.saveFrom(s);
 		}
@@ -168,8 +159,6 @@ public class ContractControllerImpl extends BaseController implements ContractCo
 		List<Integer> newSectionIds = new ArrayList<Integer>(); 
 		int newId;
 		for (SectionDto s : sections){
-			System.out.println(e);
-			System.out.println(record);
 			s.setContract(record);
 			newId =  sectionRepository.saveFrom(s).getId();
 			newSectionIds.add(newId);
@@ -222,8 +211,6 @@ public class ContractControllerImpl extends BaseController implements ContractCo
 
 	@Override
 	public RestResponse<Void> updateState(int id, String state) {
-		System.out.println("IN update state");
-		System.out.println(state);
 		state =  state.replace("=", "");
 		final ContractEntity ce = contractRepository.findById(id).orElse(null);
 

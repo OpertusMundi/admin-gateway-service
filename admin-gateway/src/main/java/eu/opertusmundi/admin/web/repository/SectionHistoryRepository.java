@@ -51,18 +51,15 @@ public interface SectionHistoryRepository extends JpaRepository<SectionHistoryEn
 	default SectionHistoryDto saveFrom(SectionDto s, ContractHistoryEntity contract) {
 		
 
-		System.out.println(s.getContract());
 		SectionHistoryEntity sectionHistoryEntity = null;
 		//sectionHistoryEntity = this.findSectionHistoryEntity(contract).orElse(null);
 		//if (sectionHistoryEntity == null) {
-		//	System.out.println("in SECTION SAVEFROM null");
 			
 		// Create a new entity
 		sectionHistoryEntity = new SectionHistoryEntity();
 		//}
 		/*else if(sectionHistoryEntity.getContract().getId()!= contract.getId()){
 			// Create a new entity if this id exists in another contract
-			System.out.println("in SECTION SAVEFROM elseif");
 			sectionHistoryEntity = new SectionHistoryEntity();
 		}*/
 		
