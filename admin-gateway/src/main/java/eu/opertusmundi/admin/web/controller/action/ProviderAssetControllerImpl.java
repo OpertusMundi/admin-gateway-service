@@ -37,24 +37,24 @@ public class ProviderAssetControllerImpl implements ProviderAssetController {
                 providerKey, status, pageIndex, pageSize, orderBy, order
             );
 
-            return RestResponse.result(result);
-        } catch (final AssetDraftException ex) {
-            return RestResponse.error(ex.getCode(), ex.getMessage());
-        } catch (final Exception ex) {
-            logger.error("[Catalogue] Operation has failed", ex);
+			return RestResponse.result(result);
+		} catch (final AssetDraftException ex) {
+			return RestResponse.error(ex.getCode(), ex.getMessage());
+		} catch (final Exception ex) {
+			logger.error("[Catalogue] Operation has failed", ex);
 
-            return RestResponse.failure();
-        }
-    }
+			return RestResponse.failure();
+		}
+	}
 
     @Override
     public RestResponse<AssetDraftDto> findOneDraft(UUID providerKey, UUID draftKey) {
         try {
             final AssetDraftDto draft = this.providerAssetService.findOneDraft(providerKey, draftKey);
 
-            if(draft ==null) {
-                return RestResponse.notFound();
-            }
+			if (draft == null) {
+				return RestResponse.notFound();
+			}
 
             return RestResponse.result(draft);
         } catch (final AssetDraftException ex) {
