@@ -61,8 +61,8 @@ The default account can be configured using the following properties:
 
 opertus-mundi.default-admin.username =
 opertus-mundi.default-admin.password =
-opertus-mundi.default-admin.firstname=
-opertus-mundi.default-admin.lastname =
+opertus-mundi.default-admin.firstName=
+opertus-mundi.default-admin.lastName =
 ```
 
 ### Configure Feign clients
@@ -70,19 +70,33 @@ opertus-mundi.default-admin.lastname =
 Admin application connects to several services using Feign clients. The following properties must be set:
 
 ```properties
+#
+# Spring Cloud Feign clients
+#
+
 # Global secret for signing JWT tokens shared by all services
 opertusmundi.feign.jwt.secret=
 
-# Catalogue service
+# Catalogue service (no authentication)
 opertusmundi.feign.catalogue.url=
 
-# BPM server
+# BPM server (basic authentication)
 opertusmundi.feign.bpm-server.url=
 opertusmundi.feign.bpm-server.basic-auth.username=
 opertusmundi.feign.bpm-server.basic-auth.password=
 
-# Email service
+# Rating service (basic authentication)
+opertusmundi.feign.rating-service.url=
+opertusmundi.feign.rating-service.basic-auth.username=
+opertusmundi.feign.rating-service.basic-auth.password=
+
+# Email service (JWT token authentication)
+# Uses private/public key pair for signing/parsing tokens.
 opertusmundi.feign.email-service.url=
+
+# Message service (JWT token authentication)
+# Uses opertusmundi.feign.jwt.secret for signing tokens.
+opertusmundi.feign.message-service.url=
 
 # Ingest service
 opertusmundi.feign.ingest.url=
@@ -92,6 +106,9 @@ opertusmundi.feign.transform.url=
 
 # Data Profiler service
 opertusmundi.feign.data-profiler.url=
+
+# Persistent Identifier Service
+opertusmundi.feign.persistent-identifier-service.url=
 ```
 
 ### Configure file system
