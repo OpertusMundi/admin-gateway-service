@@ -32,11 +32,11 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 	@Value("${opertus-mundi.default-admin.password:}")
     private String password;
 
-	@Value("${opertus-mundi.default-admin.firstname:Default Admin}")
-    private String firstname;
+	@Value("${opertus-mundi.default-admin.firstName:Default Admin}")
+    private String firstName;
 
-	@Value("${opertus-mundi.default-admin.lastname:}")
-    private String lastname;
+	@Value("${opertus-mundi.default-admin.lastName:}")
+    private String lastName;
 
 	@Autowired
 	HelpdeskAccountRepository accountRepository;
@@ -67,8 +67,8 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 			command.setActive(true);
 			command.setBlocked(false);
 			command.setEmail(this.username);
-			command.setFirstName(this.firstname);
-			command.setLastName(this.lastname);
+			command.setFirstName(this.firstName);
+			command.setLastName(this.lastName);
 			command.setLocale("en");
 			command.setPassword(password);
 
