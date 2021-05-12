@@ -81,11 +81,11 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 
 			if(logPassword) {
     			logger.info(
-    				"Default admin user [{}] have been created. Password is [{}].",
+    				"Default admin user have been created. [username={}, password={}]",
     				this.username, password
     			);
 			} else {
-                logger.info("Default admin user [{}] have been created.", this.username);
+                logger.info("Default admin user have been created. [username={}]", this.username);
 			}
 		} catch (final Exception ex) {
 			logger.error("Failed to initialize application default account", ex);

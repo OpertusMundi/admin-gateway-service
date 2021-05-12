@@ -29,7 +29,7 @@ public class WorkflowControllerImpl implements WorkflowController {
 
             return RestResponse.result(result.getCount());
         } catch (final FeignException fex) {
-            logger.error("[Feign Client] Operation has failed", fex);
+        	logger.error("Operation has failed", fex);
 
             return RestResponse.failure();
         }
@@ -44,7 +44,7 @@ public class WorkflowControllerImpl implements WorkflowController {
 
 			return RestResponse.result(result);
 		} catch (final FeignException fex) {
-			logger.error("[Feign Client] Operation has failed", fex);
+			logger.error("Operation has failed", fex);
 
 			return RestResponse.failure();
 		}

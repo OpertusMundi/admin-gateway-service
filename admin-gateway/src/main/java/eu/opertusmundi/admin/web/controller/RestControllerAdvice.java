@@ -1,65 +1,172 @@
 package eu.opertusmundi.admin.web.controller;
 
-import java.util.Date;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
-import eu.opertusmundi.common.model.ApplicationException;
+import eu.opertusmundi.common.model.BaseResponse;
 import eu.opertusmundi.common.model.BasicMessageCode;
+import eu.opertusmundi.common.model.DebugRestResponse;
+import eu.opertusmundi.common.model.Message;
 import eu.opertusmundi.common.model.MessageCode;
 import eu.opertusmundi.common.model.RestResponse;
+import eu.opertusmundi.common.model.ServiceException;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
-@ControllerAdvice(annotations = { Controller.class })
+@ControllerAdvice
 public class RestControllerAdvice {
 
-	private static final Logger logger = LoggerFactory.getLogger(RestControllerAdvice.class);
+    private static final Logger logger = LoggerFactory.getLogger(RestControllerAdvice.class);
 
-	public static final String DEFAULT_ERROR_VIEW = "error";
-	public static final String STATUS_CODE = "404";
-	public static final String TYPE = "Custom Type";
+    private static final String DEVELOPMENT_PROFILE = "development";
 
-	@ExceptionHandler(value = { NoHandlerFoundException.class })
-	public ModelAndView defaultErrorHandler(HttpServletRequest request, Exception e) {
-		final ModelAndView mav = new ModelAndView(DEFAULT_ERROR_VIEW);
-		mav.addObject("timestamp", new Date());
-		mav.addObject("status", STATUS_CODE);
-		mav.addObject("type", TYPE);
-		mav.addObject("message", String.format("The requested url is: %s", request.getRequestURL()));
-		return mav;
-	}
+    @Value("${spring.profiles.active:}")
+    private String activeProfile;
 
-	@ResponseStatus(HttpStatus.OK)
-	@ExceptionHandler(Exception.class)
-	public @ResponseBody RestResponse<Void> handleException(Exception ex) {
+    @Autowired
+    private MessageSource messageSource;
 
-		logger.error(ex.getMessage(), ex);
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ApiResponse(
+        responseCode = "400",
+        description = "Bad Request",
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = DebugRestResponse.class))
+    )
+    public @ResponseBody BaseResponse handleException(HttpMessageNotReadableException ex) {
 
-		final MessageCode code = this.exceptionToErrorCode(ex);
+        logger.error(String.format("400 - Bad Request. [message=%s]: ", ex.getMessage()), ex);
 
-		return RestResponse.failure(code, ex.getMessage());
-	}
+        final MessageCode code        = BasicMessageCode.BadRequest;
+        final String      description = this.messageSource.getMessage(code.key(), null, Locale.getDefault());
 
-	private MessageCode exceptionToErrorCode(Exception ex) {
-		if (ex instanceof ApplicationException) {
-			return ((ApplicationException) ex).getCode();
-		}
-		if (ex instanceof DataIntegrityViolationException) {
-			return BasicMessageCode.ForeignKeyConstraint;
-		}
+        final Message error = new Message(code, description, Message.EnumLevel.ERROR);
 
-		return BasicMessageCode.InternalServerError;
-	}
+        if (this.isDevelopmentProfileActive()) {
+            return new DebugRestResponse(error, ex.getMessage(), ex);
+        }
 
+        return RestResponse.error(error);
+    }
+
+    @ResponseStatus(HttpStatus.PAYLOAD_TOO_LARGE)
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    @ApiResponse(
+        responseCode = "413",
+        description = "Payload Too Large",
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = DebugRestResponse.class))
+    )
+    public @ResponseBody BaseResponse handleException(MaxUploadSizeExceededException ex) {
+
+        logger.error(String.format("413 - Payload Too Large. [message=%s]: ", ex.getMessage()), ex);
+
+        final MessageCode code        = BasicMessageCode.PayloadTooLarge;
+        final String      description = this.messageSource.getMessage(code.key(), null, Locale.getDefault());
+
+        final Message error = new Message(code, description, Message.EnumLevel.ERROR);
+
+        if (this.isDevelopmentProfileActive()) {
+            return new DebugRestResponse(error, ex.getMessage(), ex);
+        }
+
+        return RestResponse.error(error);
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(AccessDeniedException.class)
+    @ApiResponse(
+        responseCode = "403",
+        description = "Forbidden",
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = DebugRestResponse.class))
+    )
+    public @ResponseBody BaseResponse handleException(
+        AccessDeniedException ex,  HttpServletRequest request
+    ) {
+
+        logger.error(String.format("403 - Forbidden. [path=%s, message=%s]: ", request.getRequestURI(), ex.getMessage()), ex);
+
+        final MessageCode      code        = BasicMessageCode.Forbidden;
+        final String           description = this.messageSource.getMessage(code.key(), null, Locale.getDefault());
+
+        final Message error = new Message(code, description, Message.EnumLevel.ERROR);
+
+        if (this.isDevelopmentProfileActive()) {
+            return new DebugRestResponse(error, ex.getMessage(), ex);
+        }
+
+        return RestResponse.error(error);
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(ServiceException.class)
+    @ApiResponse(
+        responseCode = "500",
+        description = "Internal Server Error",
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = DebugRestResponse.class))
+    )
+    public @ResponseBody BaseResponse handleException(ServiceException ex) {
+
+        if (ex.isLogEntryRequired()) {
+            logger.error(String.format("500 - Internal Server Error. [message=%s]: ", ex.getMessage()), ex);
+        }
+
+        final MessageCode      code        = ex.getCode();
+        final String           description = this.messageSource.getMessage(code.key(), null, Locale.getDefault());
+
+        final Message error = new Message(code, description, Message.EnumLevel.ERROR);
+
+        if (this.isDevelopmentProfileActive()) {
+            return new DebugRestResponse(error, ex.getMessage(), ex);
+        }
+
+        return RestResponse.error(error);
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(Exception.class)
+    @ApiResponse(
+        responseCode = "500",
+        description = "Internal Server Error",
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = DebugRestResponse.class))
+    )
+    public @ResponseBody BaseResponse handleException(Exception ex) {
+
+        logger.error(String.format("500 - Internal Server Error. [message=%s]: ", ex.getMessage()), ex);
+
+        final MessageCode      code        = BasicMessageCode.InternalServerError;
+        final String           description = this.messageSource.getMessage(code.key(), null, Locale.getDefault());
+
+        final Message error = new Message(code, description, Message.EnumLevel.ERROR);
+
+        if (this.isDevelopmentProfileActive()) {
+            return new DebugRestResponse(error, ex.getMessage(), ex);
+        }
+
+        return RestResponse.error(error);
+    }
+
+    private boolean isDevelopmentProfileActive() {
+        for (final String profileName : this.activeProfile.split(",")) {
+            if (profileName.equalsIgnoreCase(DEVELOPMENT_PROFILE)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

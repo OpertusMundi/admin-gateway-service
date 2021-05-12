@@ -41,7 +41,7 @@ public class ProviderAssetControllerImpl implements ProviderAssetController {
 		} catch (final AssetDraftException ex) {
 			return RestResponse.error(ex.getCode(), ex.getMessage());
 		} catch (final Exception ex) {
-			logger.error("[Catalogue] Operation has failed", ex);
+			logger.error("Operation has failed", ex);
 
 			return RestResponse.failure();
 		}
@@ -60,7 +60,7 @@ public class ProviderAssetControllerImpl implements ProviderAssetController {
         } catch (final AssetDraftException ex) {
             return RestResponse.error(ex.getCode(), ex.getMessage());
         } catch (final Exception ex) {
-            logger.error("[Catalogue] Operation has failed", ex);
+            logger.error("Operation has failed", ex);
 
             return RestResponse.failure();
         }
@@ -82,7 +82,7 @@ public class ProviderAssetControllerImpl implements ProviderAssetController {
         } catch (final AssetDraftException ex) {
             return RestResponse.error(ex.getCode(), ex.getMessage());
         } catch (final Exception ex) {
-            logger.error("[Catalogue] Operation has failed", ex);
+            logger.error("Operation has failed", ex);
         }
 
         return RestResponse.failure();
