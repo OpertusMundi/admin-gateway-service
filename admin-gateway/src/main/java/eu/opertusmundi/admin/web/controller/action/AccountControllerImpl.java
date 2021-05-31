@@ -24,9 +24,9 @@ import eu.opertusmundi.admin.web.repository.HelpdeskAccountRepository;
 import eu.opertusmundi.admin.web.validation.AccountValidator;
 import eu.opertusmundi.admin.web.validation.PasswordValidator;
 import eu.opertusmundi.common.model.BasicMessageCode;
+import eu.opertusmundi.common.model.EnumSortingOrder;
 import eu.opertusmundi.common.model.PageResultDto;
 import eu.opertusmundi.common.model.RestResponse;
-import eu.opertusmundi.common.model.dto.EnumSortingOrder;
 
 @RestController
 @Secured({ "ROLE_ADMIN", "ROLE_USER" })

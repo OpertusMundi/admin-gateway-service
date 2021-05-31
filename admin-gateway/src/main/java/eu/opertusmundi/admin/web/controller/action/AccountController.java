@@ -18,9 +18,9 @@ import eu.opertusmundi.admin.web.model.dto.AccountDto;
 import eu.opertusmundi.admin.web.model.dto.AccountFormDataDto;
 import eu.opertusmundi.admin.web.model.dto.EnumAccountSortField;
 import eu.opertusmundi.admin.web.model.dto.SetPasswordCommandDto;
+import eu.opertusmundi.common.model.EnumSortingOrder;
 import eu.opertusmundi.common.model.PageResultDto;
 import eu.opertusmundi.common.model.RestResponse;
-import eu.opertusmundi.common.model.dto.EnumSortingOrder;
 
 public interface AccountController {
 
