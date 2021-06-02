@@ -155,6 +155,8 @@ public class ContractControllerImpl extends BaseController implements ContractCo
 		final ContractEntity e = contractRepository.findById(resultRecord.getId()).get();
 		record.setId(e.getId());
 		
+		
+		
 		//List<SectionEntity> contractSections = contractRepository.findSectionsByContract(e);
 		List<Integer> newSectionIds = new ArrayList<Integer>(); 
 		int newId;

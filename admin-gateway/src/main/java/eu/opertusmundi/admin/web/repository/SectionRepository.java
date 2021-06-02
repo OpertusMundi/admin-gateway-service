@@ -1,6 +1,8 @@
 package eu.opertusmundi.admin.web.repository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.domain.Sort;
@@ -12,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import eu.opertusmundi.admin.web.domain.ContractEntity;
 import eu.opertusmundi.admin.web.domain.SectionEntity;
+import eu.opertusmundi.admin.web.domain.Suboption;
 import eu.opertusmundi.admin.web.model.dto.SectionDto;
 import eu.opertusmundi.common.model.ApplicationException;
 import eu.opertusmundi.common.model.BasicMessageCode;
@@ -44,7 +47,7 @@ public interface SectionRepository extends JpaRepository<SectionEntity, Integer>
 	
 	@Transactional(readOnly = false)
 	default SectionDto saveFrom(SectionDto s) {
-		
+
 		SectionEntity sectionEntity = null;
 		sectionEntity = this.findById(s.getId()).orElse(null);
 		if (sectionEntity == null) {
@@ -67,6 +70,7 @@ public interface SectionRepository extends JpaRepository<SectionEntity, Integer>
 		sectionEntity.setDynamic(s.isDynamic());
 		sectionEntity.setStyledOptions(s.getStyledOptions());
 		sectionEntity.setOptions(s.getOptions());
+		sectionEntity.setSuboptions(s.getSuboptions());
 		sectionEntity.setSummary(s.getSummary());
 		sectionEntity.setIcons(s.getIcons());
 		return saveAndFlush(sectionEntity).toDto();
