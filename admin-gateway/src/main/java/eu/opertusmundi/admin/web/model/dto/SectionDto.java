@@ -2,6 +2,7 @@ package eu.opertusmundi.admin.web.model.dto;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -29,6 +30,7 @@ public class SectionDto implements Serializable {
 	private boolean dynamic;
 	private List<String> options;
 	private List<String> styledOptions;
+	private Map<Integer, Object> suboptions;
 	private List<String> summary;
 	private List<String> icons;
 	private String descriptionOfChange;

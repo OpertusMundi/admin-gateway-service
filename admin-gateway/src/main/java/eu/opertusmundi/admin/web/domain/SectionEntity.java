@@ -1,6 +1,8 @@
 package eu.opertusmundi.admin.web.domain;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,10 +21,12 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import com.vladmihalcea.hibernate.type.array.ListArrayType;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 
 import eu.opertusmundi.admin.web.model.dto.SectionDto;
 
 
+@TypeDef(name = "json", typeClass = JsonBinaryType.class)
 @TypeDef(
 	    name = "list-array",
 	    typeClass = ListArrayType.class)
@@ -108,7 +112,14 @@ public class SectionEntity {
     @lombok.Setter()
     List<String> styledOptions ;
     
-
+    @Type(type = "json")
+    @Column(
+        name = "suboptions"
+    )
+    @lombok.Getter()
+    @lombok.Setter()
+    Map<Integer, Object> suboptions =  new HashMap<Integer, Object>();
+    
     @Type(type = "list-array")
     @Column(
         name = "summary",
@@ -132,6 +143,8 @@ public class SectionEntity {
     @lombok.Setter()
     String descriptionOfChange;
     
+    
+    
     //@OneToMany(
     //    mappedBy = "organization", fetch = FetchType.LAZY
     //)
@@ -153,6 +166,7 @@ public class SectionEntity {
         s.setSummary(summary);
         s.setOptions(options);
         s.setStyledOptions(styledOptions);
+        s.setSuboptions(suboptions);
         s.setIcons(icons);
         s.setDescriptionOfChange(descriptionOfChange);
         return s;
