@@ -27,8 +27,8 @@ class HomeControllerTests {
         this.mockMvc.perform(get("/")
             .contentType("text/html")
         )
-        	.andExpect(status().is3xxRedirection())
-        	.andExpect(view().name("redirect:/helpdesk/")
+        	.andExpect(status().isOk())
+        	.andExpect(view().name("index")
         );
     }
 
