@@ -50,3 +50,6 @@ docker-compose.yml
 # Archives
 *.7z
 *.zip
+
+# Test controller
+TestController.java
