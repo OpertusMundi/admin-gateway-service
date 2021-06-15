@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import eu.opertusmundi.admin.web.domain.ContractEntity;
 import eu.opertusmundi.admin.web.domain.HelpdeskAccountEntity;
 import eu.opertusmundi.admin.web.domain.SectionEntity;
-import eu.opertusmundi.admin.web.model.dto.ContractDto;
+import eu.opertusmundi.admin.web.model.contract.ContractDto;
 import eu.opertusmundi.common.model.ApplicationException;
 import eu.opertusmundi.common.model.BasicMessageCode;
 

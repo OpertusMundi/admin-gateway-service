@@ -4,9 +4,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
-import eu.opertusmundi.admin.web.model.dto.configuration.BingMapsConfigurationDto;
-import eu.opertusmundi.admin.web.model.dto.configuration.MapConfigurationDto;
-import eu.opertusmundi.admin.web.model.dto.configuration.OsmConfigurationDto;
+import eu.opertusmundi.admin.web.model.configuration.BingMapsConfigurationDto;
+import eu.opertusmundi.admin.web.model.configuration.MapConfigurationDto;
+import eu.opertusmundi.admin.web.model.configuration.OsmConfigurationDto;
 import lombok.Getter;
 import lombok.Setter;
 

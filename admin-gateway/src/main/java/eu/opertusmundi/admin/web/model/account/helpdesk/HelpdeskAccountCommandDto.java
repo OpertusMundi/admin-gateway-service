@@ -1,4 +1,4 @@
-package eu.opertusmundi.admin.web.model.dto;
+package eu.opertusmundi.admin.web.model.account.helpdesk;
 
 import java.io.Serializable;
 
@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class AccountCommandDto extends AccountBaseDto implements Serializable {
+public class HelpdeskAccountCommandDto extends HelpdeskAccountBaseDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 

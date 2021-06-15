@@ -1,8 +1,6 @@
 package eu.opertusmundi.admin.web.repository;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.domain.Sort;
@@ -14,8 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import eu.opertusmundi.admin.web.domain.ContractEntity;
 import eu.opertusmundi.admin.web.domain.SectionEntity;
-import eu.opertusmundi.admin.web.domain.Suboption;
-import eu.opertusmundi.admin.web.model.dto.SectionDto;
+import eu.opertusmundi.admin.web.model.contract.SectionDto;
 import eu.opertusmundi.common.model.ApplicationException;
 import eu.opertusmundi.common.model.BasicMessageCode;
 

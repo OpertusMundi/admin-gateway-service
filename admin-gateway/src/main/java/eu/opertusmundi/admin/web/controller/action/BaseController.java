@@ -10,7 +10,7 @@ import org.springframework.context.MessageSource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.opertusmundi.admin.web.model.EnumRole;
+import eu.opertusmundi.admin.web.model.account.helpdesk.EnumHelpdeskRole;
 import eu.opertusmundi.admin.web.service.IAuthenticationFacade;
 import eu.opertusmundi.common.model.ApplicationException;
 import eu.opertusmundi.common.model.BasicMessageCode;
@@ -41,18 +41,18 @@ public abstract class BaseController {
         return this.authenticationFacade.getCurrentUserLocale();
     }
 
-    protected boolean hasRole(EnumRole role) {
+    protected boolean hasRole(EnumHelpdeskRole role) {
         return this.authenticationFacade.hasRole(role);
     }
 
-    protected void hasAnyRole(EnumRole... roles) {
+    protected void hasAnyRole(EnumHelpdeskRole... roles) {
         if (!this.authenticationFacade.hasAnyRole(roles)) {
             throw this.accessDenied();
         }
     }
 
     protected boolean isSystemAdmin() {
-        return this.hasRole(EnumRole.ADMIN);
+        return this.hasRole(EnumHelpdeskRole.ADMIN);
     }
 
     private ApplicationException accessDenied() {

@@ -23,7 +23,7 @@ import org.hibernate.annotations.TypeDef;
 import com.vladmihalcea.hibernate.type.array.ListArrayType;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 
-import eu.opertusmundi.admin.web.model.dto.SectionDto;
+import eu.opertusmundi.admin.web.model.contract.SectionDto;
 
 
 @TypeDef(name = "json", typeClass = JsonBinaryType.class)

@@ -1,4 +1,4 @@
-package eu.opertusmundi.admin.web.model.dto;
+package eu.opertusmundi.admin.web.model.dashboard;
 
 import java.time.ZonedDateTime;
 

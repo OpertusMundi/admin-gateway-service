@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.opertusmundi.admin.web.domain.HelpdeskAccountEntity;
-import eu.opertusmundi.admin.web.model.EnumRole;
-import eu.opertusmundi.admin.web.model.dto.AccountCommandDto;
-import eu.opertusmundi.admin.web.model.dto.AccountDto;
-import eu.opertusmundi.admin.web.model.dto.AccountFormDataDto;
-import eu.opertusmundi.admin.web.model.dto.EnumAccountSortField;
-import eu.opertusmundi.admin.web.model.dto.SetPasswordCommandDto;
+import eu.opertusmundi.admin.web.model.account.helpdesk.EnumHelpdeskAccountSortField;
+import eu.opertusmundi.admin.web.model.account.helpdesk.EnumHelpdeskRole;
+import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskAccountCommandDto;
+import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskAccountDto;
+import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskAccountFormDataDto;
+import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskSetPasswordCommandDto;
 import eu.opertusmundi.admin.web.repository.HelpdeskAccountRepository;
 import eu.opertusmundi.admin.web.validation.AccountValidator;
 import eu.opertusmundi.admin.web.validation.PasswordValidator;
@@ -30,7 +30,7 @@ import eu.opertusmundi.common.model.RestResponse;
 
 @RestController
 @Secured({ "ROLE_ADMIN", "ROLE_USER" })
-public class AccountControllerImpl extends BaseController implements AccountController {
+public class HelpdeskAccountControllerImpl extends BaseController implements HelpdeskAccountController {
 
 	@Autowired
 	private HelpdeskAccountRepository accountRepository;
@@ -42,8 +42,8 @@ public class AccountControllerImpl extends BaseController implements AccountCont
 	private PasswordValidator passwordValidator;
 
 	@Override
-	public RestResponse<PageResultDto<AccountDto>> find(
-		int page, int size, String name, EnumAccountSortField orderBy, EnumSortingOrder order
+	public RestResponse<PageResultDto<HelpdeskAccountDto>> find(
+		int page, int size, String name, EnumHelpdeskAccountSortField orderBy, EnumSortingOrder order
 	) {
 
         final Direction   direction   = order == EnumSortingOrder.DESC ? Direction.DESC : Direction.ASC;
@@ -56,24 +56,24 @@ public class AccountControllerImpl extends BaseController implements AccountCont
 			pageRequest
 		);
 
-		final Page<AccountDto> p = entities.map(HelpdeskAccountEntity::toDto);
+		final Page<HelpdeskAccountDto> p = entities.map(HelpdeskAccountEntity::toDto);
 
 		final long count = p.getTotalElements();
-		final List<AccountDto> records = p.stream().collect(Collectors.toList());
-		final PageResultDto<AccountDto> result = PageResultDto.of(page, size, records, count);
+		final List<HelpdeskAccountDto> records = p.stream().collect(Collectors.toList());
+		final PageResultDto<HelpdeskAccountDto> result = PageResultDto.of(page, size, records, count);
 
 		return RestResponse.result(result);
 	}
 
 	@Override
-	public RestResponse<AccountFormDataDto> findOne(int id) {
+	public RestResponse<HelpdeskAccountFormDataDto> findOne(int id) {
 		final HelpdeskAccountEntity e = this.accountRepository.findById(id).orElse(null);
 
 		if (e == null) {
 			return RestResponse.notFound();
 		}
 
-		final AccountFormDataDto result = new AccountFormDataDto();
+		final HelpdeskAccountFormDataDto result = new HelpdeskAccountFormDataDto();
 
 		result.setAccount(e.toDto());
 
@@ -81,20 +81,20 @@ public class AccountControllerImpl extends BaseController implements AccountCont
 	}
 
 	@Override
-	public RestResponse<AccountDto> create(AccountCommandDto command, BindingResult validationResult) {
+	public RestResponse<HelpdeskAccountDto> create(HelpdeskAccountCommandDto command, BindingResult validationResult) {
         this.accountValidator.validate(command, validationResult);
 
 		if (validationResult.hasErrors()) {
 			return RestResponse.invalid(validationResult.getFieldErrors());
 		}
 
-		final AccountDto result = this.accountRepository.saveFrom(this.currentUserId(), command);
+		final HelpdeskAccountDto result = this.accountRepository.saveFrom(this.currentUserId(), command);
 
 		return RestResponse.result(result);
 	}
 
 	@Override
-	public RestResponse<AccountDto> update(int id, AccountCommandDto command, BindingResult validationResult) {
+	public RestResponse<HelpdeskAccountDto> update(int id, HelpdeskAccountCommandDto command, BindingResult validationResult) {
 	    command.setId(id);
 
 		this.accountValidator.validate(command, validationResult);
@@ -103,7 +103,7 @@ public class AccountControllerImpl extends BaseController implements AccountCont
 			return RestResponse.invalid(validationResult.getFieldErrors());
 		}
 
-		final AccountDto result = this.accountRepository.saveFrom(this.currentUserId(), command);
+		final HelpdeskAccountDto result = this.accountRepository.saveFrom(this.currentUserId(), command);
 
 		return RestResponse.result(result);
 	}
@@ -125,7 +125,7 @@ public class AccountControllerImpl extends BaseController implements AccountCont
 	}
 
 	@Override
-	public RestResponse<AccountDto> grantRole(@PathVariable int accountId, @PathVariable EnumRole roleId) {
+	public RestResponse<HelpdeskAccountDto> grantRole(@PathVariable int accountId, @PathVariable EnumHelpdeskRole roleId) {
 
 		final HelpdeskAccountEntity account = this.accountRepository.findById(accountId).orElse(null);
 		if (account == null) {
@@ -142,7 +142,7 @@ public class AccountControllerImpl extends BaseController implements AccountCont
 	}
 
 	@Override
-	public RestResponse<AccountDto> revokeRole(@PathVariable int accountId, @PathVariable EnumRole roleId) {
+	public RestResponse<HelpdeskAccountDto> revokeRole(@PathVariable int accountId, @PathVariable EnumHelpdeskRole roleId) {
 
 		final HelpdeskAccountEntity account = this.accountRepository.findById(accountId).orElse(null);
 		if (account == null) {
@@ -159,14 +159,14 @@ public class AccountControllerImpl extends BaseController implements AccountCont
 
 	@Override
 	@Secured({ "ROLE_USER" })
-	public RestResponse<AccountDto> setUserPassword(SetPasswordCommandDto command, BindingResult validationResult) {
+	public RestResponse<HelpdeskAccountDto> setUserPassword(HelpdeskSetPasswordCommandDto command, BindingResult validationResult) {
 		this.passwordValidator.validate(command, validationResult);
 
 		if (validationResult.hasErrors()) {
 			return RestResponse.invalid(validationResult.getFieldErrors());
 		}
 
-		final AccountDto account = this.accountRepository.setPassword(this.currentUserId(), command.getPassword());
+		final HelpdeskAccountDto account = this.accountRepository.setPassword(this.currentUserId(), command.getPassword());
 
 		return RestResponse.result(account);
 	}

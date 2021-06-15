@@ -17,7 +17,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
-import eu.opertusmundi.admin.web.model.EnumRole;
+import eu.opertusmundi.admin.web.model.account.helpdesk.EnumHelpdeskRole;
 
 @Entity(name = "HelpdeskAccountRole")
 @Table(
@@ -42,7 +42,7 @@ public class HelpdeskAccountRoleEntity
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "`role`", nullable = false)
-    EnumRole role;
+    EnumHelpdeskRole role;
 
     @Column(name = "granted_at")
     ZonedDateTime grantedAt;
@@ -53,13 +53,13 @@ public class HelpdeskAccountRoleEntity
 
     HelpdeskAccountRoleEntity() {}
 
-    public HelpdeskAccountRoleEntity(HelpdeskAccountEntity account, EnumRole role)
+    public HelpdeskAccountRoleEntity(HelpdeskAccountEntity account, EnumHelpdeskRole role)
     {
         this(account, role, null, null);
     }
 
     public HelpdeskAccountRoleEntity(
-        HelpdeskAccountEntity account, EnumRole role, ZonedDateTime grantedAt, HelpdeskAccountEntity grantedBy)
+        HelpdeskAccountEntity account, EnumHelpdeskRole role, ZonedDateTime grantedAt, HelpdeskAccountEntity grantedBy)
     {
         this.account = account;
         this.role = role;
@@ -72,7 +72,7 @@ public class HelpdeskAccountRoleEntity
         return this.account;
     }
 
-    public EnumRole getRole()
+    public EnumHelpdeskRole getRole()
     {
         return this.role;
     }

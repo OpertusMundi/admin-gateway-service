@@ -13,7 +13,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import eu.opertusmundi.admin.web.model.dto.ContractHistoryDto;
+import eu.opertusmundi.admin.web.model.contract.ContractHistoryDto;
 
 
 @Entity(name = "ContractHistory")

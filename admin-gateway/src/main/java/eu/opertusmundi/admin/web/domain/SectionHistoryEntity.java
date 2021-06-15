@@ -20,7 +20,7 @@ import org.hibernate.annotations.TypeDef;
 
 import com.vladmihalcea.hibernate.type.array.ListArrayType;
 
-import eu.opertusmundi.admin.web.model.dto.SectionHistoryDto;
+import eu.opertusmundi.admin.web.model.contract.SectionHistoryDto;
 
 
 @TypeDef(

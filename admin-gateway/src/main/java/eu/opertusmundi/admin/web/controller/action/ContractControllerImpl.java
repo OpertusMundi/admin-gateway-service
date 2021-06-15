@@ -14,10 +14,10 @@ import eu.opertusmundi.admin.web.domain.ContractHistoryEntity;
 import eu.opertusmundi.admin.web.domain.HelpdeskAccountEntity;
 import eu.opertusmundi.admin.web.domain.SectionEntity;
 import eu.opertusmundi.admin.web.domain.SectionHistoryEntity;
-import eu.opertusmundi.admin.web.model.dto.AccountDto;
-import eu.opertusmundi.admin.web.model.dto.ContractDto;
-import eu.opertusmundi.admin.web.model.dto.ContractHistoryDto;
-import eu.opertusmundi.admin.web.model.dto.SectionDto;
+import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskAccountDto;
+import eu.opertusmundi.admin.web.model.contract.ContractDto;
+import eu.opertusmundi.admin.web.model.contract.ContractHistoryDto;
+import eu.opertusmundi.admin.web.model.contract.SectionDto;
 import eu.opertusmundi.admin.web.repository.ContractHistoryRepository;
 import eu.opertusmundi.admin.web.repository.ContractRepository;
 import eu.opertusmundi.admin.web.repository.HelpdeskAccountRepository;
@@ -105,7 +105,7 @@ public class ContractControllerImpl extends BaseController implements ContractCo
 		//final Optional<AccountEntity> accountEntity = accountRepo.findOneByUsername(this.currentUserName());
 
 		// Retrieve entity from repository
-		final AccountDto account = helpdeskAccountRepo.findOneByEmail(this.currentUserName()).get().toDto();
+		final HelpdeskAccountDto account = helpdeskAccountRepo.findOneByEmail(this.currentUserName()).get().toDto();
 
 		record.setAccount(account);
 		List<SectionDto> sections = record.getSections();
@@ -143,7 +143,7 @@ public class ContractControllerImpl extends BaseController implements ContractCo
 		
 		// increment version
 		record.setVersion("" + (Integer.parseInt(record.getVersion())+1));
-		final AccountDto account = helpdeskAccountRepo.findOneByEmail(this.currentUserName()).get().toDto();
+		final HelpdeskAccountDto account = helpdeskAccountRepo.findOneByEmail(this.currentUserName()).get().toDto();
 
 		record.setAccount(account);
 		List<SectionDto> sections = record.getSections();

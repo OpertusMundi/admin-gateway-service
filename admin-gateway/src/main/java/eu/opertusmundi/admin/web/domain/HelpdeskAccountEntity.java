@@ -25,9 +25,9 @@ import javax.validation.constraints.Pattern;
 import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.Type;
 
-import eu.opertusmundi.admin.web.model.EnumRole;
-import eu.opertusmundi.admin.web.model.dto.AccountDto;
-import eu.opertusmundi.admin.web.model.dto.ProfileCommandDto;
+import eu.opertusmundi.admin.web.model.account.helpdesk.EnumHelpdeskRole;
+import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskAccountDto;
+import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskProfileCommandDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -163,15 +163,15 @@ public class HelpdeskAccountEntity {
         return this.email;
     }
 
-    public Set<EnumRole> getRoles() {
-        final EnumSet<EnumRole> r = EnumSet.noneOf(EnumRole.class);
+    public Set<EnumHelpdeskRole> getRoles() {
+        final EnumSet<EnumHelpdeskRole> r = EnumSet.noneOf(EnumHelpdeskRole.class);
         for (final HelpdeskAccountRoleEntity ar: this.roles) {
             r.add(ar.role);
         }
         return r;
     }
 
-    public boolean hasRole(EnumRole role) {
+    public boolean hasRole(EnumHelpdeskRole role) {
         for (final HelpdeskAccountRoleEntity ar: this.roles) {
             if (role == ar.role) {
                 return true;
@@ -180,13 +180,13 @@ public class HelpdeskAccountEntity {
         return false;
     }
 
-    public void grant(EnumRole role, HelpdeskAccountEntity grantedBy) {
+    public void grant(EnumHelpdeskRole role, HelpdeskAccountEntity grantedBy) {
         if (!this.hasRole(role)) {
             this.roles.add(new HelpdeskAccountRoleEntity(this, role, ZonedDateTime.now(), grantedBy));
         }
     }
 
-    public void revoke(EnumRole role) {
+    public void revoke(EnumHelpdeskRole role) {
         HelpdeskAccountRoleEntity target = null;
         for (final HelpdeskAccountRoleEntity ar: this.roles) {
             if (role == ar.role) {
@@ -203,7 +203,7 @@ public class HelpdeskAccountEntity {
         this.roles.clear();
     }
 
-    public void updateProfile(ProfileCommandDto command) {
+    public void updateProfile(HelpdeskProfileCommandDto command) {
         this.firstName     = command.getFirstName();
         this.image         = command.getImage();
         this.imageMimeType = command.getImageMimeType();
@@ -214,8 +214,8 @@ public class HelpdeskAccountEntity {
         this.phone         = command.getPhone();
     }
 
-	public AccountDto toDto() {
-		final AccountDto a = new AccountDto();
+	public HelpdeskAccountDto toDto() {
+		final HelpdeskAccountDto a = new HelpdeskAccountDto();
 
 		a.setActive(this.active);
 		a.setBlocked(this.blocked);

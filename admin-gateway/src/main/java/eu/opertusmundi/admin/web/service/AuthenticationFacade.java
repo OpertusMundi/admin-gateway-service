@@ -7,7 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import eu.opertusmundi.admin.web.model.EnumRole;
+import eu.opertusmundi.admin.web.model.account.helpdesk.EnumHelpdeskRole;
 import eu.opertusmundi.admin.web.service.DefaultUserDetailsService.Details;
 
 @Component
@@ -32,11 +32,11 @@ public class AuthenticationFacade implements IAuthenticationFacade {
 
     @Override
     public boolean isSystemAdmin() {
-        return this.hasRole(EnumRole.ADMIN);
+        return this.hasRole(EnumHelpdeskRole.ADMIN);
     }
 
     @Override
-    public boolean hasRole(EnumRole role) {
+    public boolean hasRole(EnumHelpdeskRole role) {
         final Authentication authentication = this.getAuthentication();
         if (authentication == null) {
             return false;
@@ -45,11 +45,11 @@ public class AuthenticationFacade implements IAuthenticationFacade {
     }
 
     @Override
-    public boolean hasAnyRole(EnumRole... roles) {
+    public boolean hasAnyRole(EnumHelpdeskRole... roles) {
         if (roles == null) {
             return false;
         }
-        for (final EnumRole role : roles) {
+        for (final EnumHelpdeskRole role : roles) {
             if (this.hasRole(role)) {
                 return true;
             }

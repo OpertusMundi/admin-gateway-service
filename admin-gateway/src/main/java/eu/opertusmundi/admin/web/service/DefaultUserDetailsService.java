@@ -13,8 +13,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import eu.opertusmundi.admin.web.domain.HelpdeskAccountEntity;
-import eu.opertusmundi.admin.web.model.EnumRole;
-import eu.opertusmundi.admin.web.model.dto.AccountDto;
+import eu.opertusmundi.admin.web.model.account.helpdesk.EnumHelpdeskRole;
+import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskAccountDto;
 import eu.opertusmundi.admin.web.repository.HelpdeskAccountRepository;
 
 @Service
@@ -24,11 +24,11 @@ public class DefaultUserDetailsService implements UserDetailsService
     {
         private static final long serialVersionUID = 1L;
 
-        private final AccountDto account;
+        private final HelpdeskAccountDto account;
 
         private final String password;
 
-        public Details(AccountDto account, String password)
+        public Details(HelpdeskAccountDto account, String password)
         {
             this.account = account;
             this.password = password;
@@ -38,7 +38,7 @@ public class DefaultUserDetailsService implements UserDetailsService
         public Collection<? extends GrantedAuthority> getAuthorities()
         {
             final List<GrantedAuthority> authorities = new ArrayList<>();
-            for (final EnumRole role: this.account.getRoles()) {
+            for (final EnumHelpdeskRole role: this.account.getRoles()) {
                 authorities.add(new SimpleGrantedAuthority("ROLE_" + role.name()));
             }
             return authorities;
@@ -88,7 +88,7 @@ public class DefaultUserDetailsService implements UserDetailsService
             return this.account.getLocale();
         }
 
-        public boolean hasRole(EnumRole role) {
+        public boolean hasRole(EnumHelpdeskRole role) {
             return this.account.hasRole(role);
         }
     }

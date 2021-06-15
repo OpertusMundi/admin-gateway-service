@@ -1,11 +1,10 @@
-package eu.opertusmundi.admin.web.model.dto;
+package eu.opertusmundi.admin.web.model.account.helpdesk;
 
 import java.io.Serializable;
 import java.util.Set;
 
 import javax.validation.constraints.NotEmpty;
 
-import eu.opertusmundi.admin.web.model.EnumRole;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public abstract class AccountBaseDto implements Serializable {
+public abstract class HelpdeskAccountBaseDto implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -42,9 +41,9 @@ public abstract class AccountBaseDto implements Serializable {
 
     private String phone;
 
-    private Set<EnumRole> roles;
+    private Set<EnumHelpdeskRole> roles;
 
-    public boolean hasRole(EnumRole role) {
+    public boolean hasRole(EnumHelpdeskRole role) {
         return this.roles.contains(role);
     }
 

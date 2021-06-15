@@ -1,4 +1,4 @@
-package eu.opertusmundi.admin.web.model.dto;
+package eu.opertusmundi.admin.web.model.contract;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
@@ -8,6 +8,7 @@ import javax.validation.constraints.NotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskAccountDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -19,14 +20,18 @@ import lombok.Setter;
 @Data
 @Getter
 @Setter
-public class ContractDto implements Serializable {
+public class ContractHistoryDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
 	private Integer id;
+
+	@JsonIgnore
+	private ContractDto parentId;
 	
 	@NotEmpty
 	private String title;
+	
 	
 	private String subtitle;
 	
@@ -35,10 +40,10 @@ public class ContractDto implements Serializable {
 	private String version;
 	
 	@JsonIgnore
-	private AccountDto account;
+	private HelpdeskAccountDto account;
 	
 
-	private List<SectionDto> sections;
+	private List<SectionHistoryDto> sections;
 	
     private ZonedDateTime createdAt;
     

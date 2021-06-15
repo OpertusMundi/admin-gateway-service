@@ -40,6 +40,12 @@ public class DefaultBpmEngineService implements BpmEngineService {
     private void init() {
         jdbcTemplate = new JdbcTemplate(camundaDataSource);
     }
+    
+    public Long countProcessInstances() {
+        final CountResultDto result = this.bpmClient.getObject().countProcessInstances();
+
+        return result.getCount();
+    }
 
     public PageResultDto<ProcessInstanceDto> getRunningProcessInstances(
         int page, int size, String businessKey, EnumProcessInstanceSortField orderBy, EnumSortingOrder order
@@ -122,7 +128,7 @@ public class DefaultBpmEngineService implements BpmEngineService {
     }
 
     public PageResultDto<IncidentDto> getIncidents(
-        int page, int size, String processInstanceId, EnumIncidentSortField orderBy, EnumSortingOrder order
+        int page, int size, String businessKey, EnumIncidentSortField orderBy, EnumSortingOrder order
     ) {
         final String countQuery =
             "select  count(*) " +
@@ -170,8 +176,8 @@ public class DefaultBpmEngineService implements BpmEngineService {
 
 
         // Add filtering
-        if (!StringUtils.isBlank(processInstanceId)) {
-            selectQuery += "and ex.id_ = ? ";
+        if (!StringUtils.isBlank(businessKey)) {
+            selectQuery += "and ex.business_key_ = ? ";
         }
 
         // Add sorting
@@ -181,8 +187,8 @@ public class DefaultBpmEngineService implements BpmEngineService {
 
         final List<Object> args = new ArrayList<>();
 
-        if (!StringUtils.isBlank(processInstanceId)) {
-            args.add(processInstanceId);
+        if (!StringUtils.isBlank(businessKey)) {
+            args.add(businessKey);
         }
 
         args.add(Integer.valueOf(page * size));

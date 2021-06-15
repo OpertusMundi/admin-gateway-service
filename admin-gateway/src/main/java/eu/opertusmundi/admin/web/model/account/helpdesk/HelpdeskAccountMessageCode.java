@@ -1,8 +1,8 @@
-package eu.opertusmundi.admin.web.model;
+package eu.opertusmundi.admin.web.model.account.helpdesk;
 
 import eu.opertusmundi.common.model.MessageCode;
 
-public enum AccountMessageCode implements MessageCode
+public enum HelpdeskAccountMessageCode implements MessageCode
 {
     UNKNOWN,
     ACCOUNT_NOT_SET,

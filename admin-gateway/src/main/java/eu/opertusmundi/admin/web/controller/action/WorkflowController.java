@@ -14,6 +14,14 @@ import eu.opertusmundi.common.model.RestResponse;
 @Secured({ "ROLE_USER" })
 public interface WorkflowController {
 
+    /**
+     * Count process instances
+     * 
+     * @return
+     */
+    @GetMapping(value = "/workflows/process-instances/count")
+    RestResponse<?> countProcessInstances();
+    
 	/**
 	 * Count incidents
 	 * 
@@ -32,7 +40,7 @@ public interface WorkflowController {
 	 * @param order
 	 * @return
 	 */
-    @GetMapping(value = "/workflows/instances")
+    @GetMapping(value = "/workflows/process-instances")
     RestResponse<?> getInstances(
         @RequestParam(name = "page", required = true) Integer page,
         @RequestParam(name = "size", required = true) Integer size,
@@ -55,7 +63,7 @@ public interface WorkflowController {
 	RestResponse<?> getIncidents(
         @RequestParam(name = "page", required = true) Integer page,
         @RequestParam(name = "size", required = true) Integer size,
-        @RequestParam(name = "processInstanceId", defaultValue = "") String processInstanceId,
+        @RequestParam(name = "businessKey", defaultValue = "") String businessKey,
         @RequestParam(name = "orderBy", defaultValue = "START_TIME") EnumIncidentSortField orderBy,
         @RequestParam(name = "order", defaultValue = "DESC") EnumSortingOrder order
     );

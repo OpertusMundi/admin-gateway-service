@@ -17,24 +17,24 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import eu.opertusmundi.admin.web.domain.HelpdeskAccountEntity;
-import eu.opertusmundi.admin.web.model.EnumRole;
-import eu.opertusmundi.admin.web.model.dto.AccountCommandDto;
-import eu.opertusmundi.admin.web.model.dto.AccountDto;
-import eu.opertusmundi.admin.web.model.dto.ProfileCommandDto;
+import eu.opertusmundi.admin.web.model.account.helpdesk.EnumHelpdeskRole;
+import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskAccountCommandDto;
+import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskAccountDto;
+import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskProfileCommandDto;
 
 @Repository
 @Transactional(readOnly = true)
 public interface HelpdeskAccountRepository extends JpaRepository<HelpdeskAccountEntity, Integer> {
 
 	@Query("SELECT count(a) FROM HelpdeskAccount a INNER JOIN a.roles r WHERE r.role = :role")
-	long countByRole(@Param("role") EnumRole role);
+	long countByRole(@Param("role") EnumHelpdeskRole role);
 
 	Optional<HelpdeskAccountEntity> findOneByEmail(String email);
 
 	Optional<HelpdeskAccountEntity> findOneByEmailAndIdNot(String email, Integer id);
 
 	@Query("select count(a) from HelpdeskAccount a inner join a.roles r where r.role = :role")
-	Optional<Long> countUsersWithRole(@Param("role") EnumRole role);
+	Optional<Long> countUsersWithRole(@Param("role") EnumHelpdeskRole role);
 
 	@Query("SELECT a FROM HelpdeskAccount a WHERE a.email like :email")
 	Page<HelpdeskAccountEntity> findAllByEmailContains(
@@ -53,7 +53,7 @@ public interface HelpdeskAccountRepository extends JpaRepository<HelpdeskAccount
 	void setBlocked(@Param("id") Integer id, @Param("blocked") boolean blocked);
 
 	@Transactional(readOnly = false)
-	default AccountDto setPassword(Integer id, String password) {
+	default HelpdeskAccountDto setPassword(Integer id, String password) {
 
 		// Retrieve entity from repository
 		final HelpdeskAccountEntity accountEntity = this.findById(id).orElse(null);
@@ -71,7 +71,7 @@ public interface HelpdeskAccountRepository extends JpaRepository<HelpdeskAccount
 	}
 
 	@Transactional(readOnly = false)
-	default AccountDto saveFrom(Integer creatorId, AccountCommandDto command) {
+	default HelpdeskAccountDto saveFrom(Integer creatorId, HelpdeskAccountCommandDto command) {
         final ZonedDateTime now     = ZonedDateTime.now();
         final HelpdeskAccountEntity creator = creatorId == null ? null : this.findById(creatorId).orElse(null);
 
@@ -109,14 +109,14 @@ public interface HelpdeskAccountRepository extends JpaRepository<HelpdeskAccount
 		accountEntity.setPhone(command.getPhone());
 
 		// Roles
-		final EnumRole[] currentRoles = accountEntity.getRoles().stream().toArray(EnumRole[]::new);
-		for (final EnumRole role : currentRoles) {
+		final EnumHelpdeskRole[] currentRoles = accountEntity.getRoles().stream().toArray(EnumHelpdeskRole[]::new);
+		for (final EnumHelpdeskRole role : currentRoles) {
 			if (!command.getRoles().contains(role)) {
 				accountEntity.revoke(role);
 			}
 		}
 
-		for (final EnumRole role : command.getRoles()) {
+		for (final EnumHelpdeskRole role : command.getRoles()) {
 			if (!accountEntity.hasRole(role)) {
 				accountEntity.grant(role, creator);
 			}
@@ -126,7 +126,7 @@ public interface HelpdeskAccountRepository extends JpaRepository<HelpdeskAccount
 	}
 
 	@Transactional(readOnly = false)
-	default AccountDto saveProfile(ProfileCommandDto command) {
+	default HelpdeskAccountDto saveProfile(HelpdeskProfileCommandDto command) {
 		HelpdeskAccountEntity accountEntity = null;
 
 		if (command.getId() != null) {

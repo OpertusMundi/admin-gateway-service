@@ -16,8 +16,8 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import eu.opertusmundi.admin.web.model.EnumRole;
-import eu.opertusmundi.admin.web.model.dto.AccountCommandDto;
+import eu.opertusmundi.admin.web.model.account.helpdesk.EnumHelpdeskRole;
+import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskAccountCommandDto;
 import eu.opertusmundi.admin.web.repository.HelpdeskAccountRepository;
 
 @Profile({"development", "production"})
@@ -60,7 +60,7 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 		// Create default organization and system administrator account
 		try {
 			// Create default user
-			final AccountCommandDto command = new AccountCommandDto();
+			final HelpdeskAccountCommandDto command = new HelpdeskAccountCommandDto();
             final boolean           logPassword = StringUtils.isBlank(this.password);
             final String            password    = logPassword ? UUID.randomUUID().toString() : this.password;
 
@@ -72,8 +72,8 @@ public class StartupApplicationListener implements ApplicationListener<ContextRe
 			command.setLocale("en");
 			command.setPassword(password);
 
-			final EnumRole[] roleArray = { EnumRole.USER, EnumRole.ADMIN };
-			final Set<EnumRole> roleSet = new HashSet<EnumRole>(Arrays.asList(roleArray));
+			final EnumHelpdeskRole[] roleArray = { EnumHelpdeskRole.USER, EnumHelpdeskRole.ADMIN };
+			final Set<EnumHelpdeskRole> roleSet = new HashSet<EnumHelpdeskRole>(Arrays.asList(roleArray));
 
 			command.setRoles(roleSet);
 

@@ -12,8 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import eu.opertusmundi.admin.web.domain.ContractHistoryEntity;
 import eu.opertusmundi.admin.web.domain.SectionHistoryEntity;
-import eu.opertusmundi.admin.web.model.dto.SectionDto;
-import eu.opertusmundi.admin.web.model.dto.SectionHistoryDto;
+import eu.opertusmundi.admin.web.model.contract.SectionDto;
+import eu.opertusmundi.admin.web.model.contract.SectionHistoryDto;
 import eu.opertusmundi.common.model.ApplicationException;
 import eu.opertusmundi.common.model.BasicMessageCode;
 

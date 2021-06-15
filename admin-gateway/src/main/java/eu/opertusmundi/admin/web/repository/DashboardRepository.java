@@ -6,7 +6,7 @@ import javax.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import eu.opertusmundi.admin.web.model.dto.DashboardDto;
+import eu.opertusmundi.admin.web.model.dashboard.DashboardDto;
 
 @Repository()
 @Transactional(readOnly = true)

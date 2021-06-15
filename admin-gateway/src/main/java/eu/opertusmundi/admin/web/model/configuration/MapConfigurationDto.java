@@ -1,4 +1,4 @@
-package eu.opertusmundi.admin.web.model.dto.configuration;
+package eu.opertusmundi.admin.web.model.configuration;
 
 import lombok.Getter;
 import lombok.Setter;

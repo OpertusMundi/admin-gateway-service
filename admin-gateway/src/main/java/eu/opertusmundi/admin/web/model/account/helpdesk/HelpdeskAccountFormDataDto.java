@@ -1,4 +1,4 @@
-package eu.opertusmundi.admin.web.model.dto;
+package eu.opertusmundi.admin.web.model.account.helpdesk;
 
 import java.io.Serializable;
 
@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Data
-public class AccountFormDataDto implements Serializable {
+public class HelpdeskAccountFormDataDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private AccountDto account;
+	private HelpdeskAccountDto account;
 
 }

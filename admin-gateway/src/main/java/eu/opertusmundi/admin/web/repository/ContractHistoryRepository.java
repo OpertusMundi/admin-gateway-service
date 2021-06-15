@@ -14,7 +14,7 @@ import eu.opertusmundi.admin.web.domain.ContractEntity;
 import eu.opertusmundi.admin.web.domain.ContractHistoryEntity;
 import eu.opertusmundi.admin.web.domain.HelpdeskAccountEntity;
 import eu.opertusmundi.admin.web.domain.SectionHistoryEntity;
-import eu.opertusmundi.admin.web.model.dto.ContractHistoryDto;
+import eu.opertusmundi.admin.web.model.contract.ContractHistoryDto;
 import eu.opertusmundi.common.model.ApplicationException;
 import eu.opertusmundi.common.model.BasicMessageCode;
 

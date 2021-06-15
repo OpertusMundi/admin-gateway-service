@@ -1,11 +1,11 @@
-package eu.opertusmundi.admin.web.model;
+package eu.opertusmundi.admin.web.model.account.helpdesk;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public enum EnumRole
+public enum EnumHelpdeskRole
 {
     ADMIN       ("system administrator"),
     USER       	("User"),

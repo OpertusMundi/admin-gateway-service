@@ -18,6 +18,14 @@ public class WorkflowControllerImpl implements WorkflowController {
     @Autowired
     private BpmEngineService bpmEngineService;
 
+
+    @Override
+    public RestResponse<?> countProcessInstances() {
+        final Long result = this.bpmEngineService.countProcessInstances();
+
+        return RestResponse.result(result);
+    }
+    
     @Override
     public RestResponse<?> getInstances(
         Integer page, Integer size, String businessKey, EnumProcessInstanceSortField orderBy, EnumSortingOrder order
@@ -37,10 +45,10 @@ public class WorkflowControllerImpl implements WorkflowController {
 
     @Override
     public RestResponse<?> getIncidents(
-        Integer page, Integer size, String processInstanceId, EnumIncidentSortField orderBy, EnumSortingOrder order
+        Integer page, Integer size, String businessKey, EnumIncidentSortField orderBy, EnumSortingOrder order
     ) {
         final PageResultDto<IncidentDto> result = this.bpmEngineService.getIncidents(
-            page, size, processInstanceId, orderBy, order
+            page, size, businessKey, orderBy, order
         );
 
         return RestResponse.result(result);

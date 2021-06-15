@@ -9,6 +9,8 @@ import eu.opertusmundi.common.model.PageResultDto;
 
 public interface BpmEngineService {
 
+    Long countProcessInstances();
+    
     PageResultDto<ProcessInstanceDto> getRunningProcessInstances(
         int page, int size, String businessKey, EnumProcessInstanceSortField orderBy, EnumSortingOrder order
     );
@@ -16,7 +18,7 @@ public interface BpmEngineService {
     Long countIncidents();
 
     PageResultDto<IncidentDto> getIncidents(
-        int page, int size, String processInstanceId, EnumIncidentSortField orderBy, EnumSortingOrder order
+        int page, int size, String businessKey, EnumIncidentSortField orderBy, EnumSortingOrder order
     );
 
 }

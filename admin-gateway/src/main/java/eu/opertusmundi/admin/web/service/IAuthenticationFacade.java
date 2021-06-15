@@ -5,7 +5,7 @@ import java.util.Locale;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import eu.opertusmundi.admin.web.model.EnumRole;
+import eu.opertusmundi.admin.web.model.account.helpdesk.EnumHelpdeskRole;
 
 public interface IAuthenticationFacade {
 
@@ -32,14 +32,14 @@ public interface IAuthenticationFacade {
      * Returns {@code true} if the user is authenticated and has the given {@code role}
      * @return
      */
-    boolean hasRole(EnumRole role);
+    boolean hasRole(EnumHelpdeskRole role);
 
     /**
      * Returns {@code true} if the user has any of the roles in the {@code roles} array.
      * @param roles the roles to check
      * @return
      */
-    boolean hasAnyRole(EnumRole... roles);
+    boolean hasAnyRole(EnumHelpdeskRole... roles);
 
     /**
      * Get the unique id of the authenticated user

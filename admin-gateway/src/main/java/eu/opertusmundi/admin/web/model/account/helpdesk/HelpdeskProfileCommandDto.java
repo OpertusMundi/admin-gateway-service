@@ -1,4 +1,4 @@
-package eu.opertusmundi.admin.web.model.dto;
+package eu.opertusmundi.admin.web.model.account.helpdesk;
 
 import javax.validation.constraints.NotEmpty;
 
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Data
-public class ProfileCommandDto {
+public class HelpdeskProfileCommandDto {
 
     @NotEmpty
     private String firstName;

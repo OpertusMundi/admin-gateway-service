@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import eu.opertusmundi.admin.web.model.dto.ContractDto;
+import eu.opertusmundi.admin.web.model.contract.ContractDto;
 import eu.opertusmundi.common.model.RestResponse;
 
 public interface ContractController {
