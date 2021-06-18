@@ -7,7 +7,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.opertusmundi.admin.web.model.workflow.EnumIncidentSortField;
+import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceHistorySortField;
 import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceSortField;
+import eu.opertusmundi.admin.web.model.workflow.HistoryProcessInstanceDetailsDto;
 import eu.opertusmundi.admin.web.model.workflow.IncidentDto;
 import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceDetailsDto;
 import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceDto;
@@ -44,6 +46,26 @@ public class WorkflowControllerImpl implements WorkflowController {
 
     public RestResponse<?> getProcessInstance(String processInstanceId) {
         final Optional<ProcessInstanceDetailsDto> result = this.bpmEngineService.getProcessInstance(processInstanceId);
+
+        if (result.isPresent()) {
+            return RestResponse.result(result.get());
+        }
+
+        return RestResponse.notFound();
+    }
+    
+    @Override
+    public RestResponse<?> getHistoryProcessInstances(
+        Integer page, Integer size, String businessKey, EnumProcessInstanceHistorySortField orderBy, EnumSortingOrder order
+    ) {
+        final PageResultDto<ProcessInstanceDto> result = this.bpmEngineService.getHistoryProcessInstances(
+            page, size, businessKey, orderBy, order
+        );
+        return RestResponse.result(result);
+    }
+
+    public RestResponse<?> getHistoryProcessInstance(String processInstanceId) {
+        final Optional<HistoryProcessInstanceDetailsDto> result = this.bpmEngineService.getHistoryProcessInstance(processInstanceId);
 
         if (result.isPresent()) {
             return RestResponse.result(result.get());
