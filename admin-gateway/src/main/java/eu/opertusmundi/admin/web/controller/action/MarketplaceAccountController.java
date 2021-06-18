@@ -1,5 +1,7 @@
 package eu.opertusmundi.admin.web.controller.action;
 
+import java.util.UUID;
+
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
@@ -25,7 +27,7 @@ public interface MarketplaceAccountController {
 		@RequestParam(name = "order", defaultValue = "ASC") EnumSortingOrder order
 	);
 
-	@GetMapping(value = { "/action/marketplace/accounts/{id}" })
-	RestResponse<AccountDto> findOne(@PathVariable int id);
+	@GetMapping(value = { "/action/marketplace/accounts/{key}" })
+	RestResponse<AccountDto> findOne(@PathVariable UUID key);
 
 }

@@ -1,6 +1,7 @@
 package eu.opertusmundi.admin.web.controller.action;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,8 +56,8 @@ public class MarketplaceAccountControllerImpl extends BaseController implements 
 	}
 
 	@Override
-	public RestResponse<AccountDto> findOne(int id) {
-		final AccountEntity e = this.accountRepository.findById(id).orElse(null);
+	public RestResponse<AccountDto> findOne(UUID key) {
+		final AccountEntity e = this.accountRepository.findOneByKey(key).orElse(null);
 
 		if (e == null) {
 			return RestResponse.notFound();
