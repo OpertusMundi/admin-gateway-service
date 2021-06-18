@@ -19,6 +19,7 @@ public class ProcessInstanceDto {
     private String        processInstanceId;
     private String        businessKey;
     private ZonedDateTime startedOn;
+    private ZonedDateTime completedOn;
     private Long          incidentCount;
 
 }

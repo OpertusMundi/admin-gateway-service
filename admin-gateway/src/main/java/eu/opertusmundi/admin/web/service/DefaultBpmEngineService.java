@@ -15,7 +15,9 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.SetRetriesForExternalTasksDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricActivityInstanceDto;
+import org.camunda.bpm.engine.rest.dto.history.HistoricIncidentDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
+import org.camunda.bpm.engine.rest.dto.history.HistoricVariableInstanceDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -25,9 +27,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import eu.opertusmundi.admin.web.model.mapper.IncidentRowMapper;
+import eu.opertusmundi.admin.web.model.mapper.ProcessInstanceHistoryRowMapper;
 import eu.opertusmundi.admin.web.model.mapper.ProcessInstanceRowMapper;
 import eu.opertusmundi.admin.web.model.workflow.EnumIncidentSortField;
+import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceHistorySortField;
 import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceSortField;
+import eu.opertusmundi.admin.web.model.workflow.HistoryProcessInstanceDetailsDto;
 import eu.opertusmundi.admin.web.model.workflow.IncidentDto;
 import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceDetailsDto;
 import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceDto;
@@ -181,6 +186,111 @@ public class DefaultBpmEngineService implements BpmEngineService {
         }
 
         return Optional.of(result);
+    }
+
+    @Override
+    public PageResultDto<ProcessInstanceDto> getHistoryProcessInstances(
+        int page, int size, String businessKey, EnumProcessInstanceHistorySortField orderBy, EnumSortingOrder order
+    ) {
+        final String countQuery =
+            "select    count(*) " +
+            "from      act_hi_procinst hist " +
+            "            inner join act_re_procdef def " +
+            "              on hist.proc_def_id_ = def.id_ " +
+            "            inner join act_re_deployment dep " +
+            "              on def.deployment_id_ = dep.id_ " +
+            "where     hist.id_ = hist.proc_inst_id_ ";
+
+        final Long count = jdbcTemplate.queryForObject(countQuery, Long.class);
+
+        String selectQuery =
+            "select    def.id_                   as process_definition_id, " +
+            "          def.name_                 as process_definition_name, " +
+            "          def.key_                  as process_definition_key, " +
+            "          def.version_              as process_definition_version, " +
+            "          dep.deploy_time_          as process_definition_deployed_on, " +
+            "          hist.id_                  as process_instance_id, " +
+            "          hist.business_key_        as business_key, " +
+            "          hist.start_time_          as started_on, " +
+            "          hist.end_time_            as completed_on " +
+            "from      act_hi_procinst hist " +
+            "            inner join act_re_procdef def " +
+            "              on hist.proc_def_id_ = def.id_ " +
+            "            inner join act_re_deployment dep " +
+            "              on def.deployment_id_ = dep.id_ " +
+            "where     hist.id_ = hist.proc_inst_id_ ";
+
+        // Add filtering
+        if (!StringUtils.isBlank(businessKey)) {
+            selectQuery += "and hist.business_key_ = ? ";
+        }
+
+        // Add sorting
+        selectQuery += String.format("order by %s  %s, hist.id_ ", orderBy.getField(), order.toString());
+        // Add pagination
+        selectQuery += "offset    ? limit ?";
+
+        final List<Object> args = new ArrayList<>();
+
+        if (!StringUtils.isBlank(businessKey)) {
+            args.add(businessKey);
+        }
+
+        args.add(Integer.valueOf(page * size));
+        args.add(Integer.valueOf(size));
+
+        final List<ProcessInstanceDto> rows = jdbcTemplate.query(
+            selectQuery,
+            args.toArray(),
+            new ProcessInstanceHistoryRowMapper()
+        );
+
+        return PageResultDto.of(page, size, rows, count);
+    }
+    
+    @Override
+    public Optional<HistoryProcessInstanceDetailsDto> getHistoryProcessInstance(String processInstanceId){
+        final HistoryProcessInstanceDetailsDto result = new HistoryProcessInstanceDetailsDto();
+
+        final List<HistoricProcessInstanceDto> processInstances = this.bpmClient.getObject().getHistoryProcessInstances(processInstanceId);
+        if (processInstances.size() != 1) {
+            return Optional.empty();
+        }
+        result.setInstance(processInstances.get(0));
+
+        final List<HistoricVariableInstanceDto> variables = this.bpmClient.getObject()
+            .getHistoryProcessInstanceVariables(processInstanceId);
+        result.setVariables(variables);
+
+        final List<HistoricActivityInstanceDto> activities = this.bpmClient.getObject()
+            .getHistoryProcessInstanceActivityInstances(processInstanceId);
+        activities.sort((i1, i2) -> {
+            return i1.getStartTime().after(i2.getStartTime()) ? 1 : -1;
+        });
+        result.setActivities(activities);
+
+        final List<HistoricIncidentDto> incidents = this.bpmClient.getObject()
+            .getHistoryIncidents(processInstanceId);
+        result.setIncidents(incidents);
+
+        result.getIncidents().forEach(i -> {
+            final String details = this.bpmClient.getObject().getHistoryExternalTaskLogErrorDetails(i.getHistoryConfiguration());
+            result.getErrorDetails().put(i.getActivityId(), details);
+        });
+
+        final VariableValueDto startUserVariable = variables.stream()
+            .filter(v -> v.getName().equals(EnumProcessInstanceVariable.START_USER_KEY.getValue()))
+            .findFirst()
+            .orElse(null);
+
+        if (startUserVariable != null) {
+            final Optional<AccountEntity> startUserEntity = accountRepository.findOneByKey(
+                UUID.fromString((String) startUserVariable.getValue())
+            );
+            result.setOwner(startUserEntity.map(AccountEntity::toDto).orElse(null));
+        }
+
+        return Optional.of(result);  
     }
 
     @Override

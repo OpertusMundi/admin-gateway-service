@@ -25,7 +25,7 @@ public enum EnumIncidentSortField {
         }
 
         throw new IllegalArgumentException(String.format(
-            "Value [%s] is not a valid member of enum [EnumWorkflowInstanceSortField]", field
+            "Value [%s] is not a valid member of enum [EnumIncidentSortField]", field
         ));
     }
 

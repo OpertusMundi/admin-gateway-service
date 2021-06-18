@@ -3,7 +3,9 @@ package eu.opertusmundi.admin.web.service;
 import java.util.Optional;
 
 import eu.opertusmundi.admin.web.model.workflow.EnumIncidentSortField;
+import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceHistorySortField;
 import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceSortField;
+import eu.opertusmundi.admin.web.model.workflow.HistoryProcessInstanceDetailsDto;
 import eu.opertusmundi.admin.web.model.workflow.IncidentDto;
 import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceDetailsDto;
 import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceDto;
@@ -26,6 +28,12 @@ public interface BpmEngineService {
     }
 
     Optional<ProcessInstanceDetailsDto> getProcessInstance(String processInstanceId);
+    
+    PageResultDto<ProcessInstanceDto> getHistoryProcessInstances(
+        int page, int size, String businessKey, EnumProcessInstanceHistorySortField orderBy, EnumSortingOrder order
+    );
+    
+    Optional<HistoryProcessInstanceDetailsDto> getHistoryProcessInstance(String processInstanceId);
 
     Long countIncidents();
 
