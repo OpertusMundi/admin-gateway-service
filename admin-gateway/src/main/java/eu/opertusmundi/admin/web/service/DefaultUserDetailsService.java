@@ -3,6 +3,7 @@ package eu.opertusmundi.admin.web.service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -46,6 +47,10 @@ public class DefaultUserDetailsService implements UserDetailsService
 
         public Integer getId() {
             return this.account.getId();
+        }
+
+        public UUID getKey() {
+            return this.account.getKey();
         }
 
         @Override

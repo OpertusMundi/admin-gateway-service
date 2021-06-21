@@ -22,9 +22,14 @@ import eu.opertusmundi.common.model.order.EnumOrderStatus;
 import eu.opertusmundi.common.model.order.OrderDto;
 import eu.opertusmundi.common.model.payment.EnumPayInSortField;
 import eu.opertusmundi.common.model.payment.EnumTransactionStatus;
+import eu.opertusmundi.common.model.payment.EnumTransferSortField;
 import eu.opertusmundi.common.model.payment.PayInDto;
+import eu.opertusmundi.common.model.payment.PayInItemDto;
+import eu.opertusmundi.common.model.payment.PaymentException;
+import eu.opertusmundi.common.model.payment.TransferDto;
 import eu.opertusmundi.common.repository.OrderRepository;
 import eu.opertusmundi.common.repository.PayInRepository;
+import eu.opertusmundi.common.service.PaymentService;
 
 @RestController
 @Secured({ "ROLE_ADMIN", "ROLE_USER" })
@@ -32,17 +37,19 @@ public class BillingControllerImpl extends BaseController implements BillingCont
 
     @Autowired
     private OrderRepository orderRepository;
-    
+
     @Autowired
     private PayInRepository payInRepository;
 
+    @Autowired
+    private PaymentService paymentService;
+
     @Override
     public RestResponse<PageResultDto<OrderDto>> findOrders(
-        int page, int size, 
-        String referenceNumber, Set<EnumOrderStatus> status, 
+        int page, int size,
+        String referenceNumber, Set<EnumOrderStatus> status,
         EnumOrderSortField orderBy, EnumSortingOrder order
     ) {
-
         final Direction   direction   = order == EnumSortingOrder.DESC ? Direction.DESC : Direction.ASC;
         final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, orderBy.getValue()));
 
@@ -69,11 +76,10 @@ public class BillingControllerImpl extends BaseController implements BillingCont
 
     @Override
     public RestResponse<PageResultDto<PayInDto>> findPayIns(
-        int page, int size, 
-        String referenceNumber, String email, Set<EnumTransactionStatus> status, 
+        int page, int size,
+        String referenceNumber, String email, Set<EnumTransactionStatus> status,
         EnumPayInSortField orderBy, EnumSortingOrder order
     ) {
-
         final Direction   direction   = order == EnumSortingOrder.DESC ? Direction.DESC : Direction.ASC;
         final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, orderBy.getValue()));
 
@@ -97,6 +103,37 @@ public class BillingControllerImpl extends BaseController implements BillingCont
             return RestResponse.result(r.get());
         }
         return RestResponse.notFound();
+    }
+
+    public RestResponse<PageResultDto<PayInItemDto>> findTransfers(
+        int page, int size,
+        String referenceNumber, Set<EnumTransactionStatus> status,
+        EnumTransferSortField orderBy, EnumSortingOrder order
+    ) {
+        final Direction   direction   = order == EnumSortingOrder.DESC ? Direction.DESC : Direction.ASC;
+        final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, orderBy.getValue()));
+
+        final Page<PayInItemDto> p = this.payInRepository.findAllTransferObjects(
+            status,
+            referenceNumber,
+            pageRequest
+        );
+
+        final long count = p.getTotalElements();
+        final List<PayInItemDto> records = p.stream().collect(Collectors.toList());
+        final PageResultDto<PayInItemDto> result = PageResultDto.of(page, size, records, count);
+
+        return RestResponse.result(result);
+    }
+
+    public RestResponse<?> createTransfer(UUID key) {
+        try {
+            final List<TransferDto> transfers = this.paymentService.createTransfer(this.currentUserKey(), key);
+
+            return RestResponse.result(transfers);
+        } catch (PaymentException ex) {
+            return RestResponse.error(ex.getCode(), ex.getMessage());
+        }
     }
 
 }

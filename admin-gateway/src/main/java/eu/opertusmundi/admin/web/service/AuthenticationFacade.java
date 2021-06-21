@@ -1,6 +1,7 @@
 package eu.opertusmundi.admin.web.service;
 
 import java.util.Locale;
+import java.util.UUID;
 
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -64,6 +65,15 @@ public class AuthenticationFacade implements IAuthenticationFacade {
             return null;
         }
         return ((Details) authentication.getPrincipal()).getId();
+    }
+
+    @Override
+    public UUID getCurrentUserKey() {
+        final Authentication authentication = this.getAuthentication();
+        if (authentication == null) {
+            return null;
+        }
+        return ((Details) authentication.getPrincipal()).getKey();
     }
 
     @Override

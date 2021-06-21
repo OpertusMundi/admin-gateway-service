@@ -2,6 +2,7 @@ package eu.opertusmundi.admin.web.controller.action;
 
 import java.io.IOException;
 import java.util.Locale;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -31,6 +32,10 @@ public abstract class BaseController {
 
     protected Integer currentUserId() {
         return this.authenticationFacade.getCurrentUserId();
+    }
+
+    protected UUID currentUserKey() {
+        return this.authenticationFacade.getCurrentUserKey();
     }
 
     protected String currentUserName() {

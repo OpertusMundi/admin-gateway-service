@@ -1,6 +1,7 @@
 package eu.opertusmundi.admin.web.service;
 
 import java.util.Locale;
+import java.util.UUID;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -48,6 +49,13 @@ public interface IAuthenticationFacade {
      */
     Integer getCurrentUserId();
 
+    /**
+     * Get the unique key of the authenticated user
+     *
+     * @return the user unique id or {@code null} if the user is not authenticated
+     */
+    UUID getCurrentUserKey();
+    
     /**
      * Get the user name
      *

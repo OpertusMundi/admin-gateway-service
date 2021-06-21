@@ -9,6 +9,7 @@ import javax.validation.constraints.Min;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -20,7 +21,9 @@ import eu.opertusmundi.common.model.order.EnumOrderStatus;
 import eu.opertusmundi.common.model.order.OrderDto;
 import eu.opertusmundi.common.model.payment.EnumPayInSortField;
 import eu.opertusmundi.common.model.payment.EnumTransactionStatus;
+import eu.opertusmundi.common.model.payment.EnumTransferSortField;
 import eu.opertusmundi.common.model.payment.PayInDto;
+import eu.opertusmundi.common.model.payment.PayInItemDto;
 
 @RequestMapping(value = "/action/billing", produces = MediaType.APPLICATION_JSON_VALUE)
 public interface BillingController {
@@ -53,6 +56,21 @@ public interface BillingController {
 
     @GetMapping(value = { "/payins/{key}" })
     RestResponse<PayInDto> findPayInByKey(
+        @PathVariable(name = "key") UUID key
+    );
+ 
+    @GetMapping(value = { "/transfers" })
+    RestResponse<PageResultDto<PayInItemDto>> findTransfers(
+        @RequestParam(name = "page", defaultValue = "0") int page,
+        @RequestParam(name = "size", defaultValue = "25") @Max(100) @Min(1) int size,
+        @RequestParam(name = "referenceNumber", required = false, defaultValue = "") String name,
+        @RequestParam(name = "status", required = false) Set<EnumTransactionStatus> status,
+        @RequestParam(name = "orderBy", defaultValue = "MODIFIED_ON") EnumTransferSortField orderBy,
+        @RequestParam(name = "order", defaultValue = "DESC") EnumSortingOrder order
+    );
+
+    @PostMapping(value = { "/transfers/{key}" })
+    RestResponse<?> createTransfer(
         @PathVariable(name = "key") UUID key
     );
     
