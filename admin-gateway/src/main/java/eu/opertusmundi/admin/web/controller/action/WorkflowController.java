@@ -60,7 +60,18 @@ public interface WorkflowController {
     RestResponse<?> getProcessInstance(
         @PathVariable(name = "processInstanceId", required = true) String processInstanceId
     );
-    
+
+    /**
+     * Get process instance
+     *
+     * @param processInstanceId
+     * @return
+     */
+    @GetMapping(value = "/workflows/process-instances/business-key/{businessKey}")
+    RestResponse<?> getProcessInstanceByBusinessKey(
+        @PathVariable(name = "businessKey", required = true) String businessKey
+    );
+
     /**
      * Get process instances history
      *
@@ -75,11 +86,11 @@ public interface WorkflowController {
     RestResponse<?> getHistoryProcessInstances(
         @RequestParam(name = "page", required = true) Integer page,
         @RequestParam(name = "size", required = true) Integer size,
-        @RequestParam(name = "businessKey", defaultValue = "") String businessKey,
+        @RequestParam(name = "businessKey", required = false, defaultValue = "") String businessKey,
         @RequestParam(name = "orderBy", defaultValue = "START_TIME") EnumProcessInstanceHistorySortField orderBy,
         @RequestParam(name = "order", defaultValue = "DESC") EnumSortingOrder order
     );
-    
+
     /**
      * Get process instance historical data
      *
@@ -89,6 +100,17 @@ public interface WorkflowController {
     @GetMapping(value = "/workflows/history/process-instances/{processInstanceId}")
     RestResponse<?> getHistoryProcessInstance(
         @PathVariable(name = "processInstanceId", required = true) String processInstanceId
+    );
+
+    /**
+     * Get process instance historical data
+     *
+     * @param processInstanceId
+     * @return
+     */
+    @GetMapping(value = "/workflows/history/process-instances/business-key/{businessKey}")
+    RestResponse<?> getHistoryProcessInstanceByBusinessKey(
+        @PathVariable(name = "businessKey", required = true) String businessKey
     );
 
     /**

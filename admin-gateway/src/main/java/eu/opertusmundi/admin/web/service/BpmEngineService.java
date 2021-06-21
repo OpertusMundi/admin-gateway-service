@@ -27,13 +27,13 @@ public interface BpmEngineService {
         this.retryExternalTask(command.getProcessInstanceId(), command.getExternalTaskId());
     }
 
-    Optional<ProcessInstanceDetailsDto> getProcessInstance(String processInstanceId);
-    
+    Optional<ProcessInstanceDetailsDto> getProcessInstance(String businessKey, String processInstanceId);
+
     PageResultDto<ProcessInstanceDto> getHistoryProcessInstances(
         int page, int size, String businessKey, EnumProcessInstanceHistorySortField orderBy, EnumSortingOrder order
     );
-    
-    Optional<HistoryProcessInstanceDetailsDto> getHistoryProcessInstance(String processInstanceId);
+
+    Optional<HistoryProcessInstanceDetailsDto> getHistoryProcessInstance(String businessKey, String processInstanceId);
 
     Long countIncidents();
 

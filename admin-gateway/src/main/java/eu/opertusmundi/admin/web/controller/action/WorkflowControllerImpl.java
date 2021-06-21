@@ -44,8 +44,9 @@ public class WorkflowControllerImpl implements WorkflowController {
         return RestResponse.result(result);
     }
 
+    @Override
     public RestResponse<?> getProcessInstance(String processInstanceId) {
-        final Optional<ProcessInstanceDetailsDto> result = this.bpmEngineService.getProcessInstance(processInstanceId);
+        final Optional<ProcessInstanceDetailsDto> result = this.bpmEngineService.getProcessInstance(null, processInstanceId);
 
         if (result.isPresent()) {
             return RestResponse.result(result.get());
@@ -53,7 +54,18 @@ public class WorkflowControllerImpl implements WorkflowController {
 
         return RestResponse.notFound();
     }
-    
+
+    @Override
+    public RestResponse<?> getProcessInstanceByBusinessKey(String businessKey) {
+        final Optional<ProcessInstanceDetailsDto> result = this.bpmEngineService.getProcessInstance(businessKey, null);
+
+        if (result.isPresent()) {
+            return RestResponse.result(result.get());
+        }
+
+        return RestResponse.notFound();
+    }
+
     @Override
     public RestResponse<?> getHistoryProcessInstances(
         Integer page, Integer size, String businessKey, EnumProcessInstanceHistorySortField orderBy, EnumSortingOrder order
@@ -64,8 +76,20 @@ public class WorkflowControllerImpl implements WorkflowController {
         return RestResponse.result(result);
     }
 
+    @Override
     public RestResponse<?> getHistoryProcessInstance(String processInstanceId) {
-        final Optional<HistoryProcessInstanceDetailsDto> result = this.bpmEngineService.getHistoryProcessInstance(processInstanceId);
+        final Optional<HistoryProcessInstanceDetailsDto> result = this.bpmEngineService.getHistoryProcessInstance(null, processInstanceId);
+
+        if (result.isPresent()) {
+            return RestResponse.result(result.get());
+        }
+
+        return RestResponse.notFound();
+    }
+
+    @Override
+    public RestResponse<?> getHistoryProcessInstanceByBusinessKey(String businessKey) {
+        final Optional<HistoryProcessInstanceDetailsDto> result = this.bpmEngineService.getHistoryProcessInstance(businessKey, null);
 
         if (result.isPresent()) {
             return RestResponse.result(result.get());

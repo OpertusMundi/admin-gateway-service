@@ -149,14 +149,27 @@ public class DefaultBpmEngineService implements BpmEngineService {
     }
 
     @Override
-    public Optional<ProcessInstanceDetailsDto> getProcessInstance(String processInstanceId) {
+    public Optional<ProcessInstanceDetailsDto> getProcessInstance(String businessKey, String processInstanceId) {
         final ProcessInstanceDetailsDto result = new ProcessInstanceDetailsDto();
 
-        final List<HistoricProcessInstanceDto> processInstances = this.bpmClient.getObject().getHistoryProcessInstances(processInstanceId);
+        final List<HistoricProcessInstanceDto> processInstances = this.bpmClient.getObject().getHistoryProcessInstances(
+            businessKey,
+            processInstanceId
+        );
         if (processInstances.size() != 1) {
             return Optional.empty();
         }
         result.setInstance(processInstances.get(0));
+
+        if (result.getInstance().getEndTime() != null) {
+            // Instance is already completed, we should search the history
+            // endpoint
+            return Optional.empty();
+        }
+
+        // Set process instance id in case we have found a record by business
+        // key
+        processInstanceId = result.getInstance().getId();
 
         final Map<String, VariableValueDto> variables = this.bpmClient.getObject().getProcessInstanceVariables(processInstanceId);
         result.setVariables(variables);
@@ -178,7 +191,7 @@ public class DefaultBpmEngineService implements BpmEngineService {
         });
 
         final VariableValueDto startUserVariable = variables.get(EnumProcessInstanceVariable.START_USER_KEY.getValue());
-        if (startUserVariable != null) {
+        if (startUserVariable != null && !StringUtils.isBlank((String) startUserVariable.getValue())) {
             final Optional<AccountEntity> startUserEntity = accountRepository.findOneByKey(
                 UUID.fromString((String) startUserVariable.getValue())
             );
@@ -247,16 +260,23 @@ public class DefaultBpmEngineService implements BpmEngineService {
 
         return PageResultDto.of(page, size, rows, count);
     }
-    
+
     @Override
-    public Optional<HistoryProcessInstanceDetailsDto> getHistoryProcessInstance(String processInstanceId){
+    public Optional<HistoryProcessInstanceDetailsDto> getHistoryProcessInstance(String businessKey, String processInstanceId) {
         final HistoryProcessInstanceDetailsDto result = new HistoryProcessInstanceDetailsDto();
 
-        final List<HistoricProcessInstanceDto> processInstances = this.bpmClient.getObject().getHistoryProcessInstances(processInstanceId);
+        final List<HistoricProcessInstanceDto> processInstances = this.bpmClient.getObject().getHistoryProcessInstances(
+            businessKey,
+            processInstanceId
+        );
         if (processInstances.size() != 1) {
             return Optional.empty();
         }
         result.setInstance(processInstances.get(0));
+
+        // Set process instance id in case we have found a record by business
+        // key
+        processInstanceId = result.getInstance().getId();
 
         final List<HistoricVariableInstanceDto> variables = this.bpmClient.getObject()
             .getHistoryProcessInstanceVariables(processInstanceId);
@@ -283,14 +303,14 @@ public class DefaultBpmEngineService implements BpmEngineService {
             .findFirst()
             .orElse(null);
 
-        if (startUserVariable != null) {
+        if (startUserVariable != null && !StringUtils.isBlank((String) startUserVariable.getValue())) {
             final Optional<AccountEntity> startUserEntity = accountRepository.findOneByKey(
                 UUID.fromString((String) startUserVariable.getValue())
             );
             result.setOwner(startUserEntity.map(AccountEntity::toDto).orElse(null));
         }
 
-        return Optional.of(result);  
+        return Optional.of(result);
     }
 
     @Override
