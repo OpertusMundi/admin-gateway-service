@@ -18,16 +18,34 @@ import eu.opertusmundi.common.model.account.AccountDto;
 
 public interface MarketplaceAccountController {
 
-	@GetMapping(value = { "/action/marketplace/accounts" })
-	RestResponse<PageResultDto<MarketplaceAccountSummaryDto>> find(
-		@RequestParam(name = "page", defaultValue = "0") int page,
-		@RequestParam(name = "size", defaultValue = "25") @Max(100) @Min(1) int size,
-		@RequestParam(name = "name", defaultValue = "") String name,
-		@RequestParam(name = "orderBy", defaultValue = "EMAIL") EnumHelpdeskAccountSortField orderBy,
-		@RequestParam(name = "order", defaultValue = "ASC") EnumSortingOrder order
-	);
+    @GetMapping(value = { "/action/marketplace/accounts" })
+    RestResponse<PageResultDto<MarketplaceAccountSummaryDto>> find(
+        @RequestParam(name = "page", defaultValue = "0") int page,
+        @RequestParam(name = "size", defaultValue = "25") @Max(100) @Min(1) int size,
+        @RequestParam(name = "name", defaultValue = "") String name,
+        @RequestParam(name = "orderBy", defaultValue = "EMAIL") EnumHelpdeskAccountSortField orderBy,
+        @RequestParam(name = "order", defaultValue = "ASC") EnumSortingOrder order
+    );
 
-	@GetMapping(value = { "/action/marketplace/accounts/{key}" })
-	RestResponse<AccountDto> findOne(@PathVariable UUID key);
+    @GetMapping(value = { "/action/marketplace/accounts/consumers" })
+    RestResponse<PageResultDto<MarketplaceAccountSummaryDto>> findConsumers(
+        @RequestParam(name = "page", defaultValue = "0") int page,
+        @RequestParam(name = "size", defaultValue = "25") @Max(100) @Min(1) int size,
+        @RequestParam(name = "name", defaultValue = "") String name,
+        @RequestParam(name = "orderBy", defaultValue = "EMAIL") EnumHelpdeskAccountSortField orderBy,
+        @RequestParam(name = "order", defaultValue = "ASC") EnumSortingOrder order
+    );
+
+    @GetMapping(value = { "/action/marketplace/accounts/providers" })
+    RestResponse<PageResultDto<MarketplaceAccountSummaryDto>> findProviders(
+        @RequestParam(name = "page", defaultValue = "0") int page,
+        @RequestParam(name = "size", defaultValue = "25") @Max(100) @Min(1) int size,
+        @RequestParam(name = "name", defaultValue = "") String name,
+        @RequestParam(name = "orderBy", defaultValue = "EMAIL") EnumHelpdeskAccountSortField orderBy,
+        @RequestParam(name = "order", defaultValue = "ASC") EnumSortingOrder order
+    );
+
+    @GetMapping(value = {"/action/marketplace/accounts/{key}"})
+    RestResponse<AccountDto> findOne(@PathVariable UUID key);
 
 }

@@ -1,5 +1,6 @@
 package eu.opertusmundi.admin.web.model.account.market;
 
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
@@ -21,6 +22,7 @@ public class MarketplaceAccountSummaryDto {
     private EnumActivationStatus accountStatus;
     private ZonedDateTime        activatedAt;
     private boolean              consumer;
+    private BigDecimal           consumerFunds;
     private EnumKycLevel         consumerKycLevel;
     private String               consumerName;
     private boolean              consumerUpdatePending;
@@ -31,6 +33,7 @@ public class MarketplaceAccountSummaryDto {
     private UUID                 key;
     private String               locale;
     private boolean              provider;
+    private BigDecimal           providerFunds;
     private EnumKycLevel         providerKycLevel;
     private String               providerName;
     private boolean              providerUpdatePending;
@@ -48,9 +51,8 @@ public class MarketplaceAccountSummaryDto {
         r.setActivatedAt(a.getActivatedAt());
         r.setConsumer(c.isRegistered());
         if (r.isConsumer()) {
+            r.setConsumerFunds(c.getCurrent().getWalletFunds());
             r.setConsumerKycLevel(c.getCurrent().getKycLevel());
-        }
-        if (c.getCurrent() != null) {
             switch (c.getCurrent().getType()) {
                 case INDIVIDUAL :
                     r.setConsumerName(((CustomerIndividualDto) c.getCurrent()).getFullName());
@@ -82,9 +84,8 @@ public class MarketplaceAccountSummaryDto {
         r.setLocale(profile.getLocale());
         r.setProvider(p.isRegistered());
         if (r.isProvider()) {
+            r.setProviderFunds(p.getCurrent().getWalletFunds());
             r.setProviderKycLevel(p.getCurrent().getKycLevel());
-        }
-        if (p.getCurrent() != null) {
             r.setProviderName(p.getCurrent().getName());
         } else if (p.getDraft() != null) {
             r.setProviderName(p.getDraft().getName());
