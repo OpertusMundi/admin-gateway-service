@@ -15,11 +15,11 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RestController;
 
-import eu.opertusmundi.admin.web.model.billing.EnumOrderSortField;
 import eu.opertusmundi.common.model.EnumSortingOrder;
 import eu.opertusmundi.common.model.PageResultDto;
 import eu.opertusmundi.common.model.RestResponse;
 import eu.opertusmundi.common.model.account.AccountDto;
+import eu.opertusmundi.common.model.order.EnumOrderSortField;
 import eu.opertusmundi.common.model.order.EnumOrderStatus;
 import eu.opertusmundi.common.model.order.OrderDto;
 import eu.opertusmundi.common.model.payment.EnumPayInSortField;
@@ -70,9 +70,11 @@ public class BillingControllerImpl extends BaseController implements BillingCont
         final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, orderBy.getValue()));
 
         final Page<OrderDto> p = this.orderRepository.findAllObjects(
+            null, null,
             referenceNumber,
             status,
-            pageRequest
+            pageRequest,
+            false, true
         );
 
         final long count = p.getTotalElements();
