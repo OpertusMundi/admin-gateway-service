@@ -6,12 +6,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-import eu.opertusmundi.admin.web.domain.HelpdeskAccountEntity;
-import eu.opertusmundi.admin.web.model.account.helpdesk.EnumHelpdeskRole;
-import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskAccountCommandDto;
-import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskAccountDto;
-import eu.opertusmundi.admin.web.repository.HelpdeskAccountRepository;
+import eu.opertusmundi.common.domain.HelpdeskAccountEntity;
+import eu.opertusmundi.common.repository.HelpdeskAccountRepository;
 import eu.opertusmundi.common.model.BasicMessageCode;
+import eu.opertusmundi.common.model.account.helpdesk.EnumHelpdeskRole;
+import eu.opertusmundi.common.model.account.helpdesk.HelpdeskAccountCommandDto;
+import eu.opertusmundi.common.model.account.helpdesk.HelpdeskAccountDto;
 
 @Component
 public class AccountValidator implements Validator {

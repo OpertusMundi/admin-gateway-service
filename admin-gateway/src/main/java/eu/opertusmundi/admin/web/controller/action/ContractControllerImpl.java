@@ -6,25 +6,33 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RestController;
 
-import eu.opertusmundi.admin.web.domain.ContractEntity;
-import eu.opertusmundi.admin.web.domain.ContractHistoryEntity;
-import eu.opertusmundi.admin.web.domain.HelpdeskAccountEntity;
-import eu.opertusmundi.admin.web.domain.SectionEntity;
-import eu.opertusmundi.admin.web.domain.SectionHistoryEntity;
-import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskAccountDto;
-import eu.opertusmundi.admin.web.model.contract.ContractDto;
-import eu.opertusmundi.admin.web.model.contract.ContractHistoryDto;
-import eu.opertusmundi.admin.web.model.contract.SectionDto;
-import eu.opertusmundi.admin.web.repository.ContractHistoryRepository;
-import eu.opertusmundi.admin.web.repository.ContractRepository;
-import eu.opertusmundi.admin.web.repository.HelpdeskAccountRepository;
-import eu.opertusmundi.admin.web.repository.SectionHistoryRepository;
-import eu.opertusmundi.admin.web.repository.SectionRepository;
+import eu.opertusmundi.common.domain.MasterContractDraftEntity;
+import eu.opertusmundi.common.domain.MasterContractEntity;
+import eu.opertusmundi.common.domain.MasterContractHistoryEntity;
+import eu.opertusmundi.common.domain.HelpdeskAccountEntity;
+import eu.opertusmundi.common.domain.MasterSectionDraftEntity;
+import eu.opertusmundi.common.domain.MasterSectionEntity;
+import eu.opertusmundi.common.domain.MasterSectionHistoryEntity;
+import eu.opertusmundi.common.model.contract.MasterContractDraftDto;
+import eu.opertusmundi.common.model.contract.MasterContractDto;
+import eu.opertusmundi.common.model.contract.MasterContractHistoryDto;
+import eu.opertusmundi.common.model.contract.MasterSectionDraftDto;
+import eu.opertusmundi.common.model.contract.MasterSectionDto;
+import eu.opertusmundi.common.repository.HelpdeskAccountRepository;
+import eu.opertusmundi.common.repository.contract.MasterContractDraftRepository;
+import eu.opertusmundi.common.repository.contract.MasterContractHistoryRepository;
+import eu.opertusmundi.common.repository.contract.MasterContractRepository;
+import eu.opertusmundi.common.repository.contract.MasterSectionDraftRepository;
+import eu.opertusmundi.common.repository.contract.MasterSectionHistoryRepository;
+import eu.opertusmundi.common.repository.contract.MasterSectionRepository;
 import eu.opertusmundi.common.model.RestResponse;
+import eu.opertusmundi.common.model.account.helpdesk.HelpdeskAccountDto;
 
+@Transactional(readOnly = false)
 @RestController
 @Secured({ "ROLE_ADMIN", "ROLE_USER" })
 public class ContractControllerImpl extends BaseController implements ContractController {
@@ -32,72 +40,82 @@ public class ContractControllerImpl extends BaseController implements ContractCo
 	//private List<String> sortableFields = Arrays.asList("name");
 
 	@Autowired
-	private ContractRepository contractRepository;
+	private MasterContractRepository contractRepository;
 
 	@Autowired
-	private ContractHistoryRepository contractHistoryRepository;
+	private MasterContractDraftRepository contractDraftRepository;
 	
 	@Autowired
-	private SectionRepository sectionRepository;
+	private MasterContractHistoryRepository contractHistoryRepository;
+	
+	@Autowired
+	private MasterSectionRepository sectionRepository;
 
 	@Autowired
-	private SectionHistoryRepository sectionHistoryRepository;
+	private MasterSectionDraftRepository sectionDraftRepository;
+	
+	@Autowired
+	private MasterSectionHistoryRepository sectionHistoryRepository;
 
 	@Autowired
 	private HelpdeskAccountRepository helpdeskAccountRepo;
 	
-	
-	/*@Override
-	public RestResponse<PageResultDto<ContractDto>> find(
-		int page, int size, String name, String orderBy, String order
-	) {
-
-		Direction direction = order.equalsIgnoreCase("desc") ? Direction.DESC : Direction.ASC;
-		if (!sortableFields.contains(orderBy)) {
-			orderBy = "name";
-		}
-
-		PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, orderBy));
-
-		Page<ContractEntity> entities = this.contractRepository.findAllByNameContains(pageRequest, name);
-
-		Page<ContractDto> p = entities.map(ContractEntity::toDto);
-
-		final long count = p.getTotalElements();
-		final List<ContractDto> records = p.stream().collect(Collectors.toList());
-		final PageResultDto<ContractDto> result = PageResultDto.of(page, size, records, count);
-
-		return RestResponse.result(result);
-	}*/
 
 	@Override
-	public RestResponse<ContractDto> findOne(int id) {
-		final ContractEntity e = contractRepository.findById(id).orElse(null);
+	public RestResponse<MasterContractDto> findContract(int id) {
+		final MasterContractEntity e = contractRepository.findById(id).orElse(null);
 
 		if (e == null) {
 			return RestResponse.notFound();
 		}
-		List<SectionEntity> sections = contractRepository.findSectionsByContract(e);
-		List<SectionDto> sectionsDto = new ArrayList<SectionDto>() ;
-		for(SectionEntity s : sections) sectionsDto.add(s.toDto());
-		ContractDto contractDto = e.toDto();
+		List<MasterSectionEntity> sections = contractRepository.findSectionsByContract(e);
+		List<MasterSectionDto> sectionsDto = new ArrayList<MasterSectionDto>() ;
+		for(MasterSectionEntity s : sections) sectionsDto.add(s.toDto());
+		MasterContractDto contractDto = e.toDto();
 		contractDto.setSections(sectionsDto);
 		return RestResponse.result(contractDto);
 	}
 	
 	@Override
-	public RestResponse<List<ContractDto>> findAll(){
+	public RestResponse<MasterContractDraftDto> findDraft(int id) {
+		final MasterContractDraftEntity e = contractDraftRepository.findById(id).orElse(null);
+
+		if (e == null) {
+			return RestResponse.notFound();
+		}
+		List<MasterSectionDraftEntity> sections = contractDraftRepository.findSectionsByContract(e);
+		List<MasterSectionDraftDto> sectionsDto = new ArrayList<MasterSectionDraftDto>() ;
+		for(MasterSectionDraftEntity s : sections) sectionsDto.add(s.toDto());
+		MasterContractDraftDto contractDto = e.toDto();
+		contractDto.setSections(sectionsDto);
+		return RestResponse.result(contractDto);
+	}
+	
+	@Override
+	public RestResponse<List<MasterContractDto>> getContracts(){
 		
 		final Optional<HelpdeskAccountEntity> accountEntity = helpdeskAccountRepo.findOneByEmail(this.currentUserName());
-		final List<ContractEntity> contracts = contractRepository.findContractsByAccount(accountEntity.get());
-		final List<ContractDto> contractsDto = new ArrayList<ContractDto>() ;
-		for(ContractEntity e : contracts) contractsDto.add(e.toDto());
+		final List<MasterContractEntity> contracts = contractRepository.findContractsByAccount(accountEntity.get());
+		final List<MasterContractDto> contractsDto = new ArrayList<MasterContractDto>() ;
+		for(MasterContractEntity e : contracts) {
+			contractsDto.add(e.toDto());
+	}
+		return RestResponse.result(contractsDto);
+	}
+	
+	@Override
+	public RestResponse<List<MasterContractDraftDto>> getDrafts(){
+		
+		final Optional<HelpdeskAccountEntity> accountEntity = helpdeskAccountRepo.findOneByEmail(this.currentUserName());
+		final List<MasterContractDraftEntity> contracts = contractDraftRepository.findContractsByAccount(accountEntity.get());
+		final List<MasterContractDraftDto> contractsDto = new ArrayList<MasterContractDraftDto>() ;
+		for(MasterContractDraftEntity e : contracts) contractsDto.add(e.toDto());
 		return RestResponse.result(contractsDto);
 	}
 
 
 	@Override
-	public RestResponse<ContractDto> create(ContractDto record, BindingResult validationResult) {
+	public RestResponse<MasterContractDraftDto> createDraft(MasterContractDraftDto record, BindingResult validationResult) {
 		if (validationResult.hasErrors()) {
 			return RestResponse.invalid(validationResult.getFieldErrors());
 		}
@@ -108,59 +126,56 @@ public class ContractControllerImpl extends BaseController implements ContractCo
 		final HelpdeskAccountDto account = helpdeskAccountRepo.findOneByEmail(this.currentUserName()).get().toDto();
 
 		record.setAccount(account);
-		List<SectionDto> sections = record.getSections();
+		List<MasterSectionDraftDto> sections = record.getSections();
 		record.setSections(null);
-		ContractDto resultRecord = contractRepository.saveFrom(record);
+		MasterContractDraftDto resultRecord = contractDraftRepository.saveFrom(record);
 		// create sections
-		final ContractEntity e = contractRepository.findById(resultRecord.getId()).get();
+		final MasterContractDraftEntity e = contractDraftRepository.findById(resultRecord.getId()).get();
 		record.setId(e.getId());
-		
+		record.setParentId(e.getId());
+		contractDraftRepository.saveFrom(record);
 		//List<SectionEntity> contractSections = contractRepository.findSectionsByContract(e.getId());
-		for (SectionDto s : sections){
+		for (MasterSectionDraftDto s : sections){
 			s.setContract(record);
-			sectionRepository.saveFrom(s);
-		}
-		//also save a copy in history table
-		ContractHistoryDto contractHistoryDto = contractHistoryRepository.saveFrom(e);
-		//sectionHistoryRepository.saveSections
-		
-		ContractHistoryEntity cEntity = contractHistoryRepository.findById(contractHistoryDto.getId()).get();
-		for (SectionDto s : sections){
-			//s.setContract(record);
-			sectionHistoryRepository.saveFrom(s, cEntity);
+			sectionDraftRepository.saveFrom(s);
 		}
 		
 		return RestResponse.result(resultRecord);
 	}
 
 	@Override
-	public RestResponse<ContractDto> update(int id, ContractDto record, BindingResult validationResult) {
-		//organizationValidator.validate(record, validationResult);
+	public RestResponse<MasterContractDto> updateContract(int id, MasterContractDto record, BindingResult validationResult) {
 		
-		//if (validationResult.hasErrors()) {
-		//	return RestResponse.invalid(validationResult.getFieldErrors());
-		//}
-		
-		// increment version
-		record.setVersion("" + (Integer.parseInt(record.getVersion())+1));
 		final HelpdeskAccountDto account = helpdeskAccountRepo.findOneByEmail(this.currentUserName()).get().toDto();
 
 		record.setAccount(account);
-		List<SectionDto> sections = record.getSections();
+		List<MasterSectionDto> sections = record.getSections();
 		record.setSections(null);
-		ContractDto resultRecord = contractRepository.saveFrom(record);
-		resultRecord = contractRepository.saveFrom(record);
+		MasterContractDto resultRecord = contractRepository.saveFrom(record);
+		
 
 		// create sections
-		final ContractEntity e = contractRepository.findById(resultRecord.getId()).get();
-		record.setId(e.getId());
+		final MasterContractEntity e = contractRepository.findById(resultRecord.getId()).get();
+		
+		//save a copy in history table
+		MasterContractHistoryDto contractHistoryDto = contractHistoryRepository.saveFrom(e);
+			
+		MasterContractHistoryEntity cEntity = contractHistoryRepository.findById(contractHistoryDto.getId()).get();
+		for (MasterSectionDto s : sections){
+			//s.setContract(record);
+			sectionHistoryRepository.saveFrom(s, cEntity);
+		} 
+				
+		// increment version
+		record.setVersion("" + (Integer.parseInt(record.getVersion())+1));
+		contractRepository.saveFrom(record);
 		
 		
 		
 		//List<SectionEntity> contractSections = contractRepository.findSectionsByContract(e);
 		List<Integer> newSectionIds = new ArrayList<Integer>(); 
 		int newId;
-		for (SectionDto s : sections){
+		for (MasterSectionDto s : sections){
 			s.setContract(record);
 			newId =  sectionRepository.saveFrom(s).getId();
 			newSectionIds.add(newId);
@@ -173,33 +188,65 @@ public class ContractControllerImpl extends BaseController implements ContractCo
 			sectionRepository.remove(i);
 		}
 		
-		//also save a copy in history table
-		ContractHistoryDto contractHistoryDto = contractHistoryRepository.saveFrom(e);
-				
-		ContractHistoryEntity cEntity = contractHistoryRepository.findById(contractHistoryDto.getId()).get();
-		for (SectionDto s : sections){
-			sectionHistoryRepository.saveFrom(s, cEntity);
+		
+		return RestResponse.result(resultRecord);
+	}
+	
+	@Override
+	public RestResponse<MasterContractDraftDto> updateDraft(int id, MasterContractDraftDto record, BindingResult validationResult) {
+	
+		
+		final HelpdeskAccountDto account = helpdeskAccountRepo.findOneByEmail(this.currentUserName()).get().toDto();
+
+		record.setAccount(account);
+		List<MasterSectionDraftDto> sections = record.getSections();
+		record.setSections(null);
+		MasterContractDraftDto resultRecord = contractDraftRepository.saveFrom(record);
+		resultRecord = contractDraftRepository.saveFrom(record);
+
+		// create sections
+		final MasterContractDraftEntity e = contractDraftRepository.findById(resultRecord.getId()).get();
+		record.setId(e.getId());
+		
+		
+		
+		//List<SectionEntity> contractSections = contractRepository.findSectionsByContract(e);
+		List<Integer> newSectionIds = new ArrayList<Integer>(); 
+		int newId;
+		for (MasterSectionDraftDto s : sections){
+			s.setContract(record);
+			newId =  sectionDraftRepository.saveFrom(s).getId();
+			newSectionIds.add(newId);
 		}
+		
+		List<Integer> prevSectionIds = contractDraftRepository.findSectionsIdsByContract(e);
+		List<Integer> differences = new ArrayList<>(prevSectionIds);
+		differences.removeAll(newSectionIds);
+		for (Integer i: differences) {
+			sectionDraftRepository.remove(i);
+		}
+		
+		
 		return RestResponse.result(resultRecord);
 	}
 
 	@Override
 	public RestResponse<Void> delete(int id) {
-		final ContractEntity ce = contractRepository.findById(id).orElse(null);
+		final MasterContractEntity ce = contractRepository.findById(id).orElse(null);
 
 		if (ce == null) {
 			return RestResponse.notFound();
 		}
-		List<SectionEntity> sections = contractRepository.findSectionsByContract(ce);
-		for (SectionEntity s : sections){
+		List<MasterSectionEntity> sections = contractRepository.findSectionsByContract(ce);
+		for (MasterSectionEntity s : sections){
 			sectionRepository.remove(s.getId());
 		}
 		// remove all versions
-		List <ContractHistoryEntity> historyCeList = contractHistoryRepository.findContractVersions(ce);
-		for (ContractHistoryEntity h : historyCeList) {
+		List <MasterContractHistoryEntity> historyCeList = contractHistoryRepository.findContractVersions(ce.getParentId());
+		for (MasterContractHistoryEntity h : historyCeList) {
 
-			List<SectionHistoryEntity> sectionsHistory = contractHistoryRepository.findSectionsByContract(h);
-			for (SectionHistoryEntity s : sectionsHistory){
+			List<MasterSectionHistoryEntity> sectionsHistory = contractHistoryRepository.findSectionsByContract(h);
+			for (MasterSectionHistoryEntity s : sectionsHistory){
 				sectionHistoryRepository.remove(s.getId());
 			}
 			contractHistoryRepository.remove(h.getId());
@@ -212,18 +259,85 @@ public class ContractControllerImpl extends BaseController implements ContractCo
 	}
 
 	@Override
-	public RestResponse<Void> updateState(int id, String state) {
-		state =  state.replace("=", "");
-		final ContractEntity ce = contractRepository.findById(id).orElse(null);
+	public RestResponse<Void> deleteDraft(int id) {
+		final MasterContractDraftEntity ce = contractDraftRepository.findById(id).orElse(null);
 
 		if (ce == null) {
 			return RestResponse.notFound();
 		}
-		ce.setState(state);
-		
-		contractRepository.saveFrom(ce.toDto());
+		List<MasterSectionDraftEntity> sections = contractDraftRepository.findSectionsByContract(ce);
+		for (MasterSectionDraftEntity s : sections){
+			sectionDraftRepository.remove(s.getId());
+		}
+	
+		contractDraftRepository.remove(id);
 
 		return RestResponse.success();
+	}
+
+	
+	@Override
+	public RestResponse<Void> updateState(int id, String state) {
+		state =  state.replace("=", "");
+		if (state.equals("DRAFT")) {
+			final MasterContractEntity ce = contractRepository.findById(id).orElse(null);
+
+			if (ce == null) {
+				return RestResponse.notFound();
+			}
+			
+			//save contract in draft
+			MasterContractDraftDto cDto = contractDraftRepository.saveFrom(ce.toDto());
+			
+			// save sections
+			List<MasterSectionEntity> sections = contractRepository.findSectionsByContract(ce);
+			for (MasterSectionEntity s : sections){
+				sectionDraftRepository.saveFrom(s.toDto(), contractDraftRepository.findById(cDto.getId()).get() );
+			} 
+			
+			//remove from published
+			this.delete(id);
+			
+			return RestResponse.success();
+		}
+		else {
+			
+			final MasterContractDraftEntity ce = contractDraftRepository.findById(id).orElse(null);
+			if (ce == null) {
+				return RestResponse.notFound();
+			}
+			final MasterContractEntity ceOld = contractRepository.findById(id).orElse(null);
+			
+			ce.setState(state);
+			
+			// increment version
+			ce.setVersion("" + (Integer.parseInt(ce.getVersion())+1));
+			
+			//save contract in history table
+			MasterContractHistoryDto contractHistoryDto = contractHistoryRepository.saveFrom(ce);
+
+			
+			
+			//save contract in published
+			MasterContractDto cDto = contractRepository.saveFrom(ce.toDto());
+			// save sections
+			
+			List<MasterSectionDraftEntity> sections = contractRepository.findDraftSectionsByContract(ce);
+			for (MasterSectionDraftEntity s : sections){
+				sectionRepository.saveFrom(s.toDto(), contractRepository.findById(cDto.getId()).get() );
+			} 
+			
+			
+			MasterContractHistoryEntity contractHistoryEntity = contractHistoryRepository.findById(contractHistoryDto.getId()).get();
+			//save sections in history table
+			for (MasterSectionDraftEntity s : sections){
+				//s.setContract(record);
+				sectionHistoryRepository.saveFrom(s.toDto(), contractHistoryEntity);
+			} 
+			//remove from drafts
+			this.deleteDraft(id);
+			return RestResponse.success();
+		}
 	}
 	// TODO: Create separate service
 }

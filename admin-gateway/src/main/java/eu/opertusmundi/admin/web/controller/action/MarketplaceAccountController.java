@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import eu.opertusmundi.admin.web.model.account.helpdesk.EnumHelpdeskAccountSortField;
+import eu.opertusmundi.common.model.account.helpdesk.EnumHelpdeskAccountSortField;
 import eu.opertusmundi.admin.web.model.account.market.MarketplaceAccountSummaryDto;
 import eu.opertusmundi.common.model.EnumSortingOrder;
 import eu.opertusmundi.common.model.PageResultDto;

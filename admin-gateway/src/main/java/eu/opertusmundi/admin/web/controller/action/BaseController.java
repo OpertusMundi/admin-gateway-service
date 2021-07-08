@@ -11,13 +11,13 @@ import org.springframework.context.MessageSource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.opertusmundi.admin.web.model.account.helpdesk.EnumHelpdeskRole;
 import eu.opertusmundi.admin.web.service.IAuthenticationFacade;
 import eu.opertusmundi.common.model.ApplicationException;
 import eu.opertusmundi.common.model.BasicMessageCode;
 import eu.opertusmundi.common.model.Message;
 import eu.opertusmundi.common.model.MessageCode;
 import eu.opertusmundi.common.model.RestResponse;
+import eu.opertusmundi.common.model.account.helpdesk.EnumHelpdeskRole;
 
 public abstract class BaseController {
 

@@ -13,20 +13,20 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import eu.opertusmundi.admin.web.domain.HelpdeskAccountEntity;
-import eu.opertusmundi.admin.web.model.account.helpdesk.EnumHelpdeskAccountSortField;
-import eu.opertusmundi.admin.web.model.account.helpdesk.EnumHelpdeskRole;
-import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskAccountCommandDto;
-import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskAccountDto;
-import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskAccountFormDataDto;
-import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskSetPasswordCommandDto;
-import eu.opertusmundi.admin.web.repository.HelpdeskAccountRepository;
+import eu.opertusmundi.common.domain.HelpdeskAccountEntity;
+import eu.opertusmundi.common.repository.HelpdeskAccountRepository;
 import eu.opertusmundi.admin.web.validation.AccountValidator;
 import eu.opertusmundi.admin.web.validation.PasswordValidator;
 import eu.opertusmundi.common.model.BasicMessageCode;
 import eu.opertusmundi.common.model.EnumSortingOrder;
 import eu.opertusmundi.common.model.PageResultDto;
 import eu.opertusmundi.common.model.RestResponse;
+import eu.opertusmundi.common.model.account.helpdesk.EnumHelpdeskAccountSortField;
+import eu.opertusmundi.common.model.account.helpdesk.EnumHelpdeskRole;
+import eu.opertusmundi.common.model.account.helpdesk.HelpdeskAccountCommandDto;
+import eu.opertusmundi.common.model.account.helpdesk.HelpdeskAccountDto;
+import eu.opertusmundi.common.model.account.helpdesk.HelpdeskAccountFormDataDto;
+import eu.opertusmundi.common.model.account.helpdesk.HelpdeskSetPasswordCommandDto;
 
 @RestController
 @Secured({ "ROLE_ADMIN", "ROLE_USER" })

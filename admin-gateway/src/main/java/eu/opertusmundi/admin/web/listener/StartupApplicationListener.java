@@ -16,9 +16,9 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import eu.opertusmundi.admin.web.model.account.helpdesk.EnumHelpdeskRole;
-import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskAccountCommandDto;
-import eu.opertusmundi.admin.web.repository.HelpdeskAccountRepository;
+import eu.opertusmundi.common.model.account.helpdesk.EnumHelpdeskRole;
+import eu.opertusmundi.common.model.account.helpdesk.HelpdeskAccountCommandDto;
+import eu.opertusmundi.common.repository.HelpdeskAccountRepository;
 
 @Profile({"development", "production"})
 @Component

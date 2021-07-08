@@ -4,10 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RestController;
 
-import eu.opertusmundi.admin.web.model.account.helpdesk.EnumHelpdeskRole;
-import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskAccountDto;
-import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskProfileCommandDto;
-import eu.opertusmundi.admin.web.repository.HelpdeskAccountRepository;
+import eu.opertusmundi.common.model.account.helpdesk.EnumHelpdeskRole;
+import eu.opertusmundi.common.model.account.helpdesk.HelpdeskAccountDto;
+import eu.opertusmundi.common.model.account.helpdesk.HelpdeskProfileCommandDto;
+import eu.opertusmundi.common.repository.HelpdeskAccountRepository;
 import eu.opertusmundi.common.model.RestResponse;
 
 @RestController

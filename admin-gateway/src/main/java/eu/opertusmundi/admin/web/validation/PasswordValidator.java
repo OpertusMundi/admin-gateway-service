@@ -5,7 +5,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
-import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskSetPasswordCommandDto;
+import eu.opertusmundi.common.model.account.helpdesk.HelpdeskSetPasswordCommandDto;
 import eu.opertusmundi.common.model.BasicMessageCode;
 
 @Component

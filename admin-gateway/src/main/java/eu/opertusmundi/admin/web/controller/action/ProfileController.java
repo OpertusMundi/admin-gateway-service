@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskProfileCommandDto;
+import eu.opertusmundi.common.model.account.helpdesk.HelpdeskProfileCommandDto;
 import eu.opertusmundi.common.model.RestResponse;
 
 @RequestMapping(produces = "application/json")

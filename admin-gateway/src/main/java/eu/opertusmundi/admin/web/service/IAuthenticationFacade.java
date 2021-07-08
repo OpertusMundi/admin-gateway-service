@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import eu.opertusmundi.admin.web.model.account.helpdesk.EnumHelpdeskRole;
+import eu.opertusmundi.common.model.account.helpdesk.EnumHelpdeskRole;
 
 public interface IAuthenticationFacade {
 

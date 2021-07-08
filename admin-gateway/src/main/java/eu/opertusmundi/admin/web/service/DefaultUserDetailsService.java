@@ -13,10 +13,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import eu.opertusmundi.admin.web.domain.HelpdeskAccountEntity;
-import eu.opertusmundi.admin.web.model.account.helpdesk.EnumHelpdeskRole;
-import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskAccountDto;
-import eu.opertusmundi.admin.web.repository.HelpdeskAccountRepository;
+import eu.opertusmundi.common.domain.HelpdeskAccountEntity;
+import eu.opertusmundi.common.repository.HelpdeskAccountRepository;
+import eu.opertusmundi.common.model.account.helpdesk.EnumHelpdeskRole;
+import eu.opertusmundi.common.model.account.helpdesk.HelpdeskAccountDto;
 
 @Service
 public class DefaultUserDetailsService implements UserDetailsService

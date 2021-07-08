@@ -12,15 +12,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import eu.opertusmundi.admin.web.model.account.helpdesk.EnumHelpdeskAccountSortField;
-import eu.opertusmundi.admin.web.model.account.helpdesk.EnumHelpdeskRole;
-import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskAccountCommandDto;
-import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskAccountDto;
-import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskAccountFormDataDto;
-import eu.opertusmundi.admin.web.model.account.helpdesk.HelpdeskSetPasswordCommandDto;
 import eu.opertusmundi.common.model.EnumSortingOrder;
 import eu.opertusmundi.common.model.PageResultDto;
 import eu.opertusmundi.common.model.RestResponse;
+import eu.opertusmundi.common.model.account.helpdesk.EnumHelpdeskAccountSortField;
+import eu.opertusmundi.common.model.account.helpdesk.EnumHelpdeskRole;
+import eu.opertusmundi.common.model.account.helpdesk.HelpdeskAccountCommandDto;
+import eu.opertusmundi.common.model.account.helpdesk.HelpdeskAccountDto;
+import eu.opertusmundi.common.model.account.helpdesk.HelpdeskAccountFormDataDto;
+import eu.opertusmundi.common.model.account.helpdesk.HelpdeskSetPasswordCommandDto;
 
 public interface HelpdeskAccountController {
 

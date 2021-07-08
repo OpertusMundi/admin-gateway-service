@@ -12,7 +12,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RestController;
 
-import eu.opertusmundi.admin.web.model.account.helpdesk.EnumHelpdeskAccountSortField;
+import eu.opertusmundi.common.model.account.helpdesk.EnumHelpdeskAccountSortField;
 import eu.opertusmundi.admin.web.model.account.market.MarketplaceAccountSummaryDto;
 import eu.opertusmundi.common.domain.AccountEntity;
 import eu.opertusmundi.common.model.EnumSortingOrder;

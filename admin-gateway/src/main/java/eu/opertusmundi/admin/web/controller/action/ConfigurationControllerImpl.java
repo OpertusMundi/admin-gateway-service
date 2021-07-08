@@ -5,9 +5,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.opertusmundi.admin.web.config.MapConfiguration;
-import eu.opertusmundi.admin.web.model.account.helpdesk.EnumHelpdeskRole;
 import eu.opertusmundi.admin.web.model.configuration.ConfigurationDto;
 import eu.opertusmundi.common.model.RestResponse;
+import eu.opertusmundi.common.model.account.helpdesk.EnumHelpdeskRole;
 
 @RestController
 public class ConfigurationControllerImpl extends BaseController implements ConfigurationController {

@@ -8,8 +8,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import eu.opertusmundi.admin.web.model.account.helpdesk.EnumHelpdeskRole;
 import eu.opertusmundi.admin.web.service.DefaultUserDetailsService.Details;
+import eu.opertusmundi.common.model.account.helpdesk.EnumHelpdeskRole;
 
 @Component
 public class AuthenticationFacade implements IAuthenticationFacade {
