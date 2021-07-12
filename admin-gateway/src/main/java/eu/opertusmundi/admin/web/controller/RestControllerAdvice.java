@@ -99,7 +99,7 @@ public class RestControllerAdvice {
         AccessDeniedException ex,  HttpServletRequest request
     ) {
 
-        logger.error(String.format("403 - Forbidden. [path=%s, message=%s]: ", request.getRequestURI(), ex.getMessage()), ex);
+        logger.error("403 - Forbidden. [path={}, message={}]", request.getRequestURI(), ex.getMessage());
 
         final MessageCode      code        = BasicMessageCode.Forbidden;
         final String           description = this.messageSource.getMessage(code.key(), null, Locale.getDefault());
