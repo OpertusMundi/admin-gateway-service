@@ -32,6 +32,7 @@ import eu.opertusmundi.common.model.payment.PayOutCommandDto;
 import eu.opertusmundi.common.model.payment.PayOutDto;
 import eu.opertusmundi.common.model.payment.PaymentException;
 import eu.opertusmundi.common.model.payment.TransferDto;
+import eu.opertusmundi.common.model.payment.helpdesk.HelpdeskPayInDto;
 import eu.opertusmundi.common.repository.OrderRepository;
 import eu.opertusmundi.common.repository.PayInRepository;
 import eu.opertusmundi.common.repository.PayOutRepository;
@@ -101,7 +102,7 @@ public class BillingControllerImpl extends BaseController implements BillingCont
         final Direction   direction   = order == EnumSortingOrder.DESC ? Direction.DESC : Direction.ASC;
         final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, orderBy.getValue()));
 
-        final Page<PayInDto> p = this.payInRepository.findAllPayInObjects(
+        final Page<HelpdeskPayInDto> p = this.payInRepository.findAllPayInObjects(
             status,
             email,
             referenceNumber,
@@ -117,7 +118,7 @@ public class BillingControllerImpl extends BaseController implements BillingCont
 
     @Override
     public RestResponse<PayInDto> findPayInByKey(UUID key) {
-        final Optional<PayInDto> r = this.payInRepository.findOneObjectByKey(key, true);
+        final Optional<PayInDto> r = this.payInRepository.findOneObjectByKey(key);
         if (r.isPresent()) {
             return RestResponse.result(r.get());
         }
