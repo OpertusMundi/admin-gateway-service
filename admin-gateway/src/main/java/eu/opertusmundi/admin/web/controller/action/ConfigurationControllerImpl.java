@@ -6,14 +6,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import eu.opertusmundi.admin.web.config.MapConfiguration;
 import eu.opertusmundi.admin.web.model.configuration.ConfigurationDto;
+import eu.opertusmundi.common.domain.CountryEuropeEntity;
 import eu.opertusmundi.common.model.RestResponse;
 import eu.opertusmundi.common.model.account.helpdesk.EnumHelpdeskRole;
+import eu.opertusmundi.common.repository.CountryRepository;
 
 @RestController
 public class ConfigurationControllerImpl extends BaseController implements ConfigurationController {
 
     @Value("${opertusmundi.marketplace.url}")
     private String marketplaceUrl;
+
+    @Autowired
+    private CountryRepository countryRepository;
 
     @Autowired
     private MapConfiguration mapConfiguration;
@@ -32,6 +37,10 @@ public class ConfigurationControllerImpl extends BaseController implements Confi
         config.setBingMaps(this.mapConfiguration.getBingMaps());
         config.setMap(this.mapConfiguration.getDefaults());
         config.setMarketplaceUrl(marketplaceUrl);
+
+        this.countryRepository.getEuropeCountries().stream()
+            .map(CountryEuropeEntity::toDto)
+            .forEach(c -> config.getEuropeCountries().add(c));
 
         return config;
     }

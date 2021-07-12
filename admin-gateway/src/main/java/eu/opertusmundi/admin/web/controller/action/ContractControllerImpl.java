@@ -10,13 +10,15 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RestController;
 
+import eu.opertusmundi.common.domain.HelpdeskAccountEntity;
 import eu.opertusmundi.common.domain.MasterContractDraftEntity;
 import eu.opertusmundi.common.domain.MasterContractEntity;
 import eu.opertusmundi.common.domain.MasterContractHistoryEntity;
-import eu.opertusmundi.common.domain.HelpdeskAccountEntity;
 import eu.opertusmundi.common.domain.MasterSectionDraftEntity;
 import eu.opertusmundi.common.domain.MasterSectionEntity;
 import eu.opertusmundi.common.domain.MasterSectionHistoryEntity;
+import eu.opertusmundi.common.model.RestResponse;
+import eu.opertusmundi.common.model.account.helpdesk.HelpdeskAccountDto;
 import eu.opertusmundi.common.model.contract.MasterContractDraftDto;
 import eu.opertusmundi.common.model.contract.MasterContractDto;
 import eu.opertusmundi.common.model.contract.MasterContractHistoryDto;
@@ -29,8 +31,6 @@ import eu.opertusmundi.common.repository.contract.MasterContractRepository;
 import eu.opertusmundi.common.repository.contract.MasterSectionDraftRepository;
 import eu.opertusmundi.common.repository.contract.MasterSectionHistoryRepository;
 import eu.opertusmundi.common.repository.contract.MasterSectionRepository;
-import eu.opertusmundi.common.model.RestResponse;
-import eu.opertusmundi.common.model.account.helpdesk.HelpdeskAccountDto;
 
 @Transactional(readOnly = false)
 @RestController
