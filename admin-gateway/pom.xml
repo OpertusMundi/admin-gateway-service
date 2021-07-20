@@ -1,175 +1,246 @@
 <?xml version="1.0"?>
 <project
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-	xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-	<modelVersion>4.0.0</modelVersion>
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
 
-	<artifactId>opertus-mundi-admin-gateway</artifactId>
-	<name>[opertus-mundi] Admin gateway</name>
+    <artifactId>opertus-mundi-admin-gateway</artifactId>
+    <name>[opertus-mundi] Admin gateway</name>
 
-	<packaging>jar</packaging>
+    <packaging>jar</packaging>
 
-	<parent>
-		<groupId>eu.opertusmundi</groupId>
-		<artifactId>opertus-mundi-admin-gateway-parent</artifactId>
-		<version>1.0.0</version>
-	</parent>
+    <parent>
+        <groupId>eu.opertusmundi</groupId>
+        <artifactId>opertus-mundi-admin-gateway-parent</artifactId>
+        <version>1.0.0</version>
+    </parent>
 
-	<properties>
-		<frontend.skip>false</frontend.skip>
-		<frontend-maven-plugin.version>1.8.0</frontend-maven-plugin.version>
+    <properties>
+        <frontend.skip>false</frontend.skip>
+        <frontend-maven-plugin.version>1.8.0</frontend-maven-plugin.version>
+        <spring-cloud.version>Hoxton.SR8</spring-cloud.version>
+        <commons-collections4.version>4.4</commons-collections4.version>
+        <commons-io.version>2.7</commons-io.version>
+        <org.camunda.bpm.version>7.13.0</org.camunda.bpm.version>
+        <org.jadira.usertype.core.version>6.0.1.GA</org.jadira.usertype.core.version>
+    </properties>
 
-		<spring-cloud.version>Hoxton.SR8</spring-cloud.version>
+    <profiles>
+        <profile>
+            <!-- a profile for java-only builds -->
+            <id>java-build</id>
+            <activation>
+                <property>
+                    <name>enableJavaBuildProfile</name>
+                </property>
+            </activation>
+            <properties>
+                <frontend.skip>true</frontend.skip>
+            </properties>
+        </profile>
+        <profile>
+            <id>continuous-integration</id>
+            <activation>
+                <property>
+                    <name>enableCiProfile</name>
+                </property>
+            </activation>
+            <properties>
+                <git-commit-id.skip>true</git-commit-id.skip>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-additional-resources-for-integration-tests</id>
+                                <phase>process-test-resources</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.testOutputDirectory}/</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>resources/integration-tests</directory>
+                                            <filtering>true</filtering>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>docker-build</id>
+            <activation>
+                <property>
+                    <name>enableDockerBuildProfile</name>
+                </property>
+            </activation>
+            <properties>
+                <git-commit-id.skip>true</git-commit-id.skip>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-additional-resources-for-docker-build</id>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.outputDirectory}/</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>resources/docker</directory>
+                                            <filtering>true</filtering>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
-		<commons-collections4.version>4.4</commons-collections4.version>
-		<commons-io.version>2.7</commons-io.version>
-		<org.camunda.bpm.version>7.13.0</org.camunda.bpm.version>
-		<org.jadira.usertype.core.version>6.0.1.GA</org.jadira.usertype.core.version>
-	</properties>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
-	<profiles>
-		<profile>
-			<id>develop</id>
-			<properties>
-				<frontend.skip>true</frontend.skip>
-			</properties>
-		</profile>
-	</profiles>
+    <dependencies>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-dependencies</artifactId>
-				<version>${spring-cloud.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+        <dependency>
+            <groupId>eu.opertusmundi</groupId>
+            <artifactId>opertus-mundi-common</artifactId>
+        </dependency>
 
-	<dependencies>
+        <!-- Spring-Boot starter dependencies -->
 
-		<dependency>
-			<groupId>eu.opertusmundi</groupId>
-			<artifactId>opertus-mundi-common</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
 
-		<!-- Spring-Boot starter dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-aop</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
 
-		<dependency>
-    		<groupId>org.springframework.boot</groupId>
-    		<artifactId>spring-boot-starter-jdbc</artifactId>
-  		</dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session-jdbc</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>org.springframework.session</groupId>
-			<artifactId>spring-session-jdbc</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-thymeleaf</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-cache</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-validation</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-log4j2</artifactId>
-		</dependency>
-	
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-properties-migrator</artifactId>
-			<scope>runtime</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-properties-migrator</artifactId>
+            <scope>runtime</scope>
+        </dependency>
 
-		<dependency>
-    		<groupId>com.vladmihalcea</groupId>
-    		<artifactId>hibernate-types-52</artifactId>
-    	<version>2.10.2</version>
-		</dependency>	
-    
+        <dependency>
+            <groupId>com.vladmihalcea</groupId>
+            <artifactId>hibernate-types-52</artifactId>
+            <version>2.10.2</version>
+        </dependency>
+
         <!-- Testing -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.junit.vintage</groupId>
-					<artifactId>junit-vintage-engine</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-	
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		
-		<!-- Spring Cloud -->
-		<dependency>
-		    <groupId>javax.ws.rs</groupId>
-		    <artifactId>javax.ws.rs-api</artifactId>
-		    <version>2.1.1</version>
-		</dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.junit.vintage</groupId>
+                    <artifactId>junit-vintage-engine</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-		<!-- If packaging to WAR, mark dependency on embedded server as provided -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-		<!--
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-tomcat</artifactId>
-			<scope>provided</scope>
-		</dependency>
-  		-->	
-		
-		<!-- JDBC drivers -->
+        <!-- Spring Cloud -->
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
+            <version>2.1.1</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<scope>runtime</scope>
-		</dependency>
+        <!-- If packaging to WAR, mark dependency on embedded server as provided -->
 
-		<!-- log4j2 lifecycle hooks in web context -->
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-web</artifactId>
-		</dependency>
-		
+        <!-- <dependency> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-starter-tomcat</artifactId> 
+            <scope>provided</scope> </dependency> -->
+
+        <!-- JDBC drivers -->
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- log4j2 lifecycle hooks in web context -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-web</artifactId>
+        </dependency>
+
         <!-- Geometry types -->
         <dependency>
             <groupId>org.locationtech.jts</groupId>
@@ -183,7 +254,7 @@
             <artifactId>spatial4j</artifactId>
             <version>${org.locationtech.jts.spatial4j.version}</version>
         </dependency>
-		
+
         <!-- Serialization -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -200,249 +271,250 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
 
-		<dependency>
-			<groupId>org.jadira.usertype</groupId>
-			<artifactId>usertype.core</artifactId>
-			<version>${org.jadira.usertype.core.version}</version>
-		</dependency>
-		
-		<!-- Utilities -->
+        <dependency>
+            <groupId>org.jadira.usertype</groupId>
+            <artifactId>usertype.core</artifactId>
+            <version>${org.jadira.usertype.core.version}</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-		</dependency>
+        <!-- Utilities -->
 
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-collections4</artifactId>
-			<version>${commons-collections4.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>${commons-io.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>${commons-collections4.version}</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons-io.version}</version>
+        </dependency>
 
-		<!-- Camunda dependencies (no engine is configured, instead we use DTO definitions -->
-		<dependency>
-		    <groupId>org.camunda.bpm</groupId>
-		    <artifactId>camunda-engine</artifactId>
-		    <version>${org.camunda.bpm.version}</version>
-		</dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
 
-	    <dependency>
-	      <groupId>org.camunda.bpm</groupId>
-	      <artifactId>camunda-engine-rest-core</artifactId>
-	      <version>${org.camunda.bpm.version}</version>
-	    </dependency>
-	    
-		<!-- Auditing, health, and metrics -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
-		</dependency>
- 		
-	</dependencies>
+        <!-- Camunda dependencies (no engine is configured, instead we use 
+            DTO definitions -->
+        <dependency>
+            <groupId>org.camunda.bpm</groupId>
+            <artifactId>camunda-engine</artifactId>
+            <version>${org.camunda.bpm.version}</version>
+        </dependency>
 
-	<build>
-		<plugins>
+        <dependency>
+            <groupId>org.camunda.bpm</groupId>
+            <artifactId>camunda-engine-rest-core</artifactId>
+            <version>${org.camunda.bpm.version}</version>
+        </dependency>
 
-			<!-- Inject build information -->
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>build-info</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+        <!-- Auditing, health, and metrics -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
 
-			<!-- Inject version information into the build -->
-			<plugin>
-				<groupId>pl.project13.maven</groupId>
-				<artifactId>git-commit-id-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>get-the-git-infos</id>
-						<goals>
-							<goal>revision</goal>
-						</goals>
-						<phase>initialize</phase>
-					</execution>
-				</executions>
-				<configuration>
-					<skip>${git-commit-id.skip}</skip>
-					<generateGitPropertiesFile>true</generateGitPropertiesFile>
-					<generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
-					<includeOnlyProperties>
-						<includeOnlyProperty>^git.build.(time|version)$</includeOnlyProperty>
-						<includeOnlyProperty>^git.commit.id.(abbrev|full|describe)$</includeOnlyProperty>
-						<includeOnlyProperty>^git.commit.message.short$</includeOnlyProperty>
-					</includeOnlyProperties>
-					<commitIdGenerationMode>full</commitIdGenerationMode>
-				</configuration>
-			</plugin>
+    </dependencies>
 
-			<!-- Configure frontend build -->
-			<plugin>
-				<groupId>com.github.eirslett</groupId>
-				<artifactId>frontend-maven-plugin</artifactId>
-				<version>${frontend-maven-plugin.version}</version>
-		
-				<configuration>
-					<skip>${frontend.skip}</skip>
-					<workingDirectory>src/main/frontend</workingDirectory>
-				</configuration>
-		
-				<executions>
-		
-					<!-- Install node and npm -->
-					<execution>
-						<id>install-node-and-npm</id>
-						<goals>
-							<goal>install-node-and-npm</goal>
-						</goals>
-						<phase>generate-resources</phase>
-						<configuration>
-							<nodeVersion>${node.version}</nodeVersion>
-						</configuration>
-					</execution>
-		
-					<!-- Install packages -->
-					<execution>
-						<id>npm-install</id>
-						<goals>
-							<goal>npm</goal>
-						</goals>
-						<phase>generate-resources</phase>
-						<configuration>
-							<arguments>install</arguments>
-						</configuration>
-					</execution>
-		
-					<!-- Build frontend -->
-					<execution>
-						<id>npm-run-build</id>
-						<goals>
-							<goal>npm</goal>
-						</goals>
-						<phase>generate-resources</phase>
-						<configuration>
-							<arguments>run build</arguments>
-						</configuration>
-					</execution>
-		
-				</executions>
-			</plugin>
+    <build>
+        <plugins>
 
-			<!-- Copy React application resources -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<executions>
-					<!-- Copy resources -->
-					<execution>
-						<id>copy-frontend-resources</id>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/classes/public</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${project.basedir}/src/main/frontend/build</directory>
-									<filtering>false</filtering>
-									<excludes>
-										<exclude>index.html</exclude>
-									</excludes>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-					<!-- Copy template -->
-					<execution>
-						<id>copy-frontend-index-html-template</id>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/classes/templates</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${project.basedir}/src/main/frontend/build</directory>
-									<filtering>false</filtering>
-									<includes>
-										<include>index.html</include>
-									</includes>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			
-		</plugins>
+            <!-- Inject build information -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build-info</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
-		<pluginManagement>
-			<plugins>
-				<!-- Disable frontend-maven-plugin in eclipse -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-	
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>com.github.eirslett</groupId>
-										<artifactId>frontend-maven-plugin</artifactId>
-										<versionRange>[0.0,)</versionRange>
-										<goals>
-											<goal>install-node-and-npm</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore />
-									</action>
-								</pluginExecution>
-	
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>com.github.eirslett</groupId>
-										<artifactId>frontend-maven-plugin</artifactId>
-										<versionRange>[0.0,)</versionRange>
-										<goals>
-											<goal>npm</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore />
-									</action>
-								</pluginExecution>
-	
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-	
-			</plugins>
-	
-		</pluginManagement>
+            <!-- Inject version information into the build -->
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>get-the-git-infos</id>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <skip>${git-commit-id.skip}</skip>
+                    <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                    <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
+                    <includeOnlyProperties>
+                        <includeOnlyProperty>^git.build.(time|version)$</includeOnlyProperty>
+                        <includeOnlyProperty>^git.commit.id.(abbrev|full|describe)$</includeOnlyProperty>
+                        <includeOnlyProperty>^git.commit.message.short$</includeOnlyProperty>
+                    </includeOnlyProperties>
+                    <commitIdGenerationMode>full</commitIdGenerationMode>
+                </configuration>
+            </plugin>
 
-	</build>
+            <!-- Configure frontend build -->
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>${frontend-maven-plugin.version}</version>
+
+                <configuration>
+                    <skip>${frontend.skip}</skip>
+                    <workingDirectory>src/main/frontend</workingDirectory>
+                </configuration>
+
+                <executions>
+
+                    <!-- Install node and npm -->
+                    <execution>
+                        <id>install-node-and-npm</id>
+                        <goals>
+                            <goal>install-node-and-npm</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <nodeVersion>${node.version}</nodeVersion>
+                        </configuration>
+                    </execution>
+
+                    <!-- Install packages -->
+                    <execution>
+                        <id>npm-install</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <arguments>install</arguments>
+                        </configuration>
+                    </execution>
+
+                    <!-- Build frontend -->
+                    <execution>
+                        <id>npm-run-build</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <arguments>run build</arguments>
+                        </configuration>
+                    </execution>
+
+                </executions>
+            </plugin>
+
+            <!-- Copy React application resources -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <!-- Copy resources -->
+                    <execution>
+                        <id>copy-frontend-resources</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/classes/public</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/src/main/frontend/build</directory>
+                                    <filtering>false</filtering>
+                                    <excludes>
+                                        <exclude>index.html</exclude>
+                                    </excludes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <!-- Copy template -->
+                    <execution>
+                        <id>copy-frontend-index-html-template</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/classes/templates</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/src/main/frontend/build</directory>
+                                    <filtering>false</filtering>
+                                    <includes>
+                                        <include>index.html</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+
+        <pluginManagement>
+            <plugins>
+                <!-- Disable frontend-maven-plugin in eclipse -->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>com.github.eirslett</groupId>
+                                        <artifactId>frontend-maven-plugin</artifactId>
+                                        <versionRange>[0.0,)</versionRange>
+                                        <goals>
+                                            <goal>install-node-and-npm</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>com.github.eirslett</groupId>
+                                        <artifactId>frontend-maven-plugin</artifactId>
+                                        <versionRange>[0.0,)</versionRange>
+                                        <goals>
+                                            <goal>npm</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+
+            </plugins>
+
+        </pluginManagement>
+
+    </build>
 
 </project>

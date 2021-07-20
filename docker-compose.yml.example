@@ -1,0 +1,103 @@
+# vim: syntax=yaml:
+
+version: '3.6'
+
+services:
+  'app':
+    image: 'opertusmundi/admin-gateway:${VERSION}'
+    build:
+      context: .
+    volumes:
+    - type: 'bind'
+      source: ./secrets/
+      target: /secrets/
+      read_only: true
+    - type: 'bind'
+      source: ./logs
+      target: /app/logs
+    ## note: override logging configuration
+    #- type: 'bind'
+    #  source: ./admin-gateway/config/log4j2-syslog.xml
+    #  target: /app/config/log4j2.xml
+    #  read_only: true
+    - type: 'volume'
+      source: files_assets
+      target: /var/local/opertusmundi/files/assets
+    - type: 'volume'
+      source: files_contracts
+      target: /var/local/opertusmundi/files/contracts
+    - type: 'volume'
+      source: files_drafts
+      target: /var/local/opertusmundi/files/drafts
+    - type: 'volume'
+      source: files_users
+      target: /var/local/opertusmundi/files/users
+    - type: 'volume'
+      source: files_temp
+      target: /var/local/opertusmundi/files/temp
+    - type: 'volume'
+      source: ingest_input
+      target: /var/local/opertusmundi/ingest/input
+    - type: 'volume'
+      source: profile_input
+      target: /var/local/opertusmundi/profile/input
+    environment:
+      #XTRACE: 'true'
+      JAVA_OPTS: '-server -Xmx1024m -Xms256m -Djava.security.egd=file:///dev/urandom'
+      ADMIN_PASSWORD_FILE: /secrets/admin-password
+      MARKETPLACE_URL: ${MARKETPLACE_URL}
+      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD_FILE: /secrets/database-password
+      CAMUNDA_DATABASE_URL: ${CAMUNDA_DATABASE_URL}
+      CAMUNDA_DATABASE_USERNAME: ${CAMUNDA_DATABASE_USERNAME}
+      CAMUNDA_DATABASE_PASSWORD_FILE: /secrets/camunda-database-password
+      JWT_SECRET_FILE: /secrets/jwt-secret
+      BPM_REST_BASE_URL: ${BPM_REST_BASE_URL}
+      BPM_REST_USERNAME: ${BPM_REST_USERNAME}
+      BPM_REST_PASSWORD_FILE: /secrets/bpm-rest-password 
+      MANGOPAY_BASE_URL: https://api.sandbox.mangopay.com
+      MANGOPAY_CLIENT_ID: ${MANGOPAY_CLIENT_ID}
+      MANGOPAY_CLIENT_PASSWORD_FILE: /secrets/mangopay-client-password 
+      CATALOGUE_BASE_URL: ${CATALOGUE_BASE_URL}
+      INGEST_BASE_URL: ${INGEST_BASE_URL}
+      TRANSFORM_BASE_URL: ${TRANSFORM_BASE_URL}
+      MAILER_BASE_URL: ${MAILER_BASE_URL}
+      MESSENGER_BASE_URL: ${MESSENGER_BASE_URL}
+      RATING_BASE_URL: ${RATING_BASE_URL} 
+      RATING_USERNAME: ${RATING_USERNAME}
+      RATING_PASSWORD_FILE: /secrets/rating-password
+      PROFILE_BASE_URL: ${PROFILE_BASE_URL}
+      PID_BASE_URL: ${PID_BASE_URL}
+      ELASTICSEARCH_BASE_URL: ${ELASTICSEARCH_BASE_URL}
+      ELASTICSEARCH_INDICES_ASSETS_INDEX_NAME: ${ELASTICSEARCH_INDICES_ASSETS_INDEX_NAME}
+    networks:
+      opertusmundi_network:
+        aliases:
+        - 'webadm'
+
+volumes:
+  files_assets:
+    external: true
+    name: opertusmundi_files_assets
+  files_drafts:
+    external: true
+    name: opertusmundi_files_drafts
+  files_users:
+    external: true
+    name: opertusmundi_files_users
+  files_contracts:
+    external: true
+    name: opertusmundi_files_contracts
+  files_temp: {}
+  ingest_input:
+    external: true
+    name: opertusmundi_ingest_input
+  profile_input:
+    external: true
+    name: opertusmundi_profile_input
+
+networks:
+  opertusmundi_network:
+    external: true
+

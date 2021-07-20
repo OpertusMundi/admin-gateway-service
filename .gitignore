@@ -3,6 +3,8 @@
 /.secrets
 /secrets
 
+/admin-gateway/config
+
 .settings
 .project
 .classpath
@@ -12,3 +14,6 @@
 
 **/*.*~
 **/*.~
+
+.env
+docker-compose.yml
