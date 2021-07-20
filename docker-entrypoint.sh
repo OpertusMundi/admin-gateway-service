@@ -22,9 +22,11 @@ runtime_profile=$(hostname | md5sum | head -c10)
 {
     marketplace_url=$(echo ${MARKETPLACE_URL} | _validate_http_url "MARKETPLACE_URL")
     echo "opertusmundi.marketplace.url = ${marketplace_url}"
-	
-	admin_password=$(cat ${ADMIN_PASSWORD_FILE} | tr -d '\n')
-	echo "opertus-mundi.default-admin.password = ${admin_password}"
+    
+    admin_username=${ADMIN_USERNAME}
+    admin_password=$(cat ${ADMIN_PASSWORD_FILE} | tr -d '\n')
+    echo "opertus-mundi.default-admin.username = ${admin_username}"
+    echo "opertus-mundi.default-admin.password = ${admin_password}"
 
     database_url=$(echo ${DATABASE_URL} | _validate_database_url "DATABASE_URL")
     database_username=${DATABASE_USERNAME}

@@ -48,6 +48,7 @@ RUN mkdir config logs \
     && chmod g=rwx config logs
 
 ENV MARKETPLACE_URL="" \
+    ADMIN_USERNAME="admin@example.com" \
     ADMIN_PASSWORD_FILE="/secrets/admin-password" \
     DATABASE_URL="jdbc:postgresql://db:5432/opertusmundi" \
     DATABASE_USERNAME="spring" \

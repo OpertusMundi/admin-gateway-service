@@ -44,6 +44,7 @@ services:
     environment:
       #XTRACE: 'true'
       JAVA_OPTS: '-server -Xmx1024m -Xms256m -Djava.security.egd=file:///dev/urandom'
+      ADMIN_USERNAME: ${ADMIN_USERNAME}
       ADMIN_PASSWORD_FILE: /secrets/admin-password
       MARKETPLACE_URL: ${MARKETPLACE_URL}
       DATABASE_URL: ${DATABASE_URL}
@@ -71,6 +72,8 @@ services:
       PID_BASE_URL: ${PID_BASE_URL}
       ELASTICSEARCH_BASE_URL: ${ELASTICSEARCH_BASE_URL}
       ELASTICSEARCH_INDICES_ASSETS_INDEX_NAME: ${ELASTICSEARCH_INDICES_ASSETS_INDEX_NAME}
+    ports:
+    - '8090:8000'
     networks:
       opertusmundi_network:
         aliases:
