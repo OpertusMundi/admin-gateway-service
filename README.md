@@ -1,5 +1,7 @@
 # OpertusMundi Admin Application
 
+[![Build Status](https://ci.dev-1.opertusmundi.eu:9443/api/badges/OpertusMundi/admin-gateway-service/status.svg?ref=refs/heads/master)](https://ci.dev-1.opertusmundi.eu:9443/OpertusMundi/admin-gateway-service)
+
 Admin application for OpertusMundi marketplace
 
 ## Quickstart
