@@ -83,9 +83,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
                     "/logged-in", "/logout",
                     "/action/**")
                 .authenticated()
-            // Restrict access to actuator to system administrators only
-            .requestMatchers(EndpointRequest.toAnyEndpoint())
-            	.hasRole("ADMIN_SYSTEM");
+            // Restrict access to actuator endpoints (you may further restrict details via configuration)
+            .requestMatchers(EndpointRequest.toAnyEndpoint()).hasIpAddress("127.0.0.1/8");
 
         // Support form-based login
 
