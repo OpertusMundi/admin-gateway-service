@@ -163,7 +163,7 @@ public interface ContractController {
      * @return
      */
     @DeleteMapping(value = {"/drafts/{id}"})
-    RestResponse<MasterContractDto> deleteDraft(
+    RestResponse<Void> deleteDraft(
         @PathVariable int id
     );
 

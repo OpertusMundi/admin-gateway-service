@@ -160,11 +160,11 @@ public class ContractControllerImpl extends BaseController implements ContractCo
     }
 
     @Override
-    public RestResponse<MasterContractDto> deleteDraft(int id) {
+    public RestResponse<Void> deleteDraft(int id) {
         try {
-            final MasterContractDto result = masterService.deleteDraft(id);
+            masterService.deleteDraft(id);
 
-            return RestResponse.result(result);
+            return RestResponse.success();
         } catch (final ApplicationException ex) {
             return RestResponse.error(ex.getCode(), ex.getMessage());
         }
