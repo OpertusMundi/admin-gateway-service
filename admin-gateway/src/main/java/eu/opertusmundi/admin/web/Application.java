@@ -11,6 +11,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
         eu.opertusmundi.common.config._Marker.class,
         eu.opertusmundi.common.repository._Marker.class,
         eu.opertusmundi.common.service._Marker.class,
+        eu.opertusmundi.common.util._Marker.class,
         eu.opertusmundi.admin.web.config._Marker.class,
         eu.opertusmundi.admin.web.listener._Marker.class,
         eu.opertusmundi.admin.web.repository._Marker.class,
