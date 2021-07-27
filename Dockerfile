@@ -34,6 +34,8 @@ RUN mvn -B compile -DenableJavaBuildProfile -DenableDockerBuildProfile
 
 FROM openjdk:8-jre-alpine
 
+ARG git_commit=
+
 COPY --from=maven-build /app/admin-gateway/target/ /app/
 
 RUN addgroup spring && adduser -H -D -G spring spring
@@ -75,6 +77,8 @@ ENV MARKETPLACE_URL="" \
     PID_BASE_URL="http://pid:8000/" \
     ELASTICSEARCH_BASE_URL="http://elasticsearch:9200" \
     ELASTICSEARCH_INDICES_ASSETS_INDEX_NAME="assets"
+
+ENV GIT_COMMIT=${git_commit}
 
 VOLUME [ \
     "/var/local/opertusmundi/files/assets", \
