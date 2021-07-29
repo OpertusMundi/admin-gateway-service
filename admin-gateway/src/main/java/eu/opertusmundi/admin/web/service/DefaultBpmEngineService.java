@@ -49,6 +49,8 @@ public class DefaultBpmEngineService implements BpmEngineService {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultBpmEngineService.class);
 
+    private static final String START_EVENT = "startEvent";
+
     @Autowired
     private AccountRepository accountRepository;
 
@@ -176,9 +178,7 @@ public class DefaultBpmEngineService implements BpmEngineService {
 
         final List<HistoricActivityInstanceDto> activities = this.bpmClient.getObject()
             .getHistoryProcessInstanceActivityInstances(processInstanceId);
-        activities.sort((i1, i2) -> {
-            return i1.getStartTime().after(i2.getStartTime()) ? 1 : -1;
-        });
+        activities.sort(this::compareActivities);
         result.setActivities(activities);
 
         final List<org.camunda.bpm.engine.rest.dto.runtime.IncidentDto> incidents = this.bpmClient.getObject()
@@ -284,9 +284,7 @@ public class DefaultBpmEngineService implements BpmEngineService {
 
         final List<HistoricActivityInstanceDto> activities = this.bpmClient.getObject()
             .getHistoryProcessInstanceActivityInstances(processInstanceId);
-        activities.sort((i1, i2) -> {
-            return i1.getStartTime().after(i2.getStartTime()) ? 1 : -1;
-        });
+        activities.sort(this::compareActivities);
         result.setActivities(activities);
 
         final List<HistoricIncidentDto> incidents = this.bpmClient.getObject()
@@ -417,6 +415,22 @@ public class DefaultBpmEngineService implements BpmEngineService {
         );
 
         return PageResultDto.of(page, size, rows, count);
+    }
+
+    private int compareActivities(HistoricActivityInstanceDto i1, HistoricActivityInstanceDto i2) {
+        // Compare dates
+        final int c = i1.getStartTime().compareTo(i2.getStartTime());
+
+        if (c == 0) {
+            // Compare event type
+            if (i1.getActivityType().equals(START_EVENT)) {
+                return 1;
+            }
+            if (i2.getActivityType().equals(START_EVENT)) {
+                return -1;
+            }
+        }
+        return c;
     }
 
 }
