@@ -79,7 +79,7 @@ public class DefaultBpmEngineService implements BpmEngineService {
     public PageResultDto<ProcessInstanceDto> getProcessInstances(
         int page, int size, String businessKey, EnumProcessInstanceSortField orderBy, EnumSortingOrder order
     ) {
-        final String countQuery =
+        String countQuery =
             "select    count(*) " +
             "from      act_ru_execution ex " +
             "            inner join act_re_procdef def " +
@@ -88,7 +88,18 @@ public class DefaultBpmEngineService implements BpmEngineService {
             "              on def.deployment_id_ = dep.id_ " +
             "where     ex.id_ = ex.proc_inst_id_ ";
 
-        final Long count = jdbcTemplate.queryForObject(countQuery, Long.class);
+        // Add filtering
+        if (!StringUtils.isBlank(businessKey)) {
+            countQuery += "and ex.business_key_ = ? ";
+        }
+        
+        final List<Object> args = new ArrayList<>();
+
+        if (!StringUtils.isBlank(businessKey)) {
+            args.add(businessKey);
+        }
+        
+        final Long count = jdbcTemplate.queryForObject(countQuery, args.toArray(), Long.class);
 
         String selectQuery =
             "select    def.id_                   as process_definition_id, " +
@@ -130,9 +141,9 @@ public class DefaultBpmEngineService implements BpmEngineService {
         // Add sorting
         selectQuery += String.format("order by %s  %s, ex.id_ ", orderBy.getField(), order.toString());
         // Add pagination
-        selectQuery += "offset    ? limit ?";
+        selectQuery += "offset ? limit ?";
 
-        final List<Object> args = new ArrayList<>();
+        args.clear();
 
         if (!StringUtils.isBlank(businessKey)) {
             args.add(businessKey);
@@ -205,7 +216,7 @@ public class DefaultBpmEngineService implements BpmEngineService {
     public PageResultDto<ProcessInstanceDto> getHistoryProcessInstances(
         int page, int size, String businessKey, EnumProcessInstanceHistorySortField orderBy, EnumSortingOrder order
     ) {
-        final String countQuery =
+        String countQuery =
             "select    count(*) " +
             "from      act_hi_procinst hist " +
             "            inner join act_re_procdef def " +
@@ -214,7 +225,18 @@ public class DefaultBpmEngineService implements BpmEngineService {
             "              on def.deployment_id_ = dep.id_ " +
             "where     hist.id_ = hist.proc_inst_id_ ";
 
-        final Long count = jdbcTemplate.queryForObject(countQuery, Long.class);
+        // Add filtering
+        if (!StringUtils.isBlank(businessKey)) {
+            countQuery += "and hist.business_key_ = ? ";
+        }
+        
+        final List<Object> args = new ArrayList<>();
+
+        if (!StringUtils.isBlank(businessKey)) {
+            args.add(businessKey);
+        }
+        
+        final Long count = jdbcTemplate.queryForObject(countQuery, args.toArray(), Long.class);
 
         String selectQuery =
             "select    def.id_                   as process_definition_id, " +
@@ -243,7 +265,7 @@ public class DefaultBpmEngineService implements BpmEngineService {
         // Add pagination
         selectQuery += "offset    ? limit ?";
 
-        final List<Object> args = new ArrayList<>();
+        args.clear();
 
         if (!StringUtils.isBlank(businessKey)) {
             args.add(businessKey);
@@ -344,7 +366,7 @@ public class DefaultBpmEngineService implements BpmEngineService {
     public PageResultDto<IncidentDto> getIncidents(
         int page, int size, String businessKey, EnumIncidentSortField orderBy, EnumSortingOrder order
     ) {
-        final String countQuery =
+        String countQuery =
             "select  count(*) " +
             "from    act_ru_execution ex " +
             "          inner join act_re_procdef def " +
@@ -355,7 +377,19 @@ public class DefaultBpmEngineService implements BpmEngineService {
             "            on i.proc_inst_id_ = ex.id_ " +
             "where    ex.id_ = ex.proc_inst_id_ ";
 
-        final Long count = jdbcTemplate.queryForObject(countQuery, Long.class);
+
+        // Add filtering
+        if (!StringUtils.isBlank(businessKey)) {
+            countQuery += "and ex.business_key_ = ? ";
+        }
+        
+        final List<Object> args = new ArrayList<>();
+
+        if (!StringUtils.isBlank(businessKey)) {
+            args.add(businessKey);
+        }
+        
+        final Long count = jdbcTemplate.queryForObject(countQuery, args.toArray(), Long.class);
 
         String selectQuery =
             "select  def.id_                     as process_definition_id, " +
@@ -399,7 +433,7 @@ public class DefaultBpmEngineService implements BpmEngineService {
         // Add pagination
         selectQuery += "offset    ? limit ?";
 
-        final List<Object> args = new ArrayList<>();
+        args.clear();
 
         if (!StringUtils.isBlank(businessKey)) {
             args.add(businessKey);
@@ -418,16 +452,23 @@ public class DefaultBpmEngineService implements BpmEngineService {
     }
 
     private int compareActivities(HistoricActivityInstanceDto i1, HistoricActivityInstanceDto i2) {
-        // Compare dates
-        final int c = i1.getStartTime().compareTo(i2.getStartTime());
-
+        // Compare start dates
+        int c = i1.getStartTime().compareTo(i2.getStartTime());
+        // Compare end dates
+        if (c == 0 && i1.getEndTime() != null && i2.getEndTime() != null) {
+            c = i1.getEndTime().compareTo(i2.getEndTime());
+        } else if (c == 0 && i1.getEndTime() != null && i2.getEndTime() == null) {
+            c = -1;
+        } else if (c == 0 && i1.getEndTime() == null && i2.getEndTime() != null) {
+            c = 1;
+        }
+        // Compare event types
         if (c == 0) {
-            // Compare event type
             if (i1.getActivityType().equals(START_EVENT)) {
-                return 1;
+                return -1;
             }
             if (i2.getActivityType().equals(START_EVENT)) {
-                return -1;
+                return 1;
             }
         }
         return c;
