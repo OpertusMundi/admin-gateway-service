@@ -21,6 +21,7 @@ import eu.opertusmundi.common.model.RestResponse;
 import eu.opertusmundi.common.model.account.AccountDto;
 import eu.opertusmundi.common.model.order.EnumOrderSortField;
 import eu.opertusmundi.common.model.order.EnumOrderStatus;
+import eu.opertusmundi.common.model.order.HelpdeskOrderDto;
 import eu.opertusmundi.common.model.order.OrderDto;
 import eu.opertusmundi.common.model.payment.EnumPayInSortField;
 import eu.opertusmundi.common.model.payment.EnumPayOutSortField;
@@ -86,7 +87,7 @@ public class BillingControllerImpl extends BaseController implements BillingCont
     }
 
     public RestResponse<OrderDto> findOrderByKey(UUID key) {
-        final Optional<OrderDto> r = this.orderRepository.findOrderObjectByKey(key);
+        final Optional<HelpdeskOrderDto> r = this.orderRepository.findOrderObjectByKey(key);
         if (r.isPresent()) {
             return RestResponse.result(r.get());
         }
