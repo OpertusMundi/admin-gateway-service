@@ -22,7 +22,7 @@
 		<java.version>1.8</java.version>
 
         <!-- Node.js -->
-        <node.version>v10.16.3</node.version>
+        <node.version>v14.17.5</node.version>
 
 		<!-- Dependency versions -->
 		<hibernate.version>5.4.21.Final</hibernate.version>
