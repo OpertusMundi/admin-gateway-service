@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
@@ -18,6 +19,7 @@ import org.camunda.bpm.engine.rest.dto.history.HistoricActivityInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricIncidentDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricVariableInstanceDto;
+import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionQueryDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -34,6 +36,7 @@ import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceHistorySortFi
 import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceSortField;
 import eu.opertusmundi.admin.web.model.workflow.HistoryProcessInstanceDetailsDto;
 import eu.opertusmundi.admin.web.model.workflow.IncidentDto;
+import eu.opertusmundi.admin.web.model.workflow.ProcessDefinitionHeaderDto;
 import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceDetailsDto;
 import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceDto;
 import eu.opertusmundi.common.domain.AccountEntity;
@@ -69,6 +72,22 @@ public class DefaultBpmEngineService implements BpmEngineService {
     }
 
     @Override
+    public List<ProcessDefinitionHeaderDto> getProcessDefinitions() {
+        final ProcessDefinitionQueryDto query = new ProcessDefinitionQueryDto();
+        query.setLatestVersion(true);
+        query.setSortBy("name");
+        query.setSortOrder("asc");
+
+        final List<ProcessDefinitionHeaderDto> result = this.bpmClient.getObject()
+            .getProcessDefinitions(query, 0, 1000)
+            .stream()
+            .map(ProcessDefinitionHeaderDto::from)
+            .collect(Collectors.toList());
+
+        return result;
+    }
+
+    @Override
     public Long countProcessInstances() {
         final CountResultDto result = this.bpmClient.getObject().countProcessInstances();
 
@@ -77,7 +96,9 @@ public class DefaultBpmEngineService implements BpmEngineService {
 
     @Override
     public PageResultDto<ProcessInstanceDto> getProcessInstances(
-        int page, int size, String businessKey, EnumProcessInstanceSortField orderBy, EnumSortingOrder order
+        int page, int size,
+        String processDefinitionKey, String businessKey,
+        EnumProcessInstanceSortField orderBy, EnumSortingOrder order
     ) {
         String countQuery =
             "select    count(*) " +
@@ -89,16 +110,22 @@ public class DefaultBpmEngineService implements BpmEngineService {
             "where     ex.id_ = ex.proc_inst_id_ ";
 
         // Add filtering
+        if (!StringUtils.isBlank(processDefinitionKey)) {
+            countQuery += "and def.key_ = ? ";
+        }
         if (!StringUtils.isBlank(businessKey)) {
             countQuery += "and ex.business_key_ = ? ";
         }
-        
+
         final List<Object> args = new ArrayList<>();
 
+        if (!StringUtils.isBlank(processDefinitionKey)) {
+            args.add(processDefinitionKey);
+        }
         if (!StringUtils.isBlank(businessKey)) {
             args.add(businessKey);
         }
-        
+
         final Long count = jdbcTemplate.queryForObject(countQuery, args.toArray(), Long.class);
 
         String selectQuery =
@@ -123,6 +150,9 @@ public class DefaultBpmEngineService implements BpmEngineService {
             "where     ex.id_ = ex.proc_inst_id_ ";
 
         // Add filtering
+        if (!StringUtils.isBlank(processDefinitionKey)) {
+            selectQuery += "and def.key_ = ? ";
+        }
         if (!StringUtils.isBlank(businessKey)) {
             selectQuery += "and ex.business_key_ = ? ";
         }
@@ -145,6 +175,9 @@ public class DefaultBpmEngineService implements BpmEngineService {
 
         args.clear();
 
+        if (!StringUtils.isBlank(processDefinitionKey)) {
+            args.add(processDefinitionKey);
+        }
         if (!StringUtils.isBlank(businessKey)) {
             args.add(businessKey);
         }
@@ -166,6 +199,7 @@ public class DefaultBpmEngineService implements BpmEngineService {
         final ProcessInstanceDetailsDto result = new ProcessInstanceDetailsDto();
 
         final List<HistoricProcessInstanceDto> processInstances = this.bpmClient.getObject().getHistoryProcessInstances(
+            null,
             businessKey,
             processInstanceId
         );
@@ -214,7 +248,9 @@ public class DefaultBpmEngineService implements BpmEngineService {
 
     @Override
     public PageResultDto<ProcessInstanceDto> getHistoryProcessInstances(
-        int page, int size, String businessKey, EnumProcessInstanceHistorySortField orderBy, EnumSortingOrder order
+        int page, int size,
+        String processDefinitionKey, String businessKey,
+        EnumProcessInstanceHistorySortField orderBy, EnumSortingOrder order
     ) {
         String countQuery =
             "select    count(*) " +
@@ -226,16 +262,22 @@ public class DefaultBpmEngineService implements BpmEngineService {
             "where     hist.id_ = hist.proc_inst_id_ ";
 
         // Add filtering
+        if (!StringUtils.isBlank(processDefinitionKey)) {
+            countQuery += "and hist.proc_def_key_ = ? ";
+        }
         if (!StringUtils.isBlank(businessKey)) {
             countQuery += "and hist.business_key_ = ? ";
         }
-        
+
         final List<Object> args = new ArrayList<>();
 
+        if (!StringUtils.isBlank(processDefinitionKey)) {
+            args.add(processDefinitionKey);
+        }
         if (!StringUtils.isBlank(businessKey)) {
             args.add(businessKey);
         }
-        
+
         final Long count = jdbcTemplate.queryForObject(countQuery, args.toArray(), Long.class);
 
         String selectQuery =
@@ -256,6 +298,9 @@ public class DefaultBpmEngineService implements BpmEngineService {
             "where     hist.id_ = hist.proc_inst_id_ ";
 
         // Add filtering
+        if (!StringUtils.isBlank(processDefinitionKey)) {
+            selectQuery += "and hist.proc_def_key_ = ? ";
+        }
         if (!StringUtils.isBlank(businessKey)) {
             selectQuery += "and hist.business_key_ = ? ";
         }
@@ -267,6 +312,9 @@ public class DefaultBpmEngineService implements BpmEngineService {
 
         args.clear();
 
+        if (!StringUtils.isBlank(processDefinitionKey)) {
+            args.add(processDefinitionKey);
+        }
         if (!StringUtils.isBlank(businessKey)) {
             args.add(businessKey);
         }
@@ -284,10 +332,13 @@ public class DefaultBpmEngineService implements BpmEngineService {
     }
 
     @Override
-    public Optional<HistoryProcessInstanceDetailsDto> getHistoryProcessInstance(String businessKey, String processInstanceId) {
+    public Optional<HistoryProcessInstanceDetailsDto> getHistoryProcessInstance(
+        String businessKey, String processInstanceId
+    ) {
         final HistoryProcessInstanceDetailsDto result = new HistoryProcessInstanceDetailsDto();
 
         final List<HistoricProcessInstanceDto> processInstances = this.bpmClient.getObject().getHistoryProcessInstances(
+            null,
             businessKey,
             processInstanceId
         );
@@ -382,13 +433,13 @@ public class DefaultBpmEngineService implements BpmEngineService {
         if (!StringUtils.isBlank(businessKey)) {
             countQuery += "and ex.business_key_ = ? ";
         }
-        
+
         final List<Object> args = new ArrayList<>();
 
         if (!StringUtils.isBlank(businessKey)) {
             args.add(businessKey);
         }
-        
+
         final Long count = jdbcTemplate.queryForObject(countQuery, args.toArray(), Long.class);
 
         String selectQuery =

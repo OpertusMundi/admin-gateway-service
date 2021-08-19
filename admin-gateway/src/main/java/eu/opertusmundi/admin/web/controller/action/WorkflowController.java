@@ -24,6 +24,15 @@ import eu.opertusmundi.common.model.RestResponse;
 public interface WorkflowController {
 
     /**
+     * Get process definitions
+     *
+     * @param processInstanceId
+     * @return
+     */
+    @GetMapping(value = "/workflows/process-definitions")
+    RestResponse<?> getProcessDefinitions();
+
+    /**
      * Count process instances
      *
      * @return
@@ -45,7 +54,8 @@ public interface WorkflowController {
     RestResponse<?> getProcessInstances(
         @RequestParam(name = "page", required = true) Integer page,
         @RequestParam(name = "size", required = true) Integer size,
-        @RequestParam(name = "businessKey", defaultValue = "") String businessKey,
+        @RequestParam(name = "processDefinitionKey", required = false, defaultValue = "") String processDefinitionKey,
+        @RequestParam(name = "businessKey", required = false, defaultValue = "") String businessKey,
         @RequestParam(name = "orderBy", defaultValue = "START_TIME") EnumProcessInstanceSortField orderBy,
         @RequestParam(name = "order", defaultValue = "DESC") EnumSortingOrder order
     );
@@ -86,6 +96,7 @@ public interface WorkflowController {
     RestResponse<?> getHistoryProcessInstances(
         @RequestParam(name = "page", required = true) Integer page,
         @RequestParam(name = "size", required = true) Integer size,
+        @RequestParam(name = "processDefinitionKey", required = false, defaultValue = "") String processDefinitionKey,
         @RequestParam(name = "businessKey", required = false, defaultValue = "") String businessKey,
         @RequestParam(name = "orderBy", defaultValue = "START_TIME") EnumProcessInstanceHistorySortField orderBy,
         @RequestParam(name = "order", defaultValue = "DESC") EnumSortingOrder order

@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import eu.opertusmundi.admin.web.config.MapConfiguration;
 import eu.opertusmundi.admin.web.model.configuration.ConfigurationDto;
+import eu.opertusmundi.admin.web.service.BpmEngineService;
 import eu.opertusmundi.common.domain.CountryEuropeEntity;
 import eu.opertusmundi.common.model.RestResponse;
 import eu.opertusmundi.common.model.account.helpdesk.EnumHelpdeskRole;
@@ -18,10 +19,13 @@ public class ConfigurationControllerImpl extends BaseController implements Confi
     private String marketplaceUrl;
 
     @Autowired
+    private MapConfiguration mapConfiguration;
+
+    @Autowired
     private CountryRepository countryRepository;
 
     @Autowired
-    private MapConfiguration mapConfiguration;
+    private BpmEngineService bpmEngineService;
 
     public RestResponse<ConfigurationDto> getConfiguration() {
         if (!this.hasRole(EnumHelpdeskRole.USER)) {
@@ -37,6 +41,7 @@ public class ConfigurationControllerImpl extends BaseController implements Confi
         config.setBingMaps(this.mapConfiguration.getBingMaps());
         config.setMap(this.mapConfiguration.getDefaults());
         config.setMarketplaceUrl(marketplaceUrl);
+        config.setProcessDefinitions(this.bpmEngineService.getProcessDefinitions());
 
         this.countryRepository.getEuropeCountries().stream()
             .map(CountryEuropeEntity::toDto)

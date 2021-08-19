@@ -1,5 +1,6 @@
 package eu.opertusmundi.admin.web.controller.action;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceHistorySortFi
 import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceSortField;
 import eu.opertusmundi.admin.web.model.workflow.HistoryProcessInstanceDetailsDto;
 import eu.opertusmundi.admin.web.model.workflow.IncidentDto;
+import eu.opertusmundi.admin.web.model.workflow.ProcessDefinitionHeaderDto;
 import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceDetailsDto;
 import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceDto;
 import eu.opertusmundi.admin.web.model.workflow.RetryExternalTaskCommandDto;
@@ -26,6 +28,12 @@ public class WorkflowControllerImpl implements WorkflowController {
     @Autowired
     private BpmEngineService bpmEngineService;
 
+    @Override
+    public RestResponse<?> getProcessDefinitions() {
+        final List<ProcessDefinitionHeaderDto> result = this.bpmEngineService.getProcessDefinitions();
+
+        return RestResponse.result(result);
+    }
 
     @Override
     public RestResponse<?> countProcessInstances() {
@@ -36,10 +44,12 @@ public class WorkflowControllerImpl implements WorkflowController {
 
     @Override
     public RestResponse<?> getProcessInstances(
-        Integer page, Integer size, String businessKey, EnumProcessInstanceSortField orderBy, EnumSortingOrder order
+        Integer page, Integer size,
+        String processDefinitionKey, String businessKey,
+        EnumProcessInstanceSortField orderBy, EnumSortingOrder order
     ) {
         final PageResultDto<ProcessInstanceDto> result = this.bpmEngineService.getProcessInstances(
-            page, size, businessKey, orderBy, order
+            page, size, processDefinitionKey, businessKey, orderBy, order
         );
         return RestResponse.result(result);
     }
@@ -68,10 +78,12 @@ public class WorkflowControllerImpl implements WorkflowController {
 
     @Override
     public RestResponse<?> getHistoryProcessInstances(
-        Integer page, Integer size, String businessKey, EnumProcessInstanceHistorySortField orderBy, EnumSortingOrder order
+        Integer page, Integer size,
+        String processDefinitionKey, String businessKey,
+        EnumProcessInstanceHistorySortField orderBy, EnumSortingOrder order
     ) {
         final PageResultDto<ProcessInstanceDto> result = this.bpmEngineService.getHistoryProcessInstances(
-            page, size, businessKey, orderBy, order
+            page, size, processDefinitionKey, businessKey, orderBy, order
         );
         return RestResponse.result(result);
     }
