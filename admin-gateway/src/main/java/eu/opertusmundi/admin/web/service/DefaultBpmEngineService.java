@@ -39,6 +39,7 @@ import eu.opertusmundi.admin.web.model.workflow.IncidentDto;
 import eu.opertusmundi.admin.web.model.workflow.ProcessDefinitionHeaderDto;
 import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceDetailsDto;
 import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceDto;
+import eu.opertusmundi.admin.web.model.workflow.VariableDto;
 import eu.opertusmundi.common.domain.AccountEntity;
 import eu.opertusmundi.common.feign.client.BpmServerFeignClient;
 import eu.opertusmundi.common.model.EnumSortingOrder;
@@ -219,7 +220,7 @@ public class DefaultBpmEngineService implements BpmEngineService {
         processInstanceId = result.getInstance().getId();
 
         final Map<String, VariableValueDto> variables = this.bpmClient.getObject().getProcessInstanceVariables(processInstanceId);
-        result.setVariables(variables);
+        variables.keySet().stream().map(k -> VariableDto.from(k, variables.get(k))).forEach(result.getVariables()::add);
 
         final List<HistoricActivityInstanceDto> activities = this.bpmClient.getObject()
             .getHistoryProcessInstanceActivityInstances(processInstanceId);
@@ -353,7 +354,7 @@ public class DefaultBpmEngineService implements BpmEngineService {
 
         final List<HistoricVariableInstanceDto> variables = this.bpmClient.getObject()
             .getHistoryProcessInstanceVariables(processInstanceId);
-        result.setVariables(variables);
+        variables.stream().map(VariableDto::from).forEach(result.getVariables()::add);
 
         final List<HistoricActivityInstanceDto> activities = this.bpmClient.getObject()
             .getHistoryProcessInstanceActivityInstances(processInstanceId);
