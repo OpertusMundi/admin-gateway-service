@@ -34,7 +34,7 @@ public class ProviderAssetControllerImpl implements ProviderAssetController {
     ) {
         try {
             final PageResultDto<AssetDraftDto> result = this.providerAssetService.findAllDraft(
-                providerKey, status, pageIndex, pageSize, orderBy, order
+                providerKey, status, null, null, pageIndex, pageSize, orderBy, order
             );
 
 			return RestResponse.result(result);
