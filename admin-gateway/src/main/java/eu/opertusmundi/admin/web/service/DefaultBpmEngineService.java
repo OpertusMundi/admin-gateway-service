@@ -2,6 +2,7 @@ package eu.opertusmundi.admin.web.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -74,18 +75,24 @@ public class DefaultBpmEngineService implements BpmEngineService {
 
     @Override
     public List<ProcessDefinitionHeaderDto> getProcessDefinitions() {
-        final ProcessDefinitionQueryDto query = new ProcessDefinitionQueryDto();
-        query.setLatestVersion(true);
-        query.setSortBy("name");
-        query.setSortOrder("asc");
+        try {
+            final ProcessDefinitionQueryDto query = new ProcessDefinitionQueryDto();
+            query.setLatestVersion(true);
+            query.setSortBy("name");
+            query.setSortOrder("asc");
+    
+            final List<ProcessDefinitionHeaderDto> result = this.bpmClient.getObject()
+                .getProcessDefinitions(query, 0, 1000)
+                .stream()
+                .map(ProcessDefinitionHeaderDto::from)
+                .collect(Collectors.toList());
+    
+            return result;
+        } catch (final Exception ex) {
+            logger.error("Failed to load process definitions", ex);
+        }
 
-        final List<ProcessDefinitionHeaderDto> result = this.bpmClient.getObject()
-            .getProcessDefinitions(query, 0, 1000)
-            .stream()
-            .map(ProcessDefinitionHeaderDto::from)
-            .collect(Collectors.toList());
-
-        return result;
+        return Collections.emptyList();
     }
 
     @Override
