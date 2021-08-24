@@ -2,14 +2,14 @@ package eu.opertusmundi.admin.web.controller.action;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import eu.opertusmundi.admin.web.config.MapConfiguration;
 import eu.opertusmundi.admin.web.model.configuration.ConfigurationDto;
+import eu.opertusmundi.admin.web.service.BpmEngineService;
 import eu.opertusmundi.common.domain.CountryEuropeEntity;
 import eu.opertusmundi.common.model.RestResponse;
 import eu.opertusmundi.common.model.account.helpdesk.EnumHelpdeskRole;
@@ -26,6 +27,8 @@ import eu.opertusmundi.common.repository.CountryRepository;
 @RestController
 public class ConfigurationControllerImpl extends BaseController implements ConfigurationController {
 
+    private static final Logger logger = LoggerFactory.getLogger(ConfigurationController.class);
+    
     @Value("${opertusmundi.marketplace.url}")
     private String marketplaceUrl;
     
@@ -68,26 +71,20 @@ public class ConfigurationControllerImpl extends BaseController implements Confi
         return config;
     }
     
-
     private Map<EnumIcon, byte[]> getIcons() {
-    	Map<EnumIcon, byte[]> icons = new HashMap<EnumIcon, byte[]>();
-    	for (EnumIcon icon : EnumIcon.values()) {
-        	InputStream fileStream = null;
-			try {
-				fileStream = resourceLoader.getResource(iconFolder + icon.getFile()).getInputStream();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-        	byte[] data = null;
-			try {
-				data = IOUtils.toByteArray(fileStream);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-    		icons.put(icon, data);
-    	}
-    	
-    	return icons;
+        Map<EnumIcon, byte[]> icons = new HashMap<>();
+
+        for (EnumIcon icon : EnumIcon.values()) {
+            final Path path = Paths.get(iconFolder, icon.getFile());
+            try (final InputStream fileStream = resourceLoader.getResource(path.toString()).getInputStream()) {
+                final byte[] data = IOUtils.toByteArray(fileStream);;
+                icons.put(icon, data);
+            } catch (IOException ex) {
+                logger.error(String.format("Failed to load resource [path=%s]", path), ex);
+            }
+        }
+
+        return icons;
     }
 
 }
