@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -21,6 +19,7 @@ import eu.opertusmundi.admin.web.service.BpmEngineService;
 import eu.opertusmundi.common.domain.CountryEuropeEntity;
 import eu.opertusmundi.common.model.RestResponse;
 import eu.opertusmundi.common.model.account.helpdesk.EnumHelpdeskRole;
+import eu.opertusmundi.common.model.contract.ContractIconDto;
 import eu.opertusmundi.common.model.contract.EnumIcon;
 import eu.opertusmundi.common.repository.CountryRepository;
 
@@ -28,10 +27,10 @@ import eu.opertusmundi.common.repository.CountryRepository;
 public class ConfigurationControllerImpl extends BaseController implements ConfigurationController {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationController.class);
-    
+
     @Value("${opertusmundi.marketplace.url}")
     private String marketplaceUrl;
-    
+
     @Value("${opertusmundi.contract.icons}")
     private String iconFolder;
 
@@ -40,7 +39,7 @@ public class ConfigurationControllerImpl extends BaseController implements Confi
 
     @Autowired
     private CountryRepository countryRepository;
-    
+
     @Autowired
     private ResourceLoader resourceLoader;
 
@@ -62,29 +61,26 @@ public class ConfigurationControllerImpl extends BaseController implements Confi
         config.setMap(this.mapConfiguration.getDefaults());
         config.setMarketplaceUrl(marketplaceUrl);
         config.setProcessDefinitions(this.bpmEngineService.getProcessDefinitions());
-        config.setIcons(this.getIcons());
 
         this.countryRepository.getEuropeCountries().stream()
             .map(CountryEuropeEntity::toDto)
-            .forEach(c -> config.getEuropeCountries().add(c));
+            .forEach(config.getEuropeCountries()::add);
+
+        this.setIcons(config);
 
         return config;
     }
-    
-    private Map<EnumIcon, byte[]> getIcons() {
-        Map<EnumIcon, byte[]> icons = new HashMap<>();
 
+    private void setIcons(ConfigurationDto config) {
         for (EnumIcon icon : EnumIcon.values()) {
             final Path path = Paths.get(iconFolder, icon.getFile());
             try (final InputStream fileStream = resourceLoader.getResource(path.toString()).getInputStream()) {
                 final byte[] data = IOUtils.toByteArray(fileStream);;
-                icons.put(icon, data);
+                config.getContractIcons().add(ContractIconDto.of(icon, icon.getCategory(), data));
             } catch (IOException ex) {
-                logger.error(String.format("Failed to load resource [path=%s]", path), ex);
+                logger.error(String.format("Failed to load resource [icon=%s, path=%s]", icon, path), ex);
             }
         }
-
-        return icons;
     }
 
 }
