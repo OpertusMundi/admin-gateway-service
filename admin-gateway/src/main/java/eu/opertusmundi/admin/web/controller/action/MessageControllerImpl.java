@@ -2,6 +2,7 @@ package eu.opertusmundi.admin.web.controller.action;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -68,6 +69,12 @@ public class MessageControllerImpl extends BaseController implements MessageCont
             return RestResponse.error(code, "An error has occurred");
         }
     }
+    
+    public RestResponse<?> countUnassignedMessages() {
+        final Long result = this.messageClient.getObject().countUnassignedMessages().getBody().getResult();
+
+        return RestResponse.result(result);
+    }
 
     @Override
     public RestResponse<?> findMessages(Integer pageIndex, Integer pageSize, ZonedDateTime dateFrom, ZonedDateTime dateTo, Boolean read) {
@@ -98,6 +105,12 @@ public class MessageControllerImpl extends BaseController implements MessageCont
         }
     }
     
+    public RestResponse<?> countUserNewMessages() {
+        final Long result = this.messageClient.getObject().countUserNewMessages(this.currentUserKey()).getBody().getResult();
+
+        return RestResponse.result(result);
+    }
+    
     @Override
     public RestResponse<?> assignMessage(UUID messageKey) {
         try {
@@ -107,7 +120,9 @@ public class MessageControllerImpl extends BaseController implements MessageCont
             final RestResponse<ServerMessageDto> serviceResponse = e.getBody();
 
             if (serviceResponse.getSuccess()) {
-                return RestResponse.result(ClientMessageDto.from(serviceResponse.getResult()));
+                final ClientMessageDto result = ClientMessageDto.from(serviceResponse.getResult());
+                this.injectContracts(result);
+                return RestResponse.result(result);
             }
 
             return RestResponse.failure();
@@ -128,7 +143,9 @@ public class MessageControllerImpl extends BaseController implements MessageCont
             final RestResponse<ServerMessageDto> serviceResponse = e.getBody();
 
             if (serviceResponse.getSuccess()) {
-                return RestResponse.result(ClientMessageDto.from(serviceResponse.getResult()));
+                final ClientMessageDto result = ClientMessageDto.from(serviceResponse.getResult());
+                this.injectContracts(result);
+                return RestResponse.result(result);
             }
 
             return RestResponse.failure();
@@ -155,6 +172,7 @@ public class MessageControllerImpl extends BaseController implements MessageCont
 
             if (serviceResponse.getSuccess()) {
                 final ClientMessageDto result = ClientMessageDto.from(serviceResponse.getResult());
+                this.injectContracts(result);
                 return RestResponse.result(result);
             }
             
@@ -182,6 +200,7 @@ public class MessageControllerImpl extends BaseController implements MessageCont
 
             if (serviceResponse.getSuccess()) {
                 final ClientMessageDto result = ClientMessageDto.from(serviceResponse.getResult());
+                this.injectContracts(result);
                 return RestResponse.result(result);
             }
             
@@ -225,20 +244,11 @@ public class MessageControllerImpl extends BaseController implements MessageCont
         }
     }
     
-    private List<ClientContactDto> getContacts(List<ServerMessageDto> messages) {
-        final List<ClientContactDto> contacts     = new ArrayList<>();
-        final List<UUID>             contractKeys = new ArrayList<>();
+    private List<ClientContactDto> getContactsFromKeys(List<UUID> keys) {
+        final List<ClientContactDto> contacts = new ArrayList<>();
 
-        messages.stream()
-            .map(i -> i.getSender())
-            .forEach(contractKeys::add);
-
-        messages.stream()
-            .map(i -> i.getRecipient())
-            .collect(Collectors.toList());
-
-        final List<UUID> uniqueContractKeys = contractKeys.stream().filter(k -> k != null).distinct().collect(Collectors.toList());
-
+        final List<UUID> uniqueContractKeys = keys.stream().filter(k -> k != null).distinct().collect(Collectors.toList());
+        
         this.accountRepository.findAllByKey(uniqueContractKeys).stream()
             .map(ClientContactDto::new)
             .forEach(contacts::add);
@@ -250,4 +260,25 @@ public class MessageControllerImpl extends BaseController implements MessageCont
         return contacts;
     }
     
+    private void injectContracts(ClientMessageDto message) {
+        final List<ClientContactDto> contacts = this.getContactsFromKeys(Arrays.asList(message.getSenderId(), message.getRecipientId()));
+        
+        message.setRecipient(contacts.stream().filter(c -> c.getId().equals(message.getRecipientId())).findFirst().orElse(null));
+        message.setSender(contacts.stream().filter(c -> c.getId().equals(message.getSenderId())).findFirst().orElse(null));
+    }
+    
+    private List<ClientContactDto> getContacts(List<ServerMessageDto> messages) {
+        final List<UUID> contractKeys = new ArrayList<>();
+
+        messages.stream()
+            .map(i -> i.getSender())
+            .forEach(contractKeys::add);
+
+        messages.stream()
+            .map(i -> i.getRecipient())
+            .forEach(contractKeys::add);
+
+        return this.getContactsFromKeys(contractKeys);
+    }
+
 }

@@ -34,11 +34,19 @@ public interface MessageController {
     RestResponse<?> findUnassignedMessages(
         @RequestParam(name = "page", required = false) Integer pageIndex,
         @RequestParam(name = "size", required = false) Integer pageSize,
-        @RequestParam(name = "date-from", required = false) ZonedDateTime dateFrom,
-        @RequestParam(name = "date-to", required = false) ZonedDateTime dateTo,
+        @RequestParam(name = "dateFrom", required = false) ZonedDateTime dateFrom,
+        @RequestParam(name = "dateTo", required = false) ZonedDateTime dateTo,
         @RequestParam(name = "read", required = false) Boolean read
     );
 
+    /**
+     * Count unassigned messages
+     *
+     * @return An instance of {@link BaseResponse}
+     */
+    @GetMapping(value = "/helpdesk/inbox/count")
+    RestResponse<?> countUnassignedMessages();
+    
     /**
      * Get user messages
      *
@@ -54,10 +62,18 @@ public interface MessageController {
     RestResponse<?> findMessages(
         @RequestParam(name = "page", required = false) Integer pageIndex,
         @RequestParam(name = "size", required = false) Integer pageSize,
-        @RequestParam(name = "date-from", required = false) ZonedDateTime dateFrom,
-        @RequestParam(name = "date-to", required = false) ZonedDateTime dateTo,
+        @RequestParam(name = "dateFrom", required = false) ZonedDateTime dateFrom,
+        @RequestParam(name = "dateTo", required = false) ZonedDateTime dateTo,
         @RequestParam(name = "read", required = false) Boolean read
     );
+    
+    /**
+     * Count user new messages
+     *
+     * @return An instance of {@link BaseResponse}
+     */
+    @GetMapping(value = "/user/inbox/count")
+    RestResponse<?> countUserNewMessages();
     
     /**
      * Assign message
