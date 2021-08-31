@@ -17,6 +17,7 @@ import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceDetailsDto;
 import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceDto;
 import eu.opertusmundi.admin.web.model.workflow.RetryExternalTaskCommandDto;
 import eu.opertusmundi.admin.web.service.BpmEngineService;
+import eu.opertusmundi.common.model.BaseResponse;
 import eu.opertusmundi.common.model.BasicMessageCode;
 import eu.opertusmundi.common.model.EnumSortingOrder;
 import eu.opertusmundi.common.model.PageResultDto;
@@ -116,6 +117,17 @@ public class WorkflowControllerImpl implements WorkflowController {
     ) {
         try {
             this.bpmEngineService.retryExternalTask(command);
+
+            return RestResponse.success();
+        } catch (Exception ex) {
+            return RestResponse.failure(BasicMessageCode.InternalServerError, ex.getMessage());
+        }
+    }
+
+    @Override
+    public BaseResponse deleteProcessInstance(String processInstanceId) {
+        try {
+            this.bpmEngineService.deleteProcessInstance(processInstanceId);
 
             return RestResponse.success();
         } catch (Exception ex) {

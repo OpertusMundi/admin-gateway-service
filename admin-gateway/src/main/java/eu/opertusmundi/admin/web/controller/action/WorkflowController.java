@@ -5,6 +5,7 @@ import javax.validation.Valid;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +17,7 @@ import eu.opertusmundi.admin.web.model.workflow.EnumIncidentSortField;
 import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceHistorySortField;
 import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceSortField;
 import eu.opertusmundi.admin.web.model.workflow.RetryExternalTaskCommandDto;
+import eu.opertusmundi.common.model.BaseResponse;
 import eu.opertusmundi.common.model.EnumSortingOrder;
 import eu.opertusmundi.common.model.RestResponse;
 
@@ -139,6 +141,15 @@ public interface WorkflowController {
         @Valid @RequestBody RetryExternalTaskCommandDto command,
         BindingResult validationResult
     );
+
+    /**
+     * Delete process instance
+     *
+     * @param processInstanceId
+     * @return
+     */
+    @DeleteMapping(value = "/workflows/process-instances/{processInstanceId}")
+    BaseResponse deleteProcessInstance(@PathVariable(name = "processInstanceId") String processInstanceId);
 
     /**
      * Count incidents

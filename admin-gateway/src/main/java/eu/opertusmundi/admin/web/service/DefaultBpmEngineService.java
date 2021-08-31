@@ -80,13 +80,13 @@ public class DefaultBpmEngineService implements BpmEngineService {
             query.setLatestVersion(true);
             query.setSortBy("name");
             query.setSortOrder("asc");
-    
+
             final List<ProcessDefinitionHeaderDto> result = this.bpmClient.getObject()
                 .getProcessDefinitions(query, 0, 1000)
                 .stream()
                 .map(ProcessDefinitionHeaderDto::from)
                 .collect(Collectors.toList());
-    
+
             return result;
         } catch (final Exception ex) {
             logger.error("Failed to load process definitions", ex);
@@ -412,6 +412,11 @@ public class DefaultBpmEngineService implements BpmEngineService {
 
             throw ex;
         }
+    }
+
+    @Override
+    public void deleteProcessInstance(String processInstanceId) {
+        this.bpmClient.getObject().deleteProcessInstance(processInstanceId);
     }
 
     @Override

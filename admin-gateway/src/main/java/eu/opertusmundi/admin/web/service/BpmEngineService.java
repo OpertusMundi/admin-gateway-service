@@ -33,6 +33,8 @@ public interface BpmEngineService {
         this.retryExternalTask(command.getProcessInstanceId(), command.getExternalTaskId());
     }
 
+    void deleteProcessInstance(String processInstanceId);
+
     Optional<ProcessInstanceDetailsDto> getProcessInstance(String businessKey, String processInstanceId);
 
     PageResultDto<ProcessInstanceDto> getHistoryProcessInstances(
