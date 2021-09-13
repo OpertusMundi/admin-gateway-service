@@ -42,36 +42,10 @@ public class EventControllerImpl extends BaseController implements EventControll
         if (level != null && level.isEmpty()) {
             level = null;
         }
-        if (StringUtils.isBlank(logger)) {
-            logger = null;
-        } else {
-            if (!logger.startsWith("%")) {
-                logger = "%" + logger;
-            }
-            if (!logger.endsWith("%")) {
-                logger += "%";
-            }
-        }
-        if (StringUtils.isBlank(userName)) {
-            userName = null;
-        } else {
-            if (!userName.startsWith("%")) {
-                userName = "%" + userName;
-            }
-            if (!userName.endsWith("%")) {
-                userName += "%";
-            }
-        }
-        if (StringUtils.isBlank(clientAddress)) {
-            clientAddress = null;
-        } else {
-            if (!clientAddress.startsWith("%")) {
-                clientAddress = "%" + clientAddress;
-            }
-            if (!clientAddress.endsWith("%")) {
-                clientAddress += "%";
-            }
-        }
+        
+        clientAddress = this.createLikePredicateValue(clientAddress);
+        logger = this.createLikePredicateValue(logger);
+        userName = this.createLikePredicateValue(userName);
 
         final Page<EventDto> p = this.eventRepository
             .findAll(level, logger, userName, clientAddress, pageRequest)
@@ -84,5 +58,19 @@ public class EventControllerImpl extends BaseController implements EventControll
         return RestResponse.result(result);
     }
 
+    private String createLikePredicateValue(String value) {
+        if (StringUtils.isBlank(value)) {
+            return null;
+        } else {
+            if (!value.startsWith("%")) {
+                value = "%" + value;
+            }
+            if (!value.endsWith("%")) {
+                value += "%";
+            }
+
+            return value;
+        }
+    }
 
 }
