@@ -2,8 +2,11 @@ package eu.opertusmundi.admin.web.model.account.market;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.util.Set;
 import java.util.UUID;
 
+import eu.opertusmundi.common.model.EnumAccountType;
+import eu.opertusmundi.common.model.EnumRole;
 import eu.opertusmundi.common.model.account.AccountDto;
 import eu.opertusmundi.common.model.account.AccountProfileDto;
 import eu.opertusmundi.common.model.account.CustomerDraftIndividualDto;
@@ -38,6 +41,8 @@ public class MarketplaceAccountSummaryDto {
     private String               providerName;
     private boolean              providerUpdatePending;
     private ZonedDateTime        registeredOn;
+    private Set<EnumRole>        roles;
+    private EnumAccountType      type;
     private String               userName;
 
     public static MarketplaceAccountSummaryDto from(AccountDto a) {
@@ -92,7 +97,25 @@ public class MarketplaceAccountSummaryDto {
         }
         r.setProviderUpdatePending(p.getDraft() != null);
         r.setRegisteredOn(a.getRegisteredAt());
+        r.setRoles(a.getRoles());
+        r.setType(a.getType());
         r.setUserName(a.getUsername());
+
+        // Set provider properties from parent
+        if (a.getParent() != null) {
+            final AccountProfileDto              parentProfile = a.getParent().getProfile();
+            final AccountProfileDto.ProviderData pp            = parentProfile.getProvider();
+
+            r.setProvider(pp.isRegistered());
+            if (r.isProvider()) {
+                r.setProviderFunds(pp.getCurrent().getWalletFunds());
+                r.setProviderKycLevel(pp.getCurrent().getKycLevel());
+                r.setProviderName(pp.getCurrent().getName());
+            } else if (pp.getDraft() != null) {
+                r.setProviderName(pp.getDraft().getName());
+            }
+            r.setProviderUpdatePending(pp.getDraft() != null);
+        }
 
         return r;
     }

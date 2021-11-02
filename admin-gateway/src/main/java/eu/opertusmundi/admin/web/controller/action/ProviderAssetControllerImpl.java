@@ -34,7 +34,7 @@ public class ProviderAssetControllerImpl implements ProviderAssetController {
     ) {
         try {
             final PageResultDto<AssetDraftDto> result = this.providerAssetService.findAllDraft(
-                providerKey, status, null, null, pageIndex, pageSize, orderBy, order
+                providerKey, providerKey, status, null, null, pageIndex, pageSize, orderBy, order
             );
 
 			return RestResponse.result(result);
@@ -50,7 +50,7 @@ public class ProviderAssetControllerImpl implements ProviderAssetController {
     @Override
     public RestResponse<AssetDraftDto> findOneDraft(UUID providerKey, UUID draftKey) {
         try {
-            final AssetDraftDto draft = this.providerAssetService.findOneDraft(providerKey, draftKey);
+            final AssetDraftDto draft = this.providerAssetService.findOneDraft(providerKey, providerKey, draftKey);
 
 			if (draft == null) {
 				return RestResponse.notFound();
@@ -69,7 +69,8 @@ public class ProviderAssetControllerImpl implements ProviderAssetController {
     @Override
     public BaseResponse reviewDraft(UUID providerKey, UUID draftKey, AssetDraftReviewCommandDto command) {
         try {
-            command.setAssetKey(draftKey);
+            command.setDraftKey(draftKey);
+            command.setOwnerKey(providerKey);
             command.setPublisherKey(providerKey);
 
             if (command.isRejected()) {

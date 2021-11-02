@@ -12,13 +12,13 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RestController;
 
-import eu.opertusmundi.common.model.account.helpdesk.EnumHelpdeskAccountSortField;
 import eu.opertusmundi.admin.web.model.account.market.MarketplaceAccountSummaryDto;
 import eu.opertusmundi.common.domain.AccountEntity;
 import eu.opertusmundi.common.model.EnumSortingOrder;
 import eu.opertusmundi.common.model.PageResultDto;
 import eu.opertusmundi.common.model.RestResponse;
 import eu.opertusmundi.common.model.account.AccountDto;
+import eu.opertusmundi.common.model.account.helpdesk.EnumHelpdeskAccountSortField;
 import eu.opertusmundi.common.repository.AccountRepository;
 
 @RestController
@@ -56,23 +56,21 @@ public class MarketplaceAccountControllerImpl extends BaseController implements 
         final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, orderBy.getValue()));
         final String      param       = "%" + name + "%";
 
-        Page<AccountEntity> entities;
+        Page<AccountDto> accounts;
 
         switch (type) {
             case Consumer :
-                entities = this.accountRepository.findAllConsumers(param, pageRequest);
+                accounts = this.accountRepository.findAllConsumersObjects(param, pageRequest, true);
                 break;
             case Provider :
-                entities = this.accountRepository.findAllProviders(param, pageRequest);
+                accounts = this.accountRepository.findAllProvidersObjects(param, pageRequest, true);
                 break;
             default :
-                entities = this.accountRepository.findAll(param, pageRequest);
+                accounts = this.accountRepository.findAllObjects(param, pageRequest, true);
                 break;
         }
 
-        final Page<MarketplaceAccountSummaryDto> p = entities
-            .map(AccountEntity::toDto)
-            .map(MarketplaceAccountSummaryDto::from);
+        final Page<MarketplaceAccountSummaryDto> p = accounts.map(MarketplaceAccountSummaryDto::from);
 
         final long count = p.getTotalElements();
         final List<MarketplaceAccountSummaryDto> records = p.stream().collect(Collectors.toList());
