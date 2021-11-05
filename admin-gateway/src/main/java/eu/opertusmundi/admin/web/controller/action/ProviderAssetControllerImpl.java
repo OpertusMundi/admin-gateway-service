@@ -50,7 +50,7 @@ public class ProviderAssetControllerImpl implements ProviderAssetController {
     @Override
     public RestResponse<AssetDraftDto> findOneDraft(UUID providerKey, UUID draftKey) {
         try {
-            final AssetDraftDto draft = this.providerAssetService.findOneDraft(providerKey, providerKey, draftKey);
+            final AssetDraftDto draft = this.providerAssetService.findOneDraft(providerKey, providerKey, draftKey, false);
 
 			if (draft == null) {
 				return RestResponse.notFound();
