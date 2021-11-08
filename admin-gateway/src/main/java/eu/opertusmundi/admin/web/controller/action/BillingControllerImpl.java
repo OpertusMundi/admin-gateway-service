@@ -119,7 +119,7 @@ public class BillingControllerImpl extends BaseController implements BillingCont
 
     @Override
     public RestResponse<PayInDto> findPayInByKey(UUID key) {
-        final Optional<PayInDto> r = this.payInRepository.findOneObjectByKey(key);
+        final Optional<HelpdeskPayInDto> r = this.payInRepository.findOneObjectByKey(key);
         if (r.isPresent()) {
             return RestResponse.result(r.get());
         }
