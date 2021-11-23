@@ -45,6 +45,7 @@ import eu.opertusmundi.common.domain.AccountEntity;
 import eu.opertusmundi.common.feign.client.BpmServerFeignClient;
 import eu.opertusmundi.common.model.EnumSortingOrder;
 import eu.opertusmundi.common.model.PageResultDto;
+import eu.opertusmundi.common.model.account.AccountDto;
 import eu.opertusmundi.common.model.workflow.EnumProcessInstanceVariable;
 import eu.opertusmundi.common.repository.AccountRepository;
 import feign.FeignException;
@@ -383,10 +384,10 @@ public class DefaultBpmEngineService implements BpmEngineService {
             .orElse(null);
 
         if (startUserVariable != null && !StringUtils.isBlank((String) startUserVariable.getValue())) {
-            final Optional<AccountEntity> startUserEntity = accountRepository.findOneByKey(
+            final Optional<AccountDto> startUser = accountRepository.findOneByKeyObject(
                 UUID.fromString((String) startUserVariable.getValue())
             );
-            result.setOwner(startUserEntity.map(AccountEntity::toDto).orElse(null));
+            result.setOwner(startUser.orElse(null));
         }
 
         return Optional.of(result);
