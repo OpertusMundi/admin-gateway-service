@@ -1,76 +1,27 @@
 package eu.opertusmundi.admin.web.controller.action;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RestController;
 
-import eu.opertusmundi.common.domain.EventEntity;
-import eu.opertusmundi.common.model.EnumSortingOrder;
+import eu.opertusmundi.admin.web.service.LoggingElasticSearchService;
 import eu.opertusmundi.common.model.PageResultDto;
 import eu.opertusmundi.common.model.RestResponse;
-import eu.opertusmundi.common.model.logging.EnumEventLevel;
-import eu.opertusmundi.common.model.logging.EnumEventSortField;
-import eu.opertusmundi.common.model.logging.EventDto;
-import eu.opertusmundi.common.repository.EventRepository;
+import eu.opertusmundi.common.model.logging.ElasticEVentQueryDto;
+import eu.opertusmundi.common.model.logging.ElasticEventDto;
 
 @RestController
 @Secured({"ROLE_ADMIN"})
 public class EventControllerImpl extends BaseController implements EventController {
 
     @Autowired
-    private EventRepository eventRepository;
-
+    private LoggingElasticSearchService loggingService;
 
     @Override
-    public RestResponse<PageResultDto<EventDto>> findAll(
-        int page, int size, 
-        Set<EnumEventLevel> level, String logger, String userName, String clientAddress, 
-        EnumEventSortField orderBy, EnumSortingOrder order
-    ) {
-        final Direction   direction   = order == EnumSortingOrder.DESC ? Direction.DESC : Direction.ASC;
-        final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, orderBy.getValue()));
-
-        if (level != null && level.isEmpty()) {
-            level = null;
-        }
-        
-        clientAddress = this.createLikePredicateValue(clientAddress);
-        logger = this.createLikePredicateValue(logger);
-        userName = this.createLikePredicateValue(userName);
-
-        final Page<EventDto> p = this.eventRepository
-            .findAll(level, logger, userName, clientAddress, pageRequest)
-            .map(EventEntity::toDto);
-
-        final long                    count   = p.getTotalElements();
-        final List<EventDto>          records = p.stream().collect(Collectors.toList());
-        final PageResultDto<EventDto> result  = PageResultDto.of(page, size, records, count);
+    public RestResponse<PageResultDto<ElasticEventDto>> findAll(ElasticEVentQueryDto query) {
+        final PageResultDto<ElasticEventDto> result = this.loggingService.search(query);
 
         return RestResponse.result(result);
-    }
-
-    private String createLikePredicateValue(String value) {
-        if (StringUtils.isBlank(value)) {
-            return null;
-        } else {
-            if (!value.startsWith("%")) {
-                value = "%" + value;
-            }
-            if (!value.endsWith("%")) {
-                value += "%";
-            }
-
-            return value;
-        }
     }
 
 }
