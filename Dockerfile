@@ -1,6 +1,6 @@
 # vim: set syntax=dockerfile:
 
-FROM node:10.16.3-buster AS npm-build
+FROM node:14.17.5-buster AS npm-build
 
 ENV NPM_CONFIG_PROGRESS="false" NPM_CONFIG_SPIN="false"
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
