@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RestController;
 import eu.opertusmundi.admin.web.service.LoggingElasticSearchService;
 import eu.opertusmundi.common.model.PageResultDto;
 import eu.opertusmundi.common.model.RestResponse;
-import eu.opertusmundi.common.model.logging.ElasticEVentQueryDto;
 import eu.opertusmundi.common.model.logging.ElasticEventDto;
+import eu.opertusmundi.common.model.logging.ElasticEventQueryDto;
 
 @RestController
 @Secured({"ROLE_ADMIN"})
@@ -18,7 +18,7 @@ public class EventControllerImpl extends BaseController implements EventControll
     private LoggingElasticSearchService loggingService;
 
     @Override
-    public RestResponse<PageResultDto<ElasticEventDto>> findAll(ElasticEVentQueryDto query) {
+    public RestResponse<PageResultDto<ElasticEventDto>> findAll(ElasticEventQueryDto query) {
         final PageResultDto<ElasticEventDto> result = this.loggingService.search(query);
 
         return RestResponse.result(result);

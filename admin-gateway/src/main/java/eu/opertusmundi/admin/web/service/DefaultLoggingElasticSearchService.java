@@ -39,8 +39,8 @@ import eu.opertusmundi.admin.web.config.LoggingElasticConfiguration;
 import eu.opertusmundi.common.model.EnumSortingOrder;
 import eu.opertusmundi.common.model.PageResultDto;
 import eu.opertusmundi.common.model.catalogue.elastic.ElasticServiceException;
-import eu.opertusmundi.common.model.logging.ElasticEVentQueryDto;
 import eu.opertusmundi.common.model.logging.ElasticEventDto;
+import eu.opertusmundi.common.model.logging.ElasticEventQueryDto;
 import eu.opertusmundi.common.model.logging.EnumEventLevel;
 
 @Service
@@ -89,7 +89,7 @@ public class DefaultLoggingElasticSearchService implements LoggingElasticSearchS
     }
 
     @Override
-    public PageResultDto<ElasticEventDto> search(ElasticEVentQueryDto query) throws ElasticServiceException {
+    public PageResultDto<ElasticEventDto> search(ElasticEventQueryDto query) throws ElasticServiceException {
         try {
             final DateTimeFormatter       formatter = DateTimeFormatter.ofPattern("YYYY-MM-dd");
             final int                     from      = query.getFrom();           
@@ -129,13 +129,28 @@ public class DefaultLoggingElasticSearchService implements LoggingElasticSearchS
                 builder.must(tempBool);
             }
             
+            // Filter users
+            if (!CollectionUtils.isEmpty(query.getUserNames())) {
+                final BoolQueryBuilder   tempBool   = QueryBuilders.boolQuery();
+                final List<QueryBuilder> userQueries = new ArrayList<>();
+
+                for (final String userName : query.getUserNames()) {
+                    userQueries.add(QueryBuilders.matchQuery("client-username", userName));
+                }
+                for (final QueryBuilder currentQuery : userQueries) {
+                    tempBool.should(currentQuery);
+                }
+
+                builder.must(tempBool);
+            }
+            
             // Filter IP Addresses
             if (!CollectionUtils.isEmpty(query.getClientAddresses())) {
                 final BoolQueryBuilder   tempBool   = QueryBuilders.boolQuery();
                 final List<QueryBuilder> ipQueries = new ArrayList<>();
 
                 for (final String app : query.getClientAddresses()) {
-                    ipQueries.add(QueryBuilders.matchQuery("fromhost", app));
+                    ipQueries.add(QueryBuilders.matchQuery("client-address", app));
                 }
                 for (final QueryBuilder currentQuery : ipQueries) {
                     tempBool.should(currentQuery);

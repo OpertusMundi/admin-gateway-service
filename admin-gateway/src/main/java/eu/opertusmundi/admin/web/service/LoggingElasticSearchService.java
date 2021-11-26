@@ -3,7 +3,7 @@ package eu.opertusmundi.admin.web.service;
 import eu.opertusmundi.common.model.PageResultDto;
 import eu.opertusmundi.common.model.catalogue.elastic.ElasticServiceException;
 import eu.opertusmundi.common.model.logging.ElasticEventDto;
-import eu.opertusmundi.common.model.logging.ElasticEVentQueryDto;
+import eu.opertusmundi.common.model.logging.ElasticEventQueryDto;
 
 public interface LoggingElasticSearchService {
 
@@ -19,6 +19,6 @@ public interface LoggingElasticSearchService {
      * @return
      * @throws ElasticServiceException
      */
-    PageResultDto<ElasticEventDto> search(ElasticEVentQueryDto query) throws ElasticServiceException;
+    PageResultDto<ElasticEventDto> search(ElasticEventQueryDto query) throws ElasticServiceException;
 
 }
