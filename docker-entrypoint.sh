@@ -17,6 +17,21 @@ function _validate_database_url()
     grep -e "${re}" || { echo "${var_name} does not seem like a PostgreSQL JDBC connection URL" 1>&2 && false; }
 }
 
+function _get_url_scheme()
+{
+    echo $1 | sed -E 's#^([a-z]+)://.*#\1#'
+}
+
+function _get_url_host()
+{
+    echo $1 | sed -E 's#^([a-z]+)://([^:\/]*)([:][1-9][0-9]{1,4})?(/.*|$)#\2#'
+}
+
+function _get_url_port()
+{
+    echo $1 | sed -E 's#^([a-z]+)://([^:\/]*)([:]([1-9][0-9]{1,4}))?(/.*|$)#\4#'
+}
+
 runtime_profile=$(hostname | md5sum | head -c10)
 
 {
@@ -95,6 +110,16 @@ runtime_profile=$(hostname | md5sum | head -c10)
     echo "spring.elasticsearch.rest.uris = ${elasticsearch_base_url}"
     echo "opertusmundi.elastic.asset-index.name = ${elasticsearch_indices_assets_index_name}"
 
+    if [ -n "${RSYSLOG_LOG_AGGREGATION_ELASTICSEARCH_BASE_URL}" ]; then
+        rsyslog_log_aggregation_elasticsearch_base_url=$(echo ${RSYSLOG_LOG_AGGREGATION_ELASTICSEARCH_BASE_URL} | \
+            _validate_http_url "RSYSLOG_LOG_AGGREGATION_ELASTICSEARCH_BASE_URL")
+        rsyslog_log_aggregation_elasticsearch_index_name=${RSYSLOG_LOG_AGGREGATION_ELASTICSEARCH_INDEX_NAME}
+        echo "opertusmundi.logging.elastic.hosts[0].hostname = $(_get_url_host ${rsyslog_log_aggregation_elasticsearch_base_url})"
+        echo "opertusmundi.logging.elastic.hosts[0].port = $(_get_url_port ${rsyslog_log_aggregation_elasticsearch_base_url})"
+        echo "opertusmundi.logging.elastic.hosts[0].scheme = $(_get_url_scheme ${rsyslog_log_aggregation_elasticsearch_base_url})"
+        echo "opertusmundi.logging.elastic.rsyslog-index.name = ${rsyslog_log_aggregation_elasticsearch_index_name}"
+    fi
+    
 } > ./config/application-${runtime_profile}.properties
 
 logging_config="classpath:config/log4j2.xml"
