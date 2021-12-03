@@ -89,6 +89,17 @@ public class ContractControllerImpl extends BaseController implements ContractCo
             return RestResponse.error(ex.getCode(), ex.getMessage());
         }
     }
+    
+    @Override
+    public RestResponse<MasterContractDto> createClonedDraftFromTemplate(int id) {
+        try {
+            final MasterContractDto result = this.masterService.cloneFromTemplate(this.currentUserId(), id);
+
+            return RestResponse.result(result);
+        } catch (final ApplicationException ex) {
+            return RestResponse.error(ex.getCode(), ex.getMessage());
+        }
+    }   
 
     @Override
     public RestResponse<MasterContractHistoryDto> deactivate(int id) {

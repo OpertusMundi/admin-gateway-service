@@ -90,6 +90,19 @@ public interface ContractController {
     );
     
     /**
+     * Creates a new cloned draft from an existing template.
+     * 
+     * It will start as a new draft from version 1
+     * 
+     * @param id
+     * @return
+     */
+    @PostMapping(value = {"/history/clone/{id}"})
+    RestResponse<MasterContractDto> createClonedDraftFromTemplate(
+        @PathVariable int id
+    );
+    
+    /**
      * Deactivate contract template
      * 
      * @param id
