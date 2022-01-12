@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import eu.opertusmundi.common.model.RestResponse;
 import eu.opertusmundi.common.model.admin.WebhookRegistration;
-import eu.opertusmundi.common.service.MangoPayWebhookHelper;
+import eu.opertusmundi.common.service.mangopay.MangoPayWebhookHelper;
 
 @RestController
 public class WebhookControllerImpl extends BaseController implements WebhookController {
