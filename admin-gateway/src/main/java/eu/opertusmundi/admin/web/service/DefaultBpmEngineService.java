@@ -41,7 +41,6 @@ import eu.opertusmundi.admin.web.model.workflow.ProcessDefinitionHeaderDto;
 import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceDetailsDto;
 import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceDto;
 import eu.opertusmundi.admin.web.model.workflow.VariableDto;
-import eu.opertusmundi.common.domain.AccountEntity;
 import eu.opertusmundi.common.feign.client.BpmServerFeignClient;
 import eu.opertusmundi.common.model.EnumSortingOrder;
 import eu.opertusmundi.common.model.PageResultDto;
@@ -246,10 +245,10 @@ public class DefaultBpmEngineService implements BpmEngineService {
 
         final VariableValueDto startUserVariable = variables.get(EnumProcessInstanceVariable.START_USER_KEY.getValue());
         if (startUserVariable != null && !StringUtils.isBlank((String) startUserVariable.getValue())) {
-            final Optional<AccountEntity> startUserEntity = accountRepository.findOneByKey(
+            final Optional<AccountDto> startUser = accountRepository.findOneByKeyObject(
                 UUID.fromString((String) startUserVariable.getValue())
             );
-            result.setOwner(startUserEntity.map(AccountEntity::toDto).orElse(null));
+            result.setOwner(startUser.orElse(null));
         }
 
         return Optional.of(result);
