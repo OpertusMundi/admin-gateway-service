@@ -1,6 +1,7 @@
 package eu.opertusmundi.admin.web.config;
 
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -18,8 +19,13 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
+import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -36,12 +42,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
 	
 	private static final String DEVELOPMENT_PROFILE = "development";
 	
+	private final Pattern csrfMethods = Pattern.compile("^(POST|PUT|DELETE)$");
+	
     @Value("${spring.profiles.active:}")
     private String activeProfile;
     
     @Autowired
     @Qualifier("defaultUserDetailsService")
-    UserDetailsService userService;
+    UserDetailsService userDetailsService;
 
     @Override
     public void configure(WebSecurity security) throws Exception
@@ -55,25 +63,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
                 "/static/**" 
 			);
     }
-     
-    @Override
-    protected void configure(AuthenticationManagerBuilder builder) throws Exception
-    {
-        // Which authentication providers are to be used?
-
-        builder.userDetailsService(userService)
-            .passwordEncoder(new BCryptPasswordEncoder());
-
-        builder.eraseCredentials(true);
-    }
 
     @Override
-    protected void configure(HttpSecurity security) throws Exception
-    {
+    protected void configure(HttpSecurity security) throws Exception {
         // Authorize requests:
 
         security.authorizeRequests()
-        	// Public paths
+            // Public paths
             .antMatchers(
                     "/", "/index",
                     "/login", "/logged-out")
@@ -85,12 +81,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
                 .authenticated()
             // Restrict access to actuator endpoints (you may further restrict details via configuration)
             .requestMatchers(EndpointRequest.toAnyEndpoint()).hasIpAddress("127.0.0.1/8");
-
+        
         // Support form-based login
 
         security.formLogin()
             .loginPage("/login")
-            .failureUrl("/login?error")
+            .failureUrl("/login?error=1")
             .defaultSuccessUrl("/logged-in", true)
             .usernameParameter("username")
             .passwordParameter("password");
@@ -98,29 +94,31 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
         security.logout()
             .logoutUrl("/logout")
             .logoutSuccessUrl("/logged-out")
-            .invalidateHttpSession(true);
-
+            .invalidateHttpSession(true)
+            .clearAuthentication(true)
+            .permitAll();
+        
         // Configure CSRF
         
         security.csrf()
             .requireCsrfProtectionMatcher((HttpServletRequest req) -> {
-                String method = req.getMethod();
-                String path = req.getServletPath();
-                if (path.startsWith("/api/")) {
-                    return false; // exclude Rest API
-                }
-                if (method.equals("POST") || method.equals("PUT") || method.equals("DELETE")) {
-                	// Disable CSRF when development profile is active
+                if (this.csrfMethods.matcher(req.getMethod()).matches()) {
+                    // Disable CSRF when development profile is active
                     return !this.isDevelopmentProfileActive();
                 }
                 return false;
              });
-
+        
         // Do not redirect unauthenticated requests (just respond with a status code)
 
         security.exceptionHandling()
             .authenticationEntryPoint(
                 new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
+        
+        // OAuth2 configuration
+        security.oauth2Login()
+            .userInfoEndpoint(userInfo -> userInfo.oidcUserService(this.oidcUserService()))
+            .failureUrl("/login?error=2");
 
         // Handle CORS (Fix security errors)
         //
@@ -131,14 +129,32 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
         // contain any cookies and Spring Security is first, the request will determine
         // the user is not authenticated (since there are no cookies in the request) and
         // reject it.
-		if (this.isDevelopmentProfileActive()) {
-			security.cors();
-		}
+        if (this.isDevelopmentProfileActive()) {
+            security.cors();
+        }
         
         // Add filters
 
-        security.addFilterAfter(
-            new MappedDiagnosticContextFilter(), SwitchUserFilter.class);
+        security.addFilterAfter(new MappedDiagnosticContextFilter(), SwitchUserFilter.class);
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder builder) throws Exception {
+        builder.userDetailsService(this.userDetailsService).passwordEncoder(new BCryptPasswordEncoder());
+        builder.eraseCredentials(true);
+    }
+
+    private OAuth2UserService<OidcUserRequest, OidcUser> oidcUserService() {
+        final OidcUserService delegate = new OidcUserService();
+
+        return (userRequest) -> {
+            // Delegate to the default implementation for loading a user
+            final OidcUser oidcUser = delegate.loadUser(userRequest);
+            final String email = (String) oidcUser.getAttributes().get("email");
+            final UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+
+            return (OidcUser) userDetails;
+        };
     }
     
     @Profile({"development"})
