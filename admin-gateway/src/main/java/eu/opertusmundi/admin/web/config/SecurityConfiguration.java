@@ -24,6 +24,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
@@ -51,6 +52,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
     @Qualifier("defaultUserDetailsService")
     UserDetailsService userDetailsService;
 
+    @Autowired(required = false)
+    ClientRegistrationRepository clientRegistrationRepository;
+    
     @Override
     public void configure(WebSecurity security) throws Exception
     {
@@ -116,10 +120,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
                 new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
         
         // OAuth2 configuration
-        security.oauth2Login()
-            .userInfoEndpoint(userInfo -> userInfo.oidcUserService(this.oidcUserService()))
-            .failureUrl("/login?error=2");
-
+        if (clientRegistrationRepository != null) {
+            security.oauth2Login()
+                .userInfoEndpoint(userInfo -> userInfo.oidcUserService(this.oidcUserService()))
+                .failureUrl("/login?error=2");
+        }
+        
         // Handle CORS (Fix security errors)
         //
         // See: https://docs.spring.io/spring-security/site/docs/current/reference/html5/#cors
