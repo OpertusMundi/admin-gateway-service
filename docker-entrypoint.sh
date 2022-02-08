@@ -32,6 +32,8 @@ function _get_url_port()
     echo $1 | sed -E 's#^([a-z]+)://([^:\/]*)([:]([1-9][0-9]{1,4}))?(/.*|$)#\4#'
 }
 
+# Generate application properties
+
 runtime_profile=$(hostname | md5sum | head -c10)
 
 {
@@ -59,6 +61,29 @@ runtime_profile=$(hostname | md5sum | head -c10)
 
     jwt_secret=$(cat ${JWT_SECRET_FILE} | tr -d '\n')
     echo "opertusmundi.feign.jwt.secret = ${jwt_secret}"
+
+    if [[ -n "${OIDC_AUTH_URL}" ]]; then
+        oidc_auth_url=$(echo ${OIDC_AUTH_URL} | _validate_http_url "OIDC_AUTH_URL")
+        oidc_token_url=$(echo ${OIDC_TOKEN_URL} | _validate_http_url "OIDC_TOKEN_URL")
+        oidc_userinfo_url=$(echo ${OIDC_USERINFO_URL} | _validate_http_url "OIDC_USERINFO_URL")
+        oidc_jwks_url=$(echo ${OIDC_JWKS_URL} | _validate_http_url "OIDC_JWKS_URL")
+        oidc_scope=${OIDC_SCOPE:-openid}
+        oidc_client_id=${OIDC_CLIENT_ID}
+        oidc_client_secret=$(cat ${OIDC_CLIENT_SECRET_FILE} | tr -d '\n')
+        # Define the OAuth2 provider
+        echo "spring.security.oauth2.client.provider.keycloak.authorization-uri = ${oidc_auth_url}"
+        echo "spring.security.oauth2.client.provider.keycloak.token-uri = ${oidc_token_url}"
+        echo "spring.security.oauth2.client.provider.keycloak.jwk-set-uri = ${oidc_jwks_url}"
+        echo "spring.security.oauth2.client.provider.keycloak.user-info-uri = ${oidc_userinfo_url}"
+        echo "spring.security.oauth2.client.provider.keycloak.user-name-attribute = email"
+        # Register OAuth2 client "opertusmundi"
+        echo "spring.security.oauth2.client.registration.opertusmundi.provider = keycloak"
+        echo "spring.security.oauth2.client.registration.opertusmundi.authorization-grant-type = authorization_code"
+        echo "spring.security.oauth2.client.registration.opertusmundi.client-id = ${oidc_client_id}"
+        echo "spring.security.oauth2.client.registration.opertusmundi.client-secret = ${oidc_client_secret}"
+        echo "spring.security.oauth2.client.registration.opertusmundi.redirect-uri = {baseUrl}/login/oauth2/code/{registrationId}"
+        echo "spring.security.oauth2.client.registration.opertusmundi.scope = ${oidc_scope}"
+    fi
 
     bpm_rest_base_url=$(echo ${BPM_REST_BASE_URL} | _validate_http_url "BPM_REST_BASE_URL")
     bpm_rest_username=${BPM_REST_USERNAME}
@@ -121,6 +146,8 @@ runtime_profile=$(hostname | md5sum | head -c10)
     fi
     
 } > ./config/application-${runtime_profile}.properties
+
+# Point to logging configuration
 
 logging_config="classpath:config/log4j2.xml"
 if [[ -f "./config/log4j2.xml" ]]; then
