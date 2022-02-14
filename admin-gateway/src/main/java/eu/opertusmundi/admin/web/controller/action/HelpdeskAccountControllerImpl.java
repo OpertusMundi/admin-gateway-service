@@ -13,10 +13,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import eu.opertusmundi.common.domain.HelpdeskAccountEntity;
-import eu.opertusmundi.common.repository.HelpdeskAccountRepository;
 import eu.opertusmundi.admin.web.validation.AccountValidator;
 import eu.opertusmundi.admin.web.validation.PasswordValidator;
+import eu.opertusmundi.common.domain.HelpdeskAccountEntity;
 import eu.opertusmundi.common.model.BasicMessageCode;
 import eu.opertusmundi.common.model.EnumSortingOrder;
 import eu.opertusmundi.common.model.PageResultDto;
@@ -27,9 +26,10 @@ import eu.opertusmundi.common.model.account.helpdesk.HelpdeskAccountCommandDto;
 import eu.opertusmundi.common.model.account.helpdesk.HelpdeskAccountDto;
 import eu.opertusmundi.common.model.account.helpdesk.HelpdeskAccountFormDataDto;
 import eu.opertusmundi.common.model.account.helpdesk.HelpdeskSetPasswordCommandDto;
+import eu.opertusmundi.common.repository.HelpdeskAccountRepository;
 
 @RestController
-@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+@Secured({ "ROLE_ADMIN" })
 public class HelpdeskAccountControllerImpl extends BaseController implements HelpdeskAccountController {
 
 	@Autowired

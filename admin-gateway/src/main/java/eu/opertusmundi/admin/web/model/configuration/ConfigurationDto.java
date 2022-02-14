@@ -5,6 +5,7 @@ import java.util.List;
 
 import eu.opertusmundi.admin.web.model.workflow.ProcessDefinitionHeaderDto;
 import eu.opertusmundi.common.model.contract.ContractIconDto;
+import eu.opertusmundi.common.model.integration.ExternalDataProviderDto;
 import eu.opertusmundi.common.model.spatial.CountryEuropeDto;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,5 +21,6 @@ public class ConfigurationDto {
     private OsmConfigurationDto              osm;
     private List<ProcessDefinitionHeaderDto> processDefinitions;
     private List<ContractIconDto>            contractIcons   = new ArrayList<>();
+    private List<ExternalDataProviderDto>    externalProviders = new ArrayList<>(); 
 
 }

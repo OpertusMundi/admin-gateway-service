@@ -21,6 +21,8 @@ import eu.opertusmundi.common.model.RestResponse;
 import eu.opertusmundi.common.model.account.helpdesk.EnumHelpdeskRole;
 import eu.opertusmundi.common.model.contract.ContractIconDto;
 import eu.opertusmundi.common.model.contract.EnumIcon;
+import eu.opertusmundi.common.model.integration.EnumDataProvider;
+import eu.opertusmundi.common.model.integration.ExternalDataProviderDto;
 import eu.opertusmundi.common.repository.CountryRepository;
 
 @RestController
@@ -66,6 +68,10 @@ public class ConfigurationControllerImpl extends BaseController implements Confi
             .map(CountryEuropeEntity::toDto)
             .forEach(config.getEuropeCountries()::add);
 
+        for (final EnumDataProvider p : EnumDataProvider.values()) {
+            config.getExternalProviders().add(ExternalDataProviderDto.of(p, p.getName(), p.getRequiredRole()));
+        }
+        
         this.setIcons(config);
 
         return config;
