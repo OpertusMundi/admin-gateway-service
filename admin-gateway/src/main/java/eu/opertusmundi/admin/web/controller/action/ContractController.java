@@ -7,6 +7,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import eu.opertusmundi.common.model.EnumSortingOrder;
 import eu.opertusmundi.common.model.PageResultDto;
@@ -191,5 +193,15 @@ public interface ContractController {
     RestResponse<MasterContractDto> publishDraft(
         @PathVariable int id
     );
+    
+    /**
+     * Print master contract 
+     * 
+     * @param id
+     * @return
+     */
+    @GetMapping(value = {"/print/{id}"})
+    ResponseEntity<StreamingResponseBody> print(
+            @PathVariable int id);
 
 }

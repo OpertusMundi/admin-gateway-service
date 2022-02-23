@@ -1,11 +1,18 @@
 package eu.opertusmundi.admin.web.controller.action;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import eu.opertusmundi.common.model.ApplicationException;
 import eu.opertusmundi.common.model.EnumSortingOrder;
@@ -25,6 +32,7 @@ public class ContractControllerImpl extends BaseController implements ContractCo
    
     @Autowired
     private MasterTemplateContractService masterService;
+    
 
     @Override
     public RestResponse<PageResultDto<MasterContractHistoryDto>> findAllHistory(
@@ -191,5 +199,20 @@ public class ContractControllerImpl extends BaseController implements ContractCo
             return RestResponse.error(ex.getCode(), ex.getMessage());
         }
     }
-
+    
+    @Override
+    public ResponseEntity<StreamingResponseBody> print(int id){
+        byte[] data = null;
+        try {
+            data = masterService.print(id);
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        InputStream inputStream = new ByteArrayInputStream(data); 
+        final StreamingResponseBody stream = out -> {
+           IOUtils.copyLarge(inputStream, out);
+            
+        };
+        return new ResponseEntity<StreamingResponseBody>(stream, HttpStatus.OK);
+    }
 }
