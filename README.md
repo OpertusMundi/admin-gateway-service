@@ -130,6 +130,8 @@ opertusmundi.file-system.data-dir=
 opertusmundi.file-system.draft-dir=
 # Root folder for storing files for assets
 opertusmundi.file-system.asset-dir=
+# Root folder for storing invoice files
+opertusmundi.file-system.invoice-dir=
 ```
 
 ### Configure the Web Client
@@ -165,7 +167,7 @@ Ensure that the following section is not commented (to avoid packaging an embedd
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-tomcat</artifactId>
     <scope>provided</scope>
-</dependency>    
+</dependency>
 ```
 
 Rebuild, and deploy generated `admin-gateway/target/opertus-mundi-admin-gateway-1.0.0.war` on a Tomcat 9.x servlet container.
