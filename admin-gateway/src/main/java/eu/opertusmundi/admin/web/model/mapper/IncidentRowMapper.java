@@ -26,6 +26,7 @@ public class IncidentRowMapper implements RowMapper<IncidentDto> {
         result.setProcessDefinitionKey(rs.getString("process_definition_key"));
         result.setProcessDefinitionName(rs.getString("process_definition_name"));
         result.setProcessDefinitionVersion(rs.getInt("process_definition_version"));
+        result.setProcessDefinitionVersionTag(rs.getString("process_definition_version_tag"));
         result.setProcessInstanceId(rs.getString("process_instance_id"));
         result.setTaskErrorDetails(rs.getString("task_error_details"));
         result.setTaskErrorMessage(rs.getString("task_error_message"));

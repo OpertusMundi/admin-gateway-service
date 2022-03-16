@@ -141,6 +141,7 @@ public class DefaultBpmEngineService implements BpmEngineService {
             "          def.name_                 as process_definition_name, " +
             "          def.key_                  as process_definition_key, " +
             "          def.version_              as process_definition_version, " +
+            "          def.version_tag_          as process_definition_version_tag, " +
             "          dep.deploy_time_          as process_definition_deployed_on, " +
             "          ex.id_                    as process_instance_id, " +
             "          ex.business_key_          as business_key, " +
@@ -293,6 +294,7 @@ public class DefaultBpmEngineService implements BpmEngineService {
             "          def.name_                 as process_definition_name, " +
             "          def.key_                  as process_definition_key, " +
             "          def.version_              as process_definition_version, " +
+            "          def.version_tag_          as process_definition_version_tag, " +
             "          dep.deploy_time_          as process_definition_deployed_on, " +
             "          hist.id_                  as process_instance_id, " +
             "          hist.business_key_        as business_key, " +
@@ -460,6 +462,7 @@ public class DefaultBpmEngineService implements BpmEngineService {
             "        def.name_                   as process_definition_name, " +
             "        def.key_                    as process_definition_key, " +
             "        def.version_                as process_definition_version, " +
+            "        def.version_tag_            as process_definition_version_tag, " +
             "        dep.deploy_time_            as process_definition_deployed_on, " +
             "        ex.id_                      as process_instance_id, " +
             "        ex.business_key_            as business_key, " +

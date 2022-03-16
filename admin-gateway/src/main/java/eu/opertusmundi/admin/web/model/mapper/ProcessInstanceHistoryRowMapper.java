@@ -21,8 +21,9 @@ public class ProcessInstanceHistoryRowMapper implements RowMapper<ProcessInstanc
         result.setProcessDefinitionKey(rs.getString("process_definition_key"));
         result.setProcessDefinitionName(rs.getString("process_definition_name"));
         result.setProcessDefinitionVersion(rs.getInt("process_definition_version"));
+        result.setProcessDefinitionVersionTag(rs.getString("process_definition_version_tag"));
         result.setProcessInstanceId(rs.getString("process_instance_id"));
-        
+
         final Timestamp     deployedOnTimestamp = rs.getTimestamp("process_definition_deployed_on");
         final ZonedDateTime deployedOn          = deployedOnTimestamp.toInstant().atZone(ZoneId.of("UTC"));
         result.setProcessDefinitionDeployedOn(deployedOn);

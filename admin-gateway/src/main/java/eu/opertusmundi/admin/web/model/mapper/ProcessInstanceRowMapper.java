@@ -22,6 +22,7 @@ public class ProcessInstanceRowMapper implements RowMapper<ProcessInstanceDto> {
         result.setProcessDefinitionKey(rs.getString("process_definition_key"));
         result.setProcessDefinitionName(rs.getString("process_definition_name"));
         result.setProcessDefinitionVersion(rs.getInt("process_definition_version"));
+        result.setProcessDefinitionVersionTag(rs.getString("process_definition_version_tag"));
         result.setProcessInstanceId(rs.getString("process_instance_id"));
 
         final Timestamp     deployedOnTimestamp = rs.getTimestamp("process_definition_deployed_on");

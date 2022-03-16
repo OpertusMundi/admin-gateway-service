@@ -15,6 +15,7 @@ public class IncidentDto {
     private String        processDefinitionName;
     private String        processDefinitionKey;
     private Integer       processDefinitionVersion;
+    private String        processDefinitionVersionTag;
     private ZonedDateTime processDefinitionDeployedOn;
     private String        processInstanceId;
     private String        businessKey;
