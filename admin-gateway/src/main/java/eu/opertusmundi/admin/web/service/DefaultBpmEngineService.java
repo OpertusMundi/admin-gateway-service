@@ -134,7 +134,7 @@ public class DefaultBpmEngineService implements BpmEngineService {
             args.add(businessKey);
         }
 
-        final Long count = jdbcTemplate.queryForObject(countQuery, args.toArray(), Long.class);
+        final Long count = jdbcTemplate.queryForObject(countQuery, Long.class, args.toArray());
 
         String selectQuery =
             "select    def.id_                   as process_definition_id, " +
@@ -196,8 +196,8 @@ public class DefaultBpmEngineService implements BpmEngineService {
 
         final List<ProcessInstanceDto> rows = jdbcTemplate.query(
             selectQuery,
-            args.toArray(),
-            new ProcessInstanceRowMapper()
+            new ProcessInstanceRowMapper(),
+            args.toArray()
         );
 
         return PageResultDto.of(page, size, rows, count);
@@ -287,7 +287,7 @@ public class DefaultBpmEngineService implements BpmEngineService {
             args.add(businessKey);
         }
 
-        final Long count = jdbcTemplate.queryForObject(countQuery, args.toArray(), Long.class);
+        final Long count = jdbcTemplate.queryForObject(countQuery, Long.class, args.toArray());
 
         String selectQuery =
             "select    def.id_                   as process_definition_id, " +
@@ -334,8 +334,8 @@ public class DefaultBpmEngineService implements BpmEngineService {
 
         final List<ProcessInstanceDto> rows = jdbcTemplate.query(
             selectQuery,
-            args.toArray(),
-            new ProcessInstanceHistoryRowMapper()
+            new ProcessInstanceHistoryRowMapper(),
+            args.toArray()
         );
 
         return PageResultDto.of(page, size, rows, count);
@@ -455,7 +455,7 @@ public class DefaultBpmEngineService implements BpmEngineService {
             args.add(businessKey);
         }
 
-        final Long count = jdbcTemplate.queryForObject(countQuery, args.toArray(), Long.class);
+        final Long count = jdbcTemplate.queryForObject(countQuery, Long.class, args.toArray());
 
         String selectQuery =
             "select  def.id_                     as process_definition_id, " +
@@ -511,8 +511,8 @@ public class DefaultBpmEngineService implements BpmEngineService {
 
         final List<IncidentDto> rows = jdbcTemplate.query(
             selectQuery,
-            args.toArray(),
-            new IncidentRowMapper()
+            new IncidentRowMapper(),
+            args.toArray()
         );
 
         return PageResultDto.of(page, size, rows, count);

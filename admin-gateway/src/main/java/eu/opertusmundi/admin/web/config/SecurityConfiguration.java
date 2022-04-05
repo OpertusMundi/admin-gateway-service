@@ -1,6 +1,7 @@
 package eu.opertusmundi.admin.web.config;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -56,35 +56,26 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
     ClientRegistrationRepository clientRegistrationRepository;
     
     @Override
-    public void configure(WebSecurity security) throws Exception
-    {
-        security.ignoring()
-            .antMatchers(
-        		"/manifest.json",
-                "/asset-manifest.json",
-                "/i18n/**", 
-                "/images/**", 
-                "/static/**" 
-			);
-    }
-
-    @Override
     protected void configure(HttpSecurity security) throws Exception {
         // Authorize requests:
 
         security.authorizeRequests()
-            // Public paths
-            .antMatchers(
-                    "/", "/index",
-                    "/login", "/logged-out")
-                .permitAll()
             // Secured paths
             .antMatchers(
-                    "/logged-in", "/logout",
-                    "/action/**")
-                .authenticated()
+                "/logged-in", 
+                "/logout",
+                "/action/**"
+            ).authenticated()
             // Restrict access to actuator endpoints (you may further restrict details via configuration)
-            .requestMatchers(EndpointRequest.toAnyEndpoint()).hasIpAddress("127.0.0.1/8");
+            .requestMatchers(EndpointRequest.toAnyEndpoint()).hasIpAddress("127.0.0.1/8")
+            // Public
+            .antMatchers(
+                // Permit all endpoints. Actions are secured using
+                // annotations
+                "/**"
+            ).permitAll()
+            // Secure any other path
+            .anyRequest().authenticated();
         
         // Support form-based login
 
@@ -167,10 +158,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         final CorsConfiguration configuration = new CorsConfiguration();
-        
+
         configuration.setAllowCredentials(true);
-        
-        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedOriginPatterns(Collections.singletonList("*"));
+
         configuration.setAllowedMethods(Arrays.asList("*"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
 
