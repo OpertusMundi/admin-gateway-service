@@ -107,7 +107,7 @@ public class ProviderDraftControllerImpl implements ProviderDraftController {
         final UUID             publisherKey = draft.getPublisher().getKey();
         // We set publisher key to the owner key value. Helpdesk account can
         // review any draft
-        final Path path = this.providerAssetService.resolveDraftCustomContractPath(publisherKey, publisherKey, draftKey);
+        final Path path = this.providerAssetService.resolveDraftContractPath(publisherKey, publisherKey, draftKey);
         final File file = path.toFile();
 
         String contentType = Files.probeContentType(path);
@@ -136,7 +136,7 @@ public class ProviderDraftControllerImpl implements ProviderDraftController {
         final UUID             publisherKey = draft.getPublisher().getKey();
         // We set publisher key to the owner key value. Helpdesk account can
         // review any draft
-        final Path path = this.providerAssetService.resolveDraftContractAnnex(publisherKey, publisherKey, draftKey, annexKey);
+        final Path path = this.providerAssetService.resolveDraftContractAnnexPath(publisherKey, publisherKey, draftKey, annexKey);
         final File file = path.toFile();
 
         String contentType = Files.probeContentType(path);
