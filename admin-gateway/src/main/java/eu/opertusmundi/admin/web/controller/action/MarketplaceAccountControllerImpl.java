@@ -82,17 +82,16 @@ public class MarketplaceAccountControllerImpl extends BaseController implements 
         return RestResponse.result(result);
     }
 
-	@Override
-	public RestResponse<AccountDto> findOne(UUID key) {
-		final AccountEntity e = this.accountRepository.findOneByKey(key).orElse(null);
+    @Override
+    public RestResponse<AccountDto> findOne(UUID key) {
+        final AccountDto account = this.accountRepository.findOneByKeyObject(key).orElse(null);
 
-		if (e == null) {
-		    return RestResponse.failure(BasicMessageCode.RecordNotFound, "Account was not found");
-		}
+        if (account == null) {
+            return RestResponse.failure(BasicMessageCode.RecordNotFound, "Account was not found");
+        }
 
-
-		return RestResponse.result(e.toDto());
-	}
+        return RestResponse.result(account);
+    }
 	
     public RestResponse<AccountDto> assignExternalProvider(UUID key, ExternalProviderCommandDto command) {
         command.setCustomerKey(key);
