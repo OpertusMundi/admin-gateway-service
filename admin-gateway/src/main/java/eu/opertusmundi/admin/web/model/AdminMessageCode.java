@@ -4,6 +4,7 @@ import eu.opertusmundi.common.model.MessageCode;
 
 public enum AdminMessageCode implements MessageCode {
     ExternalProviderAlreadyExists,
+    OpenDatasetProviderAlreadyExists,
     ;
 
     @Override

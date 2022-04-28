@@ -16,6 +16,7 @@ import eu.opertusmundi.admin.web.model.AdminMessageCode;
 import eu.opertusmundi.admin.web.model.account.market.MarketplaceAccountSummaryDto;
 import eu.opertusmundi.common.domain.AccountEntity;
 import eu.opertusmundi.common.model.BasicMessageCode;
+import eu.opertusmundi.common.model.EnumRole;
 import eu.opertusmundi.common.model.EnumSortingOrder;
 import eu.opertusmundi.common.model.PageResultDto;
 import eu.opertusmundi.common.model.RestResponse;
@@ -112,6 +113,26 @@ public class MarketplaceAccountControllerImpl extends BaseController implements 
 	    return RestResponse.result(result);
 	}
 
+    public RestResponse<AccountDto> grantOpenDatasetProvider(UUID key) {      
+        final List<AccountEntity> existingAccounts = this.accountRepository.findAllWithRole(EnumRole.ROLE_PROVIDER_OPEN_DATASET);
+        if (existingAccounts.size() != 0) {
+            return RestResponse.failure(
+                AdminMessageCode.OpenDatasetProviderAlreadyExists,
+                "Open Dataset provider is already assigned to another user"
+            );
+        }
+
+        final AccountDto result = this.accountRepository.grantOpenDatasetProvider(key);
+        
+        return RestResponse.result(result);
+    }
+    
+    public RestResponse<AccountDto> revokeOpenDatasetProvider(UUID key) {      
+        final AccountDto result = this.accountRepository.revokeOpenDatasetProvider(key);
+        
+        return RestResponse.result(result);
+    }
+    
     private enum EnumAccountType {
         All, 
         Consumer, 

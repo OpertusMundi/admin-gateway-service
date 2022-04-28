@@ -5,9 +5,11 @@ import java.util.UUID;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -57,4 +59,10 @@ public interface MarketplaceAccountController {
         @RequestBody ExternalProviderCommandDto command
     );
 
+    @PutMapping(value = {"/action/marketplace/accounts/{key}/open-dataset-provider"})
+    RestResponse<AccountDto> grantOpenDatasetProvider(@PathVariable UUID key);
+    
+    @DeleteMapping(value = {"/action/marketplace/accounts/{key}/open-dataset-provider"})
+    RestResponse<AccountDto> revokeOpenDatasetProvider(@PathVariable UUID key);
+    
 }
