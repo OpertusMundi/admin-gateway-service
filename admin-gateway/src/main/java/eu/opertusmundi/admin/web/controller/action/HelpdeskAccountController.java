@@ -46,16 +46,24 @@ public interface HelpdeskAccountController {
 		@PathVariable int id, @Valid @RequestBody HelpdeskAccountCommandDto command, BindingResult validationResult
 	);
 
-	@DeleteMapping(value = { "/action/helpdesk/accounts/{id}" })
-	RestResponse<Void> delete(@PathVariable int id);
+    @DeleteMapping(value = {"/action/helpdesk/accounts/{id}"})
+    RestResponse<Void> delete(@PathVariable int id);
 
-	@PostMapping(value = { "/action/helpdesk/accounts/{accountId}/role/{roleId}" })
-	RestResponse<HelpdeskAccountDto> grantRole(@PathVariable int accountId, @PathVariable EnumHelpdeskRole roleId);
+    @PostMapping(value = {"/action/helpdesk/accounts/{id}/idp"})
+    RestResponse<String> registerToIdp(@PathVariable int id);
 
-	@DeleteMapping(value = { "/action/helpdesk/accounts/{accountId}/role/{roleId}" })
-	RestResponse<HelpdeskAccountDto> revokeRole(@PathVariable int accountId, @PathVariable EnumHelpdeskRole roleId);
+    @PostMapping(value = {"/action/helpdesk/accounts/{id}/password"})
+    RestResponse<String> resetPassword(@PathVariable int id);
+
+    @PostMapping(value = {"/action/helpdesk/accounts/{accountId}/role/{roleId}"})
+    RestResponse<HelpdeskAccountDto> grantRole(@PathVariable int accountId, @PathVariable EnumHelpdeskRole roleId);
+
+    @DeleteMapping(value = {"/action/helpdesk/accounts/{accountId}/role/{roleId}"})
+    RestResponse<HelpdeskAccountDto> revokeRole(@PathVariable int accountId, @PathVariable EnumHelpdeskRole roleId);
 
 	@PostMapping(value = { "/action/user/password" })
-	RestResponse<HelpdeskAccountDto> setUserPassword(@RequestBody HelpdeskSetPasswordCommandDto command, BindingResult validationResult);
+	RestResponse<Void> setUserPassword(
+        @Valid @RequestBody HelpdeskSetPasswordCommandDto command, BindingResult validationResult
+    );
 
 }
