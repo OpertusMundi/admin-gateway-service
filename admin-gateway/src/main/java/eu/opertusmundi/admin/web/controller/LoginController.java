@@ -1,8 +1,8 @@
 package eu.opertusmundi.admin.web.controller;
 
 import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -26,13 +26,13 @@ public class LoginController {
 		}
 	}
 
-	@RequestMapping(value = "/logged-in", method = RequestMethod.GET)
+	@GetMapping(value = "/logged-in")
 	public RestResponse<Token> loggedIn(CsrfToken token) {
 
 		return RestResponse.result(new Token(token));
 	}
 
-	@RequestMapping(value = "/logged-out", method = RequestMethod.GET)
+	@GetMapping(value = "/logged-out")
 	public RestResponse<Token> loggedOut(CsrfToken token) {
 
 		return RestResponse.result(new Token(token));

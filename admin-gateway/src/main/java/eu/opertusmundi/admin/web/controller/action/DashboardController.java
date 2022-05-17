@@ -2,8 +2,8 @@ package eu.opertusmundi.admin.web.controller.action;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.opertusmundi.admin.web.model.dashboard.DashboardDto;
@@ -28,7 +28,7 @@ public class DashboardController extends BaseController {
 	 * @return an instance of {@link DashboardDto}}
 	 * @throws Exception if a data access operation fails
 	 */
-	@RequestMapping(value = "/action/dashboard", method = RequestMethod.GET)
+	@GetMapping(value = "/action/dashboard")
 	public RestResponse<DashboardDto> getDashboard() throws Exception {
 
 		final Integer accountId = this.authenticationFacade.isSystemAdmin() ? null : this.authenticationFacade.getCurrentUserId();
