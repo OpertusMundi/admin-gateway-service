@@ -2,6 +2,7 @@ package eu.opertusmundi.admin.web.config;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,12 +35,12 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import eu.opertusmundi.admin.web.logging.filter.MappedDiagnosticContextFilter;
+import eu.opertusmundi.common.model.EnumAuthProvider;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true)
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter
-{
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	
 	private static final String DEVELOPMENT_PROFILE = "development";
 	
@@ -47,6 +48,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
 	
     @Value("${spring.profiles.active:}")
     private String activeProfile;
+
+    @Value("${opertusmundi.authentication-providers:forms}")
+    private List<EnumAuthProvider> authProviders;
     
     @Autowired
     @Qualifier("defaultUserDetailsService")
@@ -60,6 +64,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
         // Authorize requests:
 
         security.authorizeRequests()
+            // Configuration
+            .antMatchers(
+                "/action/configuration"
+            ).permitAll()
             // Secured paths
             .antMatchers(
                 "/logged-in", 
@@ -79,12 +87,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
         
         // Support form-based login
 
-        security.formLogin()
-            .loginPage("/login")
-            .failureUrl("/login?error=1")
-            .defaultSuccessUrl("/logged-in", true)
-            .usernameParameter("username")
-            .passwordParameter("password");
+        if(this.authProviders.contains(EnumAuthProvider.Forms)) {
+            security.formLogin()
+                .loginPage("/login")
+                .failureUrl("/login?error=1")
+                .defaultSuccessUrl("/logged-in", true)
+                .usernameParameter("username")
+                .passwordParameter("password");
+        }
 
         security.logout()
             .logoutUrl("/logout")
@@ -94,7 +104,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
             .permitAll();
         
         // Configure CSRF
-        
         security.csrf()
             .requireCsrfProtectionMatcher((HttpServletRequest req) -> {
                 if (this.csrfMethods.matcher(req.getMethod()).matches()) {
@@ -105,16 +114,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
              });
         
         // Do not redirect unauthenticated requests (just respond with a status code)
-
         security.exceptionHandling()
             .authenticationEntryPoint(
                 new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
         
         // OAuth2 configuration
-        if (clientRegistrationRepository != null) {
-            security.oauth2Login()
-                .userInfoEndpoint(userInfo -> userInfo.oidcUserService(this.oidcUserService()))
-                .failureUrl("/login?error=2");
+        if(this.authProviders.contains(EnumAuthProvider.OpertusMundi)) {
+            if (clientRegistrationRepository != null) {
+                security.oauth2Login()
+                    .userInfoEndpoint(userInfo -> userInfo.oidcUserService(this.oidcUserService()))
+                    .failureUrl("/login?error=2");
+            }
+        } else {
+            security.oauth2Login().disable();
         }
         
         // Handle CORS (Fix security errors)
