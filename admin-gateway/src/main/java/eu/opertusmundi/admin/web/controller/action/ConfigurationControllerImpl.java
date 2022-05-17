@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -17,6 +18,7 @@ import eu.opertusmundi.admin.web.config.MapConfiguration;
 import eu.opertusmundi.admin.web.model.configuration.ConfigurationDto;
 import eu.opertusmundi.admin.web.service.BpmEngineService;
 import eu.opertusmundi.common.domain.CountryEuropeEntity;
+import eu.opertusmundi.common.model.EnumAuthProvider;
 import eu.opertusmundi.common.model.RestResponse;
 import eu.opertusmundi.common.model.account.helpdesk.EnumHelpdeskRole;
 import eu.opertusmundi.common.model.contract.ContractIconDto;
@@ -29,6 +31,9 @@ import eu.opertusmundi.common.repository.CountryRepository;
 public class ConfigurationControllerImpl extends BaseController implements ConfigurationController {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationController.class);
+
+    @Value("${opertusmundi.authentication-providers:forms}")
+    private List<EnumAuthProvider> authProviders;
 
     @Value("${opertusmundi.marketplace.url}")
     private String marketplaceUrl;
@@ -49,29 +54,38 @@ public class ConfigurationControllerImpl extends BaseController implements Confi
     private BpmEngineService bpmEngineService;
 
     public RestResponse<ConfigurationDto> getConfiguration() {
-        if (!this.hasRole(EnumHelpdeskRole.USER)) {
-            return RestResponse.accessDenied();
-        }
-        return RestResponse.result(this.createConfiguration());
+        final ConfigurationDto config = this.hasRole(EnumHelpdeskRole.USER)
+            ? this.createPrivateConfiguration()
+            : this.createPublicConfiguration();
+
+        return RestResponse.result(config);
     }
 
-    private ConfigurationDto createConfiguration() {
+    private ConfigurationDto createPublicConfiguration() {
         final ConfigurationDto config = new ConfigurationDto();
 
-        config.setOsm(this.mapConfiguration.getOsm());
+        config.setAuthProviders(authProviders);
+        config.setMarketplaceUrl(marketplaceUrl);
+
+        return config;
+    }
+
+    private ConfigurationDto createPrivateConfiguration() {
+        final ConfigurationDto config = this.createPublicConfiguration();
+
         config.setBingMaps(this.mapConfiguration.getBingMaps());
         config.setMap(this.mapConfiguration.getDefaults());
-        config.setMarketplaceUrl(marketplaceUrl);
+        config.setOsm(this.mapConfiguration.getOsm());
         config.setProcessDefinitions(this.bpmEngineService.getProcessDefinitions());
+
+        for (final EnumDataProvider p : EnumDataProvider.values()) {
+            config.getExternalProviders().add(ExternalDataProviderDto.of(p, p.getName(), p.getRequiredRole()));
+        }
 
         this.countryRepository.getEuropeCountries().stream()
             .map(CountryEuropeEntity::toDto)
             .forEach(config.getEuropeCountries()::add);
 
-        for (final EnumDataProvider p : EnumDataProvider.values()) {
-            config.getExternalProviders().add(ExternalDataProviderDto.of(p, p.getName(), p.getRequiredRole()));
-        }
-        
         this.setIcons(config);
 
         return config;
