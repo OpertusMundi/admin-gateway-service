@@ -63,6 +63,7 @@ runtime_profile=$(hostname | md5sum | head -c10)
     echo "opertusmundi.feign.jwt.secret = ${jwt_secret}"
 
     if [[ -n "${OIDC_AUTH_URL}" ]]; then
+        echo "opertusmundi.authentication-providers = forms,opertusmundi"
         oidc_auth_url=$(echo ${OIDC_AUTH_URL} | _validate_http_url "OIDC_AUTH_URL")
         oidc_token_url=$(echo ${OIDC_TOKEN_URL} | _validate_http_url "OIDC_TOKEN_URL")
         oidc_userinfo_url=$(echo ${OIDC_USERINFO_URL} | _validate_http_url "OIDC_USERINFO_URL")
@@ -83,6 +84,8 @@ runtime_profile=$(hostname | md5sum | head -c10)
         echo "spring.security.oauth2.client.registration.opertusmundi.client-secret = ${oidc_client_secret}"
         echo "spring.security.oauth2.client.registration.opertusmundi.redirect-uri = {baseUrl}/login/oauth2/code/{registrationId}"
         echo "spring.security.oauth2.client.registration.opertusmundi.scope = ${oidc_scope}"
+    else
+        echo "opertusmundi.authentication-providers = forms"
     fi
 
     bpm_rest_base_url=$(echo ${BPM_REST_BASE_URL} | _validate_http_url "BPM_REST_BASE_URL")
