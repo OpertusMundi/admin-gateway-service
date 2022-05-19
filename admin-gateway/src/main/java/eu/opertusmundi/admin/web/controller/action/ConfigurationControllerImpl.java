@@ -35,6 +35,9 @@ public class ConfigurationControllerImpl extends BaseController implements Confi
     @Value("${opertusmundi.authentication-providers:forms}")
     private List<EnumAuthProvider> authProviders;
 
+    @Value("${opertusmundi.authentication-providers.opertusmundi.client-id:opertusmundi}")
+    private String clientId;
+
     @Value("${opertusmundi.marketplace.url}")
     private String marketplaceUrl;
 
@@ -65,6 +68,7 @@ public class ConfigurationControllerImpl extends BaseController implements Confi
         final ConfigurationDto config = new ConfigurationDto();
 
         config.setAuthProviders(authProviders);
+        config.setClientId(clientId);
         config.setMarketplaceUrl(marketplaceUrl);
 
         return config;

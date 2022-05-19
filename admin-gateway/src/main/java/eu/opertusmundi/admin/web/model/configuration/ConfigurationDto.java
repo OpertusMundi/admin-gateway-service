@@ -23,6 +23,8 @@ public class ConfigurationDto {
     @JsonInclude(Include.NON_NULL)
     private BingMapsConfigurationDto bingMaps;
 
+    private String clientId;
+    
     @JsonInclude(Include.NON_EMPTY)
     private final List<ContractIconDto> contractIcons = new ArrayList<>();
 
