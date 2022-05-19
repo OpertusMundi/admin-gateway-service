@@ -260,6 +260,8 @@ public class DefaultUserService implements UserService {
             user = new UserDto();
             user.setUsername(userName);
             user.setEmail(userEmail);
+            user.setEmailVerified(true);
+            user.setEnabled(true);
             
             // Add opertusmundi-specific attributes (accountType etc.)
             user.setAttributes(
