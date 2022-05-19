@@ -35,6 +35,8 @@ public class MarketplaceAccountSummaryDto {
     private String               imageMimeType;
     private UUID                 key;
     private String               locale;
+    private BigDecimal           pendingPayoutFunds;
+    private ZonedDateTime        pendingPayoutFundsUpdatedOn;
     private boolean              provider;
     private BigDecimal           providerFunds;
     private EnumKycLevel         providerKycLevel;
@@ -89,6 +91,8 @@ public class MarketplaceAccountSummaryDto {
         r.setLocale(profile.getLocale());
         r.setProvider(p.isRegistered());
         if (r.isProvider()) {
+            r.setPendingPayoutFunds(p.getCurrent().getPendingPayoutFunds());
+            r.setPendingPayoutFundsUpdatedOn(p.getCurrent().getPendingPayoutFundsUpdatedOn());
             r.setProviderFunds(p.getCurrent().getWalletFunds());
             r.setProviderKycLevel(p.getCurrent().getKycLevel());
             r.setProviderName(p.getCurrent().getName());
