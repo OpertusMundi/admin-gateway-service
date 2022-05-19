@@ -119,14 +119,6 @@ runtime_profile=$(hostname | md5sum | head -c10)
     echo "opertusmundi.feign.message-service.url = ${messenger_base_url}"
     echo "opertusmundi.feign.message-service.jwt.subject = api-gateway"
 
-    rating_base_url=$(test -z "${RATING_BASE_URL:-}" && echo -n || \
-        { echo ${RATING_BASE_URL} | _validate_http_url "RATING_BASE_URL"; })
-    rating_username=${RATING_USERNAME}
-    rating_password=$({ test -f "${RATING_PASSWORD_FILE}" && cat ${RATING_PASSWORD_FILE}; } | tr -d '\n' || echo -n)
-    echo "opertusmundi.feign.rating-service.url = ${rating_base_url}"
-    echo "opertusmundi.feign.rating-service.basic-auth.username = ${rating_username}"
-    echo "opertusmundi.feign.rating-service.basic-auth.password = ${rating_password}"
-
     profile_base_url=$(echo ${PROFILE_BASE_URL} | _validate_http_url "PROFILE_BASE_URL")
     echo "opertusmundi.feign.data-profiler.url = ${profile_base_url}"
     
@@ -137,6 +129,15 @@ runtime_profile=$(hostname | md5sum | head -c10)
     elasticsearch_indices_assets_index_name=${ELASTICSEARCH_INDICES_ASSETS_INDEX_NAME}
     echo "spring.elasticsearch.uris = ${elasticsearch_base_url}"
     echo "opertusmundi.elastic.asset-index.name = ${elasticsearch_indices_assets_index_name}"
+
+    if [[ -n "${KEYCLOAK_URL}" ]]; then
+        keycloak_url=$(echo ${KEYCLOAK_URL} | _validate_http_url "KEYCLOAK_URL")
+        keycloak_realm=${KEYCLOAK_REALM}
+        keycloak_refresh_token=$(cat ${KEYCLOAK_REFRESH_TOKEN_FILE} | tr -d '\n')
+        echo "opertusmundi.feign.keycloak.url = ${keycloak_url}"
+        echo "opertusmundi.feign.keycloak.realm = ${keycloak_realm}"
+        echo "opertusmundi.feign.keycloak.admin.refresh-token.refresh-token = ${keycloak_refresh_token}"
+    fi 
 
     if [ -n "${RSYSLOG_LOG_AGGREGATION_ELASTICSEARCH_BASE_URL}" ]; then
         rsyslog_log_aggregation_elasticsearch_base_url=$(echo ${RSYSLOG_LOG_AGGREGATION_ELASTICSEARCH_BASE_URL} | \

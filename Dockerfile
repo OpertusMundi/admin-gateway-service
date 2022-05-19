@@ -77,15 +77,16 @@ ENV MARKETPLACE_URL="" \
     TRANSFORM_BASE_URL="http://transform:8000/" \
     MAILER_BASE_URL="http://mailer:8000/" \
     MESSENGER_BASE_URL="http://messenger:8000/" \
-    RATING_BASE_URL="http://rating:8000/" \
-    RATING_USERNAME="" \
-    RATING_PASSWORD_FILE="/secrets/rating-password" \
     PROFILE_BASE_URL="http://profile:8000/" \
     PID_BASE_URL="http://pid:8000/" \
     ELASTICSEARCH_BASE_URL="http://elasticsearch:9200" \
     ELASTICSEARCH_INDICES_ASSETS_INDEX_NAME="assets" \
     RSYSLOG_LOG_AGGREGATION_ELASTICSEARCH_BASE_URL="http://elasticsearch:9200" \
-    RSYSLOG_LOG_AGGREGATION_ELASTICSEARCH_INDEX_NAME="rsyslog_local7"
+    RSYSLOG_LOG_AGGREGATION_ELASTICSEARCH_INDEX_NAME="rsyslog_local7" \
+    KEYCLOAK_URL="" \
+    KEYCLOAK_REALM="master" \
+    KEYCLOAK_REFRESH_TOKEN_FILE=""
+
 
 ENV GIT_COMMIT=${git_commit}
 
