@@ -24,6 +24,7 @@ import eu.opertusmundi.common.model.account.AccountDto;
 import eu.opertusmundi.common.model.account.helpdesk.EnumMarketplaceAccountSortField;
 import eu.opertusmundi.common.model.account.helpdesk.ExternalProviderCommandDto;
 import eu.opertusmundi.common.repository.AccountRepository;
+import eu.opertusmundi.common.service.mangopay.CustomerVerificationService;
 
 @RestController
 @Secured({ "ROLE_ADMIN" })
@@ -31,6 +32,9 @@ public class MarketplaceAccountControllerImpl extends BaseController implements 
 
 	@Autowired
 	private AccountRepository accountRepository;
+
+	@Autowired
+	private CustomerVerificationService customerVerificationService;
 
 	@Override
 	public RestResponse<PageResultDto<MarketplaceAccountSummaryDto>> find(
@@ -93,11 +97,11 @@ public class MarketplaceAccountControllerImpl extends BaseController implements 
 
         return RestResponse.result(account);
     }
-	
+
     public RestResponse<AccountDto> assignExternalProvider(UUID key, ExternalProviderCommandDto command) {
         command.setCustomerKey(key);
         command.setUserId(currentUserId());
-        
+
         if (command.getProvider().getRequiredRole() != null) {
             final List<AccountEntity> existingAccounts = this.accountRepository.findAllWithRole(command.getProvider().getRequiredRole());
             if (existingAccounts.size() != 0) {
@@ -109,11 +113,11 @@ public class MarketplaceAccountControllerImpl extends BaseController implements 
         }
 
 	    final AccountDto result = this.accountRepository.assignExternalProvider(command);
-	    
+
 	    return RestResponse.result(result);
 	}
 
-    public RestResponse<AccountDto> grantOpenDatasetProvider(UUID key) {      
+    public RestResponse<AccountDto> grantOpenDatasetProvider(UUID key) {
         final List<AccountEntity> existingAccounts = this.accountRepository.findAllWithRole(EnumRole.ROLE_PROVIDER_OPEN_DATASET);
         if (existingAccounts.size() != 0) {
             return RestResponse.failure(
@@ -123,19 +127,25 @@ public class MarketplaceAccountControllerImpl extends BaseController implements 
         }
 
         final AccountDto result = this.accountRepository.grantOpenDatasetProvider(key);
-        
+
         return RestResponse.result(result);
     }
-    
-    public RestResponse<AccountDto> revokeOpenDatasetProvider(UUID key) {      
+
+    public RestResponse<AccountDto> revokeOpenDatasetProvider(UUID key) {
         final AccountDto result = this.accountRepository.revokeOpenDatasetProvider(key);
-        
+
         return RestResponse.result(result);
     }
-    
+
+    public RestResponse<AccountDto> refreshCustomerKycLevel(UUID key) {
+        final AccountDto result = this.customerVerificationService.refreshCustomerKycLevel(key);
+
+        return RestResponse.result(result);
+    }
+
     private enum EnumAccountType {
-        All, 
-        Consumer, 
+        All,
+        Consumer,
         Provider,
         ;
     }

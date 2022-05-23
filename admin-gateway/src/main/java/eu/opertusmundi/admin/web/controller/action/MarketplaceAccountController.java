@@ -61,8 +61,11 @@ public interface MarketplaceAccountController {
 
     @PutMapping(value = {"/action/marketplace/accounts/{key}/open-dataset-provider"})
     RestResponse<AccountDto> grantOpenDatasetProvider(@PathVariable UUID key);
-    
+
     @DeleteMapping(value = {"/action/marketplace/accounts/{key}/open-dataset-provider"})
     RestResponse<AccountDto> revokeOpenDatasetProvider(@PathVariable UUID key);
-    
+
+    @PutMapping(value = {"/action/marketplace/accounts/{key}/kyc"})
+    RestResponse<AccountDto> refreshCustomerKycLevel(@PathVariable UUID key);
+
 }
