@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.camunda.bpm.engine.rest.dto.history.HistoricActivityInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
@@ -28,4 +29,13 @@ public class ProcessInstanceDetailsDto {
 
     private Map<String, String> errorDetails = new HashMap<>();
 
+    public Optional<Object> getVariable(String name) {
+        return variables.stream()
+            .filter(v -> v.getName().equals(name)).map(v -> v.getValue())
+            .findFirst();
+    }
+    
+    public String getVariableAsString(String name) {
+        return this.getVariable(name).map(Object::toString).orElse(null);
+    }
 }

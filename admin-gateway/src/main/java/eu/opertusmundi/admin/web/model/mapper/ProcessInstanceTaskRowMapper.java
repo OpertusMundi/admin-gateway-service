@@ -5,19 +5,16 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.jdbc.core.RowMapper;
 
-import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceDto;
+import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceTaskDto;
 
-public class ProcessInstanceRowMapper implements RowMapper<ProcessInstanceDto> {
-    
+public class ProcessInstanceTaskRowMapper implements RowMapper<ProcessInstanceTaskDto> {
+
     @Override
-    public ProcessInstanceDto mapRow(ResultSet rs, int rowNum) throws SQLException {
-        final ProcessInstanceDto result = new ProcessInstanceDto();
+    public ProcessInstanceTaskDto mapRow(ResultSet rs, int rowNum) throws SQLException {
+        final ProcessInstanceTaskDto result = new ProcessInstanceTaskDto();
 
         result.setBusinessKey(rs.getString("business_key"));
         result.setIncidentCount(rs.getLong("incident_counter"));
@@ -27,18 +24,13 @@ public class ProcessInstanceRowMapper implements RowMapper<ProcessInstanceDto> {
         result.setProcessDefinitionVersion(rs.getInt("process_definition_version"));
         result.setProcessDefinitionVersionTag(rs.getString("process_definition_version_tag"));
         result.setProcessInstanceId(rs.getString("process_instance_id"));
-        result.setTaskCount(rs.getLong("task_counter"));
-        result.setTaskReviewCount(rs.getLong("task_review_counter"));
-        result.setTaskErrorCount(rs.getLong("task_error_counter"));  
-        
-        final String[]     taskNames    = (String[]) rs.getArray("task_names").getArray();
-        final List<String> nonNullNames = Arrays.asList(taskNames).stream().filter(n -> n != null).collect(Collectors.toList());
-        result.setTaskNames(nonNullNames);
+        result.setTaskId(rs.getString("task_id"));
+        result.setTaskName(rs.getString("task_name"));
 
         final Timestamp     deployedOnTimestamp = rs.getTimestamp("process_definition_deployed_on");
         final ZonedDateTime deployedOn          = deployedOnTimestamp.toInstant().atZone(ZoneId.of("UTC"));
         result.setProcessDefinitionDeployedOn(deployedOn);
-        
+
         final Timestamp     startedOnTimestamp = rs.getTimestamp("started_on");
         final ZonedDateTime startedOn          = startedOnTimestamp.toInstant().atZone(ZoneId.of("UTC"));
         result.setStartedOn(startedOn);

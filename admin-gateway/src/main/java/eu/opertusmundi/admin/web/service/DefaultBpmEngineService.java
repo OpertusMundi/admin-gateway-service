@@ -21,6 +21,8 @@ import org.camunda.bpm.engine.rest.dto.history.HistoricIncidentDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricVariableInstanceDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionQueryDto;
+import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
+import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -28,22 +30,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import eu.opertusmundi.admin.web.model.mapper.IncidentRowMapper;
 import eu.opertusmundi.admin.web.model.mapper.ProcessInstanceHistoryRowMapper;
 import eu.opertusmundi.admin.web.model.mapper.ProcessInstanceRowMapper;
+import eu.opertusmundi.admin.web.model.mapper.ProcessInstanceTaskRowMapper;
 import eu.opertusmundi.admin.web.model.workflow.EnumIncidentSortField;
 import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceHistorySortField;
 import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceSortField;
+import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceTaskSortField;
 import eu.opertusmundi.admin.web.model.workflow.HistoryProcessInstanceDetailsDto;
 import eu.opertusmundi.admin.web.model.workflow.IncidentDto;
 import eu.opertusmundi.admin.web.model.workflow.ProcessDefinitionHeaderDto;
 import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceDetailsDto;
 import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceDto;
+import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceTaskDto;
 import eu.opertusmundi.admin.web.model.workflow.VariableDto;
 import eu.opertusmundi.common.feign.client.BpmServerFeignClient;
+import eu.opertusmundi.common.model.BasicMessageCode;
 import eu.opertusmundi.common.model.EnumSortingOrder;
 import eu.opertusmundi.common.model.PageResultDto;
+import eu.opertusmundi.common.model.ServiceException;
 import eu.opertusmundi.common.model.account.AccountDto;
 import eu.opertusmundi.common.model.workflow.EnumProcessInstanceVariable;
 import eu.opertusmundi.common.repository.AccountRepository;
@@ -105,17 +113,26 @@ public class DefaultBpmEngineService implements BpmEngineService {
     @Override
     public PageResultDto<ProcessInstanceDto> getProcessInstances(
         int page, int size,
-        String processDefinitionKey, String businessKey,
+        String processDefinitionKey, String businessKey, String task,
         EnumProcessInstanceSortField orderBy, EnumSortingOrder order
     ) {
         String countQuery =
-            "select    count(*) " +
+            "select    count(*) as counter " +
             "from      act_ru_execution ex " +
             "            inner join act_re_procdef def " +
             "              on ex.proc_def_id_ = def.id_ " +
             "            inner join act_re_deployment dep " +
             "              on def.deployment_id_ = dep.id_ " +
-            "where     ex.id_ = ex.proc_inst_id_ ";
+            "            left outer join act_ru_incident i " +
+            "              on i.proc_inst_id_ = ex.id_ and i.id_ = i.root_cause_incident_id_ ";
+
+        if (!StringUtils.isBlank(task)) {
+            countQuery +=
+                "            left outer join act_ru_task tk " +
+                "              on ex.id_ = tk.proc_inst_id_ ";
+        }
+
+        countQuery += "where     ex.id_ = ex.proc_inst_id_ ";
 
         // Add filtering
         if (!StringUtils.isBlank(processDefinitionKey)) {
@@ -123,6 +140,9 @@ public class DefaultBpmEngineService implements BpmEngineService {
         }
         if (!StringUtils.isBlank(businessKey)) {
             countQuery += "and ex.business_key_ = ? ";
+        }
+        if (!StringUtils.isBlank(task)) {
+            countQuery += "and tk.task_def_key_ = ? ";
         }
 
         final List<Object> args = new ArrayList<>();
@@ -132,6 +152,9 @@ public class DefaultBpmEngineService implements BpmEngineService {
         }
         if (!StringUtils.isBlank(businessKey)) {
             args.add(businessKey);
+        }
+        if (!StringUtils.isBlank(task)) {
+            args.add(task);
         }
 
         final Long count = jdbcTemplate.queryForObject(countQuery, Long.class, args.toArray());
@@ -146,7 +169,11 @@ public class DefaultBpmEngineService implements BpmEngineService {
             "          ex.id_                    as process_instance_id, " +
             "          ex.business_key_          as business_key, " +
             "          hist.start_time_          as started_on, " +
-            "          count(i.id_)              as incident_counter " +
+            "          count(i.id_)              as incident_counter, " +
+            "          count(tk)                 as task_counter, " +
+            "          count(tk) filter (where tk.task_def_key_ = 'task-review')             as task_review_counter, " +
+            "          count(tk) filter (where tk.task_def_key_ = 'task-helpdesk-set-error') as task_error_counter, " +
+            "          array_agg(DISTINCT tk.task_def_key_)                                  as task_names " +
             "from      act_ru_execution ex " +
             "            inner join act_re_procdef def " +
             "              on ex.proc_def_id_ = def.id_ " +
@@ -156,6 +183,8 @@ public class DefaultBpmEngineService implements BpmEngineService {
             "              on ex.id_ = hist.proc_inst_id_ " +
             "            left outer join act_ru_incident i " +
             "              on i.proc_inst_id_ = ex.id_ and i.id_ = i.root_cause_incident_id_ " +
+            "            left outer join act_ru_task tk " +
+            "              on ex.id_ = tk.proc_inst_id_ " +
             "where     ex.id_ = ex.proc_inst_id_ ";
 
         // Add filtering
@@ -164,6 +193,9 @@ public class DefaultBpmEngineService implements BpmEngineService {
         }
         if (!StringUtils.isBlank(businessKey)) {
             selectQuery += "and ex.business_key_ = ? ";
+        }
+        if (!StringUtils.isBlank(task)) {
+            selectQuery += "and tk.task_def_key_ = ? ";
         }
 
         // Add grouping
@@ -190,6 +222,9 @@ public class DefaultBpmEngineService implements BpmEngineService {
         if (!StringUtils.isBlank(businessKey)) {
             args.add(businessKey);
         }
+        if (!StringUtils.isBlank(task)) {
+            args.add(task);
+        }
 
         args.add(Integer.valueOf(page * size));
         args.add(Integer.valueOf(size));
@@ -197,6 +232,136 @@ public class DefaultBpmEngineService implements BpmEngineService {
         final List<ProcessInstanceDto> rows = jdbcTemplate.query(
             selectQuery,
             new ProcessInstanceRowMapper(),
+            args.toArray()
+        );
+
+        return PageResultDto.of(page, size, rows, count);
+    }
+
+    @Override
+    public Long countProcessInstanceTasks() {
+        final CountResultDto result = this.bpmClient.getObject().countProcessInstanceTasks();
+
+        return result.getCount();
+    }
+
+    @Override
+    public PageResultDto<ProcessInstanceTaskDto> getProcessInstanceTasks(
+        int page, int size,
+        String processDefinitionKey, String businessKey, String task,
+        EnumProcessInstanceTaskSortField orderBy, EnumSortingOrder order
+    ) {
+        String countQuery =
+            "select    count(*) as counter " +
+            "from      act_ru_execution ex " +
+            "            inner join act_re_procdef def " +
+            "              on ex.proc_def_id_ = def.id_ " +
+            "            inner join act_re_deployment dep " +
+            "              on def.deployment_id_ = dep.id_ " +
+            "            inner join act_ru_task tk " +
+            "              on ex.id_ = tk.proc_inst_id_ " +
+            "            left outer join act_ru_incident i " +
+            "              on i.proc_inst_id_ = ex.id_ and i.id_ = i.root_cause_incident_id_ " +
+            "where     ex.id_ = ex.proc_inst_id_ ";
+
+        // Add filtering
+        if (!StringUtils.isBlank(processDefinitionKey)) {
+            countQuery += "and def.key_ = ? ";
+        }
+        if (!StringUtils.isBlank(businessKey)) {
+            countQuery += "and ex.business_key_ = ? ";
+        }
+        if (!StringUtils.isBlank(task)) {
+            countQuery += "and tk.task_def_key_ = ? ";
+        }
+
+        final List<Object> args = new ArrayList<>();
+
+        if (!StringUtils.isBlank(processDefinitionKey)) {
+            args.add(processDefinitionKey);
+        }
+        if (!StringUtils.isBlank(businessKey)) {
+            args.add(businessKey);
+        }
+        if (!StringUtils.isBlank(task)) {
+            args.add(task);
+        }
+
+        final Long count = jdbcTemplate.queryForObject(countQuery, Long.class, args.toArray());
+
+        String selectQuery =
+            "select    def.id_                   as process_definition_id, " +
+            "          def.name_                 as process_definition_name, " +
+            "          def.key_                  as process_definition_key, " +
+            "          def.version_              as process_definition_version, " +
+            "          def.version_tag_          as process_definition_version_tag, " +
+            "          dep.deploy_time_          as process_definition_deployed_on, " +
+            "          ex.id_                    as process_instance_id, " +
+            "          ex.business_key_          as business_key, " +
+            "          hist.start_time_          as started_on, " +
+            "          tk.id_                    as task_id, " +
+            "          tk.task_def_key_          as task_name, " +
+            "          count(i.id_)              as incident_counter " +
+            "from      act_ru_execution ex " +
+            "            inner join act_re_procdef def " +
+            "              on ex.proc_def_id_ = def.id_ " +
+            "            inner join act_re_deployment dep " +
+            "              on def.deployment_id_ = dep.id_ " +
+            "            inner join act_hi_procinst hist " +
+            "              on ex.id_ = hist.proc_inst_id_ " +
+            "            inner join act_ru_task tk " +
+            "              on ex.id_ = tk.proc_inst_id_ " +
+            "            left outer join act_ru_incident i " +
+            "              on i.proc_inst_id_ = ex.id_ and i.id_ = i.root_cause_incident_id_ " +
+            "where     ex.id_ = ex.proc_inst_id_ ";
+
+        // Add filtering
+        if (!StringUtils.isBlank(processDefinitionKey)) {
+            selectQuery += "and def.key_ = ? ";
+        }
+        if (!StringUtils.isBlank(businessKey)) {
+            selectQuery += "and ex.business_key_ = ? ";
+        }
+        if (!StringUtils.isBlank(task)) {
+            selectQuery += "and tk.task_def_key_ = ? ";
+        }
+
+        // Add grouping
+        selectQuery +=
+            "group by  def.id_,  " +
+            "          def.name_,  " +
+            "          def.key_,  " +
+            "          def.version_,  " +
+            "          dep.deploy_time_, " +
+            "          ex.id_, " +
+            "          ex.business_key_, " +
+            "          hist.start_time_, " +
+            "          tk.id_, " +
+            "          tk.task_def_key_ ";
+
+        // Add sorting
+        selectQuery += String.format("order by %s  %s, ex.id_ ", orderBy.getField(), order.toString());
+        // Add pagination
+        selectQuery += "offset ? limit ?";
+
+        args.clear();
+
+        if (!StringUtils.isBlank(processDefinitionKey)) {
+            args.add(processDefinitionKey);
+        }
+        if (!StringUtils.isBlank(businessKey)) {
+            args.add(businessKey);
+        }
+        if (!StringUtils.isBlank(task)) {
+            args.add(task);
+        }
+
+        args.add(Integer.valueOf(page * size));
+        args.add(Integer.valueOf(size));
+
+        final List<ProcessInstanceTaskDto> rows = jdbcTemplate.query(
+            selectQuery,
+            new ProcessInstanceTaskRowMapper(),
             args.toArray()
         );
 
@@ -413,6 +578,35 @@ public class DefaultBpmEngineService implements BpmEngineService {
             ), ex);
 
             throw ex;
+        }
+    }
+
+    @Override
+    public void completeTask(String businessKey, String taskName, Map<String, VariableValueDto> variables) {
+        Assert.hasText(businessKey, "Expected a non-empty process instance business key");
+        Assert.hasText(taskName, "Expected a non-empty task name");
+        Assert.notNull(variables, "Expected a non-null collection of variables");
+
+        try {
+            // Find workflow instance
+            final TaskDto task = this.bpmClient.getObject().findTaskById(businessKey, taskName).stream()
+                .findFirst()
+                .orElse(null);
+
+            if (task == null) {
+                throw new ServiceException(BasicMessageCode.BpmServiceError, "Task was not found");
+            }
+
+            // Complete task
+            final CompleteTaskDto options = new CompleteTaskDto();
+            options.setVariables(variables);
+
+            this.bpmClient.getObject().completeTask(task.getId(), options);
+        }
+        catch (ServiceException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new ServiceException(BasicMessageCode.BpmServiceError, "Failed to complete task");
         }
     }
 

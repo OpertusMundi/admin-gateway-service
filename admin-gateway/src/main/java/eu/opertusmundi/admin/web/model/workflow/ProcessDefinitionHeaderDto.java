@@ -2,8 +2,6 @@ package eu.opertusmundi.admin.web.model.workflow;
 
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,9 +9,7 @@ import lombok.Setter;
 @Setter
 public class ProcessDefinitionHeaderDto {
 
-    @JsonIgnore
     private String id;
-
     private String key;
     private String name;
     private int    version;
