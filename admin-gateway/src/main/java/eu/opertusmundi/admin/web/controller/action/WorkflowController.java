@@ -18,6 +18,7 @@ import eu.opertusmundi.admin.web.model.workflow.EnumIncidentSortField;
 import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceHistorySortField;
 import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceSortField;
 import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceTaskSortField;
+import eu.opertusmundi.admin.web.model.workflow.ModifyProcessInstanceCommandDto;
 import eu.opertusmundi.admin.web.model.workflow.RetryExternalTaskCommandDto;
 import eu.opertusmundi.common.model.BaseResponse;
 import eu.opertusmundi.common.model.EnumSortingOrder;
@@ -35,6 +36,15 @@ public interface WorkflowController {
      */
     @GetMapping(value = "/workflows/process-definitions")
     RestResponse<?> getProcessDefinitions();
+
+    /**
+     * Retrieves the BPMN 2.0 XML of a process definition
+     * 
+     * @param processDefinitionId
+     * @return
+     */
+    @GetMapping(value = "/workflows/process-definition/{id}/xml")
+    RestResponse<String> getProcessDefinitionBpmn2Xml(@PathVariable("id") String processDefinitionId);
 
     /**
      * Count process instances
@@ -224,6 +234,12 @@ public interface WorkflowController {
         @RequestParam(name = "businessKey", defaultValue = "") String businessKey,
         @RequestParam(name = "orderBy", defaultValue = "START_TIME") EnumIncidentSortField orderBy,
         @RequestParam(name = "order", defaultValue = "DESC") EnumSortingOrder order
+    );
+	
+	@PostMapping(value = "/workflows/process-instances/{processInstanceId}/modification")
+    BaseResponse modifyProcessInstance(
+        @PathVariable(name = "processInstanceId") String processInstanceId,
+        @Valid @RequestBody ModifyProcessInstanceCommandDto command
     );
 
 }

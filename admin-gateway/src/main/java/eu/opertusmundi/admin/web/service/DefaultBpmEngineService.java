@@ -14,13 +14,18 @@ import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.ModificationDto;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 import org.camunda.bpm.engine.rest.dto.externaltask.SetRetriesForExternalTasksDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricActivityInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricIncidentDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricVariableInstanceDto;
+import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionQueryDto;
+import org.camunda.bpm.engine.rest.dto.runtime.modification.CancellationInstructionDto;
+import org.camunda.bpm.engine.rest.dto.runtime.modification.ProcessInstanceModificationInstructionDto;
+import org.camunda.bpm.engine.rest.dto.runtime.modification.StartBeforeInstructionDto;
 import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.slf4j.Logger;
@@ -36,6 +41,7 @@ import eu.opertusmundi.admin.web.model.mapper.IncidentRowMapper;
 import eu.opertusmundi.admin.web.model.mapper.ProcessInstanceHistoryRowMapper;
 import eu.opertusmundi.admin.web.model.mapper.ProcessInstanceRowMapper;
 import eu.opertusmundi.admin.web.model.mapper.ProcessInstanceTaskRowMapper;
+import eu.opertusmundi.admin.web.model.workflow.BpmnMessageCode;
 import eu.opertusmundi.admin.web.model.workflow.EnumIncidentSortField;
 import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceHistorySortField;
 import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceSortField;
@@ -101,6 +107,19 @@ public class DefaultBpmEngineService implements BpmEngineService {
         }
 
         return Collections.emptyList();
+    }
+
+    @Override
+    public String getBpmnXml(String processDefinitionId) {
+        try {
+            final ProcessDefinitionDiagramDto result = this.bpmClient.getObject().getBpmnXml(processDefinitionId).getBody();
+
+            return result == null ? null : result.getBpmn20Xml();
+        } catch (final Exception ex) {
+            logger.error(String.format("Failed to load process BPMN 2.0 XML [processDefinitionId=%s]", processDefinitionId), ex);
+        }
+
+        return null;
     }
 
     @Override
@@ -370,9 +389,10 @@ public class DefaultBpmEngineService implements BpmEngineService {
 
     @Override
     public Optional<ProcessInstanceDetailsDto> getProcessInstance(String businessKey, String processInstanceId) {
+        final BpmServerFeignClient      client = this.bpmClient.getObject();
         final ProcessInstanceDetailsDto result = new ProcessInstanceDetailsDto();
 
-        final List<HistoricProcessInstanceDto> processInstances = this.bpmClient.getObject().getHistoryProcessInstances(
+        final List<HistoricProcessInstanceDto> processInstances = client.getHistoryProcessInstances(
             null,
             businessKey,
             processInstanceId
@@ -392,20 +412,20 @@ public class DefaultBpmEngineService implements BpmEngineService {
         // key
         processInstanceId = result.getInstance().getId();
 
-        final Map<String, VariableValueDto> variables = this.bpmClient.getObject().getProcessInstanceVariables(processInstanceId);
+        final Map<String, VariableValueDto> variables = client.getProcessInstanceVariables(processInstanceId);
         variables.keySet().stream().map(k -> VariableDto.from(k, variables.get(k))).forEach(result.getVariables()::add);
 
-        final List<HistoricActivityInstanceDto> activities = this.bpmClient.getObject()
+        final List<HistoricActivityInstanceDto> activities = client
             .getHistoryProcessInstanceActivityInstances(processInstanceId);
         activities.sort(this::compareActivities);
         result.setActivities(activities);
 
-        final List<org.camunda.bpm.engine.rest.dto.runtime.IncidentDto> incidents = this.bpmClient.getObject()
+        final List<org.camunda.bpm.engine.rest.dto.runtime.IncidentDto> incidents = client
             .getIncidents(null, null, processInstanceId, null, null, null);
         result.setIncidents(incidents);
 
         result.getIncidents().forEach(i -> {
-            final String details = this.bpmClient.getObject().getExternalTaskErrorDetails(i.getConfiguration());
+            final String details = client.getExternalTaskErrorDetails(i.getConfiguration());
             result.getErrorDetails().put(i.getActivityId(), details);
         });
 
@@ -416,6 +436,11 @@ public class DefaultBpmEngineService implements BpmEngineService {
             );
             result.setOwner(startUser.orElse(null));
         }
+
+        final String processDefinitionId = result.getInstance().getProcessDefinitionId();
+        final String bpmn2Xml            = this.getBpmnXml(processDefinitionId);
+
+        result.setBpmn2Xml(bpmn2Xml);
 
         return Optional.of(result);
     }
@@ -555,6 +580,11 @@ public class DefaultBpmEngineService implements BpmEngineService {
             );
             result.setOwner(startUser.orElse(null));
         }
+
+        final String processDefinitionId = result.getInstance().getProcessDefinitionId();
+        final String bpmn2Xml            = this.getBpmnXml(processDefinitionId);
+
+        result.setBpmn2Xml(bpmn2Xml);
 
         return Optional.of(result);
     }
@@ -710,6 +740,53 @@ public class DefaultBpmEngineService implements BpmEngineService {
         );
 
         return PageResultDto.of(page, size, rows, count);
+    }
+
+    @Override
+    public void modify(String processInstanceId, List<String> cancelActivities, List<String> startActivities) {
+        Assert.notNull(startActivities, "Expected at least one start task instruction");
+        Assert.isTrue(!startActivities.isEmpty(), "Expected at least one start task instruction");
+
+        try {
+            final ProcessInstanceDetailsDto instance = this.getProcessInstance(null, processInstanceId).orElse(null);
+            if (instance == null) {
+                throw new ServiceException(BpmnMessageCode.ProcessInstanceNotFound, "Process instance was not found");
+            }
+
+            final ModificationDto                                 modification = new ModificationDto();
+            final List<ProcessInstanceModificationInstructionDto> instructions = new ArrayList<>();
+
+            startActivities.forEach(a -> {
+                final StartBeforeInstructionDto i = new StartBeforeInstructionDto();
+                i.setActivityId(a);
+                instructions.add(i);
+            });
+
+            cancelActivities.forEach(id -> {
+                final List<HistoricActivityInstanceDto> activityInstances = instance.getActivities().stream()
+                    .filter(a -> a.getActivityId().equals(id) && a.getEndTime() == null)
+                    .collect(Collectors.toList());
+                if (activityInstances.isEmpty()) {
+                    throw new ServiceException(BpmnMessageCode.ActivityInstanceNotFound, "Activity instance was not found");
+                }
+                if (activityInstances.size() > 1) {
+                    throw new ServiceException(BpmnMessageCode.ActivityInstanceNotActive, "Only one active activity instance is supported");
+                }
+
+                final CancellationInstructionDto i = new CancellationInstructionDto();
+                i.setActivityId(id);
+                instructions.add(i);
+            });
+
+            modification.setInstructions(instructions);
+
+            this.bpmClient.getObject().modifyProcessInstance(processInstanceId, modification);
+        } catch (ServiceException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            logger.error(String.format("Modification instructions execution has failed [processInstanceId=%s]",processInstanceId),ex);
+            throw new ServiceException(BasicMessageCode.BpmServiceError, "Failed to modify process instance");
+        }
     }
 
     private int compareActivities(HistoricActivityInstanceDto i1, HistoricActivityInstanceDto i2) {

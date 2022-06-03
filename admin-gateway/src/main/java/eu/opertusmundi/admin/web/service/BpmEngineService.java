@@ -23,16 +23,51 @@ import eu.opertusmundi.common.model.ServiceException;
 
 public interface BpmEngineService {
 
+    /**
+     * Queries for process definitions
+     *
+     * @return
+     */
     List<ProcessDefinitionHeaderDto> getProcessDefinitions();
 
+    /**
+     * Retrieves the BPMN 2.0 XML of a process definition.
+     *
+     * @param processDefinitionId
+     * @return
+     */
+    String getBpmnXml(String processDefinitionId);
+
+    /**
+     * Queries for the number of process instances
+     *
+     * @return
+     */
     Long countProcessInstances();
 
+    /**
+     * Queries for process instances that fulfill given parameters
+     *
+     * @param page
+     * @param size
+     * @param processDefinitionKey
+     * @param businessKey
+     * @param task
+     * @param orderBy
+     * @param order
+     * @return
+     */
     PageResultDto<ProcessInstanceDto> getProcessInstances(
         int page, int size,
         String processDefinitionKey, String businessKey, String task,
         EnumProcessInstanceSortField orderBy, EnumSortingOrder order
     );
 
+    /**
+     * Queries for the number of tasks
+     *
+     * @return
+     */
     Long countProcessInstanceTasks();
 
     PageResultDto<ProcessInstanceTaskDto> getProcessInstanceTasks(
@@ -41,14 +76,40 @@ public interface BpmEngineService {
         EnumProcessInstanceTaskSortField orderBy, EnumSortingOrder order
     );
 
+    /**
+     * Sets the number of retries left to execute external tasks by id
+     * synchronously
+     *
+     * @param processInstanceId
+     * @param externalTaskId
+     */
     void retryExternalTask(String processInstanceId, String externalTaskId);
 
+    /**
+     * Sets the number of retries left to execute external tasks by id
+     * synchronously
+     *
+     * @param command
+     */
     default void retryExternalTask(RetryExternalTaskCommandDto command) {
         this.retryExternalTask(command.getProcessInstanceId(), command.getExternalTaskId());
     }
 
+    /**
+     * Completes a task and updates process variables.
+     *
+     * @param businessKey
+     * @param taskName
+     * @param variables
+     * @throws ServiceException
+     */
     void completeTask(String businessKey, String taskName, Map<String, VariableValueDto> variables) throws ServiceException;
 
+    /**
+     * Deletes a running process instance by id.
+     *
+     * @param processInstanceId
+     */
     void deleteProcessInstance(String processInstanceId);
 
     Optional<ProcessInstanceDetailsDto> getProcessInstance(String businessKey, String processInstanceId);
@@ -61,10 +122,35 @@ public interface BpmEngineService {
 
     Optional<HistoryProcessInstanceDetailsDto> getHistoryProcessInstance(String businessKey, String processInstanceId);
 
+    /**
+     * Queries for the number of incidents
+     *
+     * @return
+     */
     Long countIncidents();
 
+    /**
+     * Queries for incidents that fulfill given parameters
+     *
+     * @param page
+     * @param size
+     * @param businessKey
+     * @param orderBy
+     * @param order
+     * @return
+     */
     PageResultDto<IncidentDto> getIncidents(
         int page, int size, String businessKey, EnumIncidentSortField orderBy, EnumSortingOrder order
     );
+
+    /**
+     * Submits a list of modification instructions to change a process
+     * instance's execution state
+     *
+     * @param processInstanceId
+     * @param cancelActivityInstances
+     * @param startActivities
+     */
+    void modify(String processInstanceId, List<String> cancelActivities, List<String> startActivities);
 
 }

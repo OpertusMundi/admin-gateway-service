@@ -9,6 +9,9 @@ import org.camunda.bpm.engine.rest.dto.history.HistoricActivityInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricIncidentDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 import eu.opertusmundi.common.model.account.AccountDto;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -23,6 +26,9 @@ public class HistoryProcessInstanceDetailsDto {
     private HistoricProcessInstanceDto        instance;
     private AccountDto                        owner;
 
+    @JsonInclude(Include.NON_EMPTY)
+    private String bpmn2Xml;
+    
     @Setter(value = AccessLevel.PROTECTED)
     private List<VariableDto> variables = new ArrayList<>();
 

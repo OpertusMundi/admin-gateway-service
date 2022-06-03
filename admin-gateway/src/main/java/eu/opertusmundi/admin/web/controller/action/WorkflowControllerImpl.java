@@ -14,6 +14,7 @@ import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceSortField;
 import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceTaskSortField;
 import eu.opertusmundi.admin.web.model.workflow.HistoryProcessInstanceDetailsDto;
 import eu.opertusmundi.admin.web.model.workflow.IncidentDto;
+import eu.opertusmundi.admin.web.model.workflow.ModifyProcessInstanceCommandDto;
 import eu.opertusmundi.admin.web.model.workflow.ProcessDefinitionHeaderDto;
 import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceDetailsDto;
 import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceDto;
@@ -40,6 +41,13 @@ public class WorkflowControllerImpl implements WorkflowController {
     @Override
     public RestResponse<?> getProcessDefinitions() {
         final List<ProcessDefinitionHeaderDto> result = this.bpmEngineService.getProcessDefinitions();
+
+        return RestResponse.result(result);
+    }
+
+    @Override
+    public RestResponse<String> getProcessDefinitionBpmn2Xml(String processDefinitionId) {
+        final String result = this.bpmEngineService.getBpmnXml(processDefinitionId);
 
         return RestResponse.result(result);
     }
@@ -198,6 +206,19 @@ public class WorkflowControllerImpl implements WorkflowController {
         );
 
         return RestResponse.result(result);
+    }
+
+    @Override
+    public BaseResponse modifyProcessInstance(String processInstanceId, ModifyProcessInstanceCommandDto command) {
+        try {
+            this.bpmEngineService.modify(processInstanceId, command.getCancelActivities(), command.getStartActivities());
+
+            return RestResponse.success();
+        } catch (ServiceException ex) {
+            return RestResponse.failure(ex);
+        } catch (Exception ex) {
+            return RestResponse.failure(BasicMessageCode.InternalServerError, ex.getMessage());
+        }
     }
 
 }
