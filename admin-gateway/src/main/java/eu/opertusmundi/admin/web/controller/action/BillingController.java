@@ -48,6 +48,7 @@ public interface BillingController {
         @RequestParam(name = "size", defaultValue = "25") @Max(100) @Min(1) int size,
         @RequestParam(name = "referenceNumber", required = false, defaultValue = "") String referenceNumber,
         @RequestParam(name = "status", required = false) Set<EnumOrderStatus> status,
+        @RequestParam(name = "consumer", required = false, defaultValue = "") String consumer,
         @RequestParam(name = "orderBy", defaultValue = "MODIFIED_ON") EnumOrderSortField orderBy,
         @RequestParam(name = "order", defaultValue = "DESC") EnumSortingOrder order
     );

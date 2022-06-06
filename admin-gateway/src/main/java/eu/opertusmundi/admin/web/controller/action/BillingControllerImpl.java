@@ -65,16 +65,18 @@ public class BillingControllerImpl extends BaseController implements BillingCont
     @Override
     public RestResponse<PageResultDto<OrderDto>> findOrders(
         int page, int size,
-        String referenceNumber, Set<EnumOrderStatus> status,
+        String referenceNumber, Set<EnumOrderStatus> status, String consumer,
         EnumOrderSortField orderBy, EnumSortingOrder order
     ) {
-        final Direction   direction   = order == EnumSortingOrder.DESC ? Direction.DESC : Direction.ASC;
-        final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, orderBy.getValue()));
+        final Direction   direction    = order == EnumSortingOrder.DESC ? Direction.DESC : Direction.ASC;
+        final PageRequest pageRequest  = PageRequest.of(page, size, Sort.by(direction, orderBy.getValue()));
+        final String      consumerLike = StringUtils.isBlank(consumer) ? null : "%" + consumer + "%";
 
         final Page<OrderDto> p = this.orderRepository.findAllObjects(
             null, null,
             referenceNumber,
             status,
+            consumerLike,
             pageRequest,
             false, true
         );
@@ -102,10 +104,11 @@ public class BillingControllerImpl extends BaseController implements BillingCont
     ) {
         final Direction   direction   = order == EnumSortingOrder.DESC ? Direction.DESC : Direction.ASC;
         final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, orderBy.getValue()));
+        final String      emailLike   = StringUtils.isBlank(email) ? null : "%" + email + "%";
 
         final Page<HelpdeskPayInDto> p = this.payInRepository.findAllPayInObjects(
             status,
-            email,
+            emailLike,
             referenceNumber,
             pageRequest
         );
@@ -167,10 +170,11 @@ public class BillingControllerImpl extends BaseController implements BillingCont
     ) {
         final Direction   direction   = order == EnumSortingOrder.DESC ? Direction.DESC : Direction.ASC;
         final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, orderBy.getValue()));
+        final String      emailLike   = StringUtils.isBlank(email) ? null : "%" + email + "%";
 
         final Page<PayOutDto> p = this.payOutRepository.findAllPayOutObjects(
             status,
-            email,
+            emailLike,
             bankwireRef,
             pageRequest
         );
