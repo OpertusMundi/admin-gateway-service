@@ -16,6 +16,7 @@ import eu.opertusmundi.admin.web.model.AdminMessageCode;
 import eu.opertusmundi.admin.web.model.account.market.MarketplaceAccountSummaryDto;
 import eu.opertusmundi.common.domain.AccountEntity;
 import eu.opertusmundi.common.model.BasicMessageCode;
+import eu.opertusmundi.common.model.EnumAccountType;
 import eu.opertusmundi.common.model.EnumRole;
 import eu.opertusmundi.common.model.EnumSortingOrder;
 import eu.opertusmundi.common.model.PageResultDto;
@@ -40,25 +41,25 @@ public class MarketplaceAccountControllerImpl extends BaseController implements 
 	public RestResponse<PageResultDto<MarketplaceAccountSummaryDto>> find(
 		int page, int size, String name, EnumMarketplaceAccountSortField orderBy, EnumSortingOrder order
 	) {
-        return this.find(EnumAccountType.All, page, size, name, orderBy, order);
+        return this.find(EnumAccountSelection.All, page, size, name, orderBy, order);
 	}
 
     @Override
     public RestResponse<PageResultDto<MarketplaceAccountSummaryDto>> findConsumers(
         int page, int size, String name, EnumMarketplaceAccountSortField orderBy, EnumSortingOrder order
     ) {
-        return this.find(EnumAccountType.Consumer, page, size, name, orderBy, order);
+        return this.find(EnumAccountSelection.Consumer, page, size, name, orderBy, order);
     }
 
     @Override
     public RestResponse<PageResultDto<MarketplaceAccountSummaryDto>> findProviders(
         int page, int size, String name, EnumMarketplaceAccountSortField orderBy, EnumSortingOrder order
     ) {
-        return this.find(EnumAccountType.Provider, page, size, name, orderBy, order);
+        return this.find(EnumAccountSelection.Provider, page, size, name, orderBy, order);
     }
 
     private RestResponse<PageResultDto<MarketplaceAccountSummaryDto>> find(
-        EnumAccountType type, int page, int size, String name, EnumMarketplaceAccountSortField orderBy, EnumSortingOrder order
+            EnumAccountSelection type, int page, int size, String name, EnumMarketplaceAccountSortField orderBy, EnumSortingOrder order
     ) {
         final Direction   direction   = order == EnumSortingOrder.DESC ? Direction.DESC : Direction.ASC;
         final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, orderBy.getValue()));
@@ -90,10 +91,15 @@ public class MarketplaceAccountControllerImpl extends BaseController implements 
     @Override
     public RestResponse<AccountDto> findOne(UUID key) {
         final AccountDto account = this.accountRepository.findOneByKeyObject(key).orElse(null);
-
         if (account == null) {
             return RestResponse.failure(BasicMessageCode.RecordNotFound, "Account was not found");
         }
+
+        final AccountDto parent = account.getType() == EnumAccountType.VENDOR
+            ? this.accountRepository.findOneByKeyObject(account.getParentKey()).orElse(null)
+            : null;
+            
+        account.setParent(parent);
 
         return RestResponse.result(account);
     }
@@ -143,7 +149,7 @@ public class MarketplaceAccountControllerImpl extends BaseController implements 
         return RestResponse.result(result);
     }
 
-    private enum EnumAccountType {
+    private enum EnumAccountSelection {
         All,
         Consumer,
         Provider,
