@@ -7,6 +7,7 @@ public enum EnumProcessInstanceTaskSortField {
     INCIDENT_COUNT("count(i.id_)"),
     PROCESS_DEFINITION("def.name_"),
     STARTED_ON("hist.start_time_"),
+    TASK_NAME("tk.task_def_key_"),
     ;
 
     @Getter
