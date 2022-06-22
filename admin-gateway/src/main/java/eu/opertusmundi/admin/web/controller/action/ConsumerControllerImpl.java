@@ -1,5 +1,6 @@
 package eu.opertusmundi.admin.web.controller.action;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -17,6 +18,8 @@ import eu.opertusmundi.common.model.EnumSortingOrder;
 import eu.opertusmundi.common.model.PageResultDto;
 import eu.opertusmundi.common.model.RestResponse;
 import eu.opertusmundi.common.model.account.AccountSubscriptionDto;
+import eu.opertusmundi.common.model.account.EnumSubscriptionBillingSortField;
+import eu.opertusmundi.common.model.account.EnumSubscriptionBillingStatus;
 import eu.opertusmundi.common.model.account.EnumSubscriptionSortField;
 import eu.opertusmundi.common.model.account.EnumSubscriptionStatus;
 import eu.opertusmundi.common.model.catalogue.client.CatalogueItemDetailsDto;
@@ -26,10 +29,12 @@ import eu.opertusmundi.common.model.order.OrderDto;
 import eu.opertusmundi.common.model.payment.EnumPayInSortField;
 import eu.opertusmundi.common.model.payment.EnumTransactionStatus;
 import eu.opertusmundi.common.model.payment.PayInDto;
+import eu.opertusmundi.common.model.payment.SubscriptionBillingDto;
 import eu.opertusmundi.common.model.payment.helpdesk.HelpdeskPayInDto;
 import eu.opertusmundi.common.repository.AccountSubscriptionRepository;
 import eu.opertusmundi.common.repository.OrderRepository;
 import eu.opertusmundi.common.repository.PayInRepository;
+import eu.opertusmundi.common.repository.SubscriptionBillingRepository;
 import eu.opertusmundi.common.service.CatalogueService;
 
 @RestController
@@ -45,6 +50,9 @@ public class ConsumerControllerImpl extends BaseController implements ConsumerCo
     @Autowired
     private AccountSubscriptionRepository subscriptionRepository;
 
+    @Autowired
+    private SubscriptionBillingRepository subscriptionBillingRepository;
+    
     @Autowired
     private CatalogueService catalogueService;
 
@@ -119,7 +127,7 @@ public class ConsumerControllerImpl extends BaseController implements ConsumerCo
         final PageResultDto<AccountSubscriptionDto> result = PageResultDto.of(page, size, records, count);
 
         final String[]                      pid    = result.getItems().stream().map(a -> a.getAssetId()).distinct().toArray(String[]::new);
-        final List<CatalogueItemDetailsDto> assets = this.catalogueService.findAllById(pid);
+        final List<CatalogueItemDetailsDto> assets = pid.length == 0 ? Collections.emptyList() : this.catalogueService.findAllById(pid);
         
         // Add catalogue items to records
         result.getItems().forEach(r -> {
@@ -140,4 +148,51 @@ public class ConsumerControllerImpl extends BaseController implements ConsumerCo
         return RestResponse.result(result);
     }   
 
+    @Override
+    public RestResponse<PageResultDto<SubscriptionBillingDto>> findSubscriptionBillingRecords(
+        int page, int size,
+        UUID consumerKey, Integer subscriptionId, Set<EnumSubscriptionBillingStatus> status, EnumSubscriptionBillingSortField orderBy,
+        EnumSortingOrder order
+    ) {
+        final Direction   direction   = order == EnumSortingOrder.DESC ? Direction.DESC : Direction.ASC;
+        final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, orderBy.getValue()));
+
+        final Page<SubscriptionBillingDto> p = this.subscriptionBillingRepository.findAllObjectsByConsumer(
+            consumerKey, 
+            null /* providerKey */,
+            subscriptionId,
+            status, 
+            pageRequest 
+        );
+        
+        final long count = p.getTotalElements();
+        final List<SubscriptionBillingDto> records = p.stream().collect(Collectors.toList());
+        final PageResultDto<SubscriptionBillingDto> result = PageResultDto.of(page, size, records, count);
+       
+
+        final String[]                      pid    = result.getItems().stream()
+            .map(a -> a.getSubscription().getAssetId())
+            .distinct()
+            .toArray(String[]::new);
+        final List<CatalogueItemDetailsDto> assets = pid.length == 0 ? Collections.emptyList() : this.catalogueService.findAllById(pid);
+            
+        // Add catalogue items to records
+        result.getItems().forEach(r -> {
+            final CatalogueItemDetailsDto item = assets.stream()
+                .filter(a -> a.getId().equals(r.getSubscription().getAssetId()))
+                .findFirst()
+                .orElse(null);
+
+            if (item != null) {
+                // Remove superfluous data
+                item.resetAutomatedMetadata();
+                item.resetContract();
+
+                r.getSubscription().setItem(item);
+            }
+        });
+        
+        return RestResponse.result(result);
+    }   
+   
 }

@@ -25,7 +25,7 @@ import eu.opertusmundi.common.model.payment.PayInItemDto;
 import eu.opertusmundi.common.model.payment.PayOutDto;
 import eu.opertusmundi.common.model.payment.helpdesk.HelpdeskPayInItemDto;
 
-@RequestMapping(value = "/action/billing/provider", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/action/provider", produces = MediaType.APPLICATION_JSON_VALUE)
 public interface ProviderController {
 
     @GetMapping(value = { "/orders" })
