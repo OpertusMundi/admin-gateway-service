@@ -190,9 +190,9 @@ public class DefaultBpmEngineService implements BpmEngineService {
             "          hist.start_time_          as started_on, " +
             "          count(i.id_)              as incident_counter, " +
             "          count(tk)                 as task_counter, " +
-            "          count(tk) filter (where tk.task_def_key_ = 'task-review')             as task_review_counter, " +
-            "          count(tk) filter (where tk.task_def_key_ = 'task-helpdesk-set-error') as task_error_counter, " +
-            "          array_agg(DISTINCT tk.task_def_key_)                                  as task_names " +
+            "          count(tk) filter (where tk.task_def_key_ = 'task-review')        as task_review_counter, " +
+            "          count(tk) filter (where tk.task_def_key_ like '%-set-error')     as task_error_counter, " +
+            "          array_agg(DISTINCT tk.task_def_key_)                             as task_names " +
             "from      act_ru_execution ex " +
             "            inner join act_re_procdef def " +
             "              on ex.proc_def_id_ = def.id_ " +

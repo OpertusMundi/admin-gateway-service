@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RestController;
 
-import eu.opertusmundi.admin.web.model.workflow.CompleteTaskTaskCommandDto;
+import eu.opertusmundi.admin.web.model.workflow.CompleteTaskCommandDto;
 import eu.opertusmundi.admin.web.model.workflow.EnumIncidentSortField;
 import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceHistorySortField;
 import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceSortField;
@@ -163,7 +163,7 @@ public class WorkflowControllerImpl implements WorkflowController {
         }
     }
 
-    public BaseResponse completeTask(String processInstanceId, CompleteTaskTaskCommandDto command, BindingResult validationResult) {
+    public BaseResponse completeTask(String processInstanceId, CompleteTaskCommandDto command, BindingResult validationResult) {
         try {
             command.setProcessInstanceId(processInstanceId);
 

@@ -12,11 +12,12 @@ import lombok.Setter;
     use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "taskName", visible = true
 )
 @JsonSubTypes({
-    @Type(name = TaskNameConstants.PUBLISH_SET_ERROR_TASK, value = SetPublishErrorTaskCommandDto.class),
+    @Type(name = TaskNameConstants.PUBLISH_CATALOGUE_ASSET_SET_ERROR, value = SetPublishErrorTaskCommandDto.class),
+    @Type(name = TaskNameConstants.PUBLISH_USER_SERVICE_SET_ERROR,    value = SetPublishErrorTaskCommandDto.class),
 })
 @Getter
 @Setter
-public class CompleteTaskTaskCommandDto {
+public class CompleteTaskCommandDto {
 
     @JsonIgnore
     protected String processInstanceId;

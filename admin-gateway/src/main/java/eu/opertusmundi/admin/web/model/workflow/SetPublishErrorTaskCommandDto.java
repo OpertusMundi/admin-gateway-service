@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SetPublishErrorTaskCommandDto extends CompleteTaskTaskCommandDto {
+public class SetPublishErrorTaskCommandDto extends CompleteTaskCommandDto {
 
     @NotEmpty
     private String message;
