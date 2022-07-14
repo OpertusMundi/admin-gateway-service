@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import eu.opertusmundi.admin.web.model.AdminMessageCode;
 import eu.opertusmundi.admin.web.model.account.market.MarketplaceAccountSummaryDto;
+import eu.opertusmundi.admin.web.service.MarketplaceUserService;
 import eu.opertusmundi.common.domain.AccountEntity;
 import eu.opertusmundi.common.model.BasicMessageCode;
 import eu.opertusmundi.common.model.EnumAccountType;
@@ -21,6 +22,7 @@ import eu.opertusmundi.common.model.EnumRole;
 import eu.opertusmundi.common.model.EnumSortingOrder;
 import eu.opertusmundi.common.model.PageResultDto;
 import eu.opertusmundi.common.model.RestResponse;
+import eu.opertusmundi.common.model.ServiceException;
 import eu.opertusmundi.common.model.account.AccountDto;
 import eu.opertusmundi.common.model.account.helpdesk.EnumMarketplaceAccountSortField;
 import eu.opertusmundi.common.model.account.helpdesk.ExternalProviderCommandDto;
@@ -35,7 +37,10 @@ public class MarketplaceAccountControllerImpl extends BaseController implements 
 	private AccountRepository accountRepository;
 
 	@Autowired
-	private CustomerVerificationService customerVerificationService;
+    private CustomerVerificationService customerVerificationService;
+
+    @Autowired
+    private MarketplaceUserService marketplaceUserService;
 
 	@Override
 	public RestResponse<PageResultDto<MarketplaceAccountSummaryDto>> find(
@@ -98,12 +103,13 @@ public class MarketplaceAccountControllerImpl extends BaseController implements 
         final AccountDto parent = account.getType() == EnumAccountType.VENDOR
             ? this.accountRepository.findOneByKeyObject(account.getParentKey()).orElse(null)
             : null;
-            
+
         account.setParent(parent);
 
         return RestResponse.result(account);
     }
 
+    @Override
     public RestResponse<AccountDto> assignExternalProvider(UUID key, ExternalProviderCommandDto command) {
         command.setCustomerKey(key);
         command.setUserId(currentUserId());
@@ -123,6 +129,7 @@ public class MarketplaceAccountControllerImpl extends BaseController implements 
 	    return RestResponse.result(result);
 	}
 
+    @Override
     public RestResponse<AccountDto> grantOpenDatasetProvider(UUID key) {
         final List<AccountEntity> existingAccounts = this.accountRepository.findAllWithRole(EnumRole.ROLE_PROVIDER_OPEN_DATASET);
         if (existingAccounts.size() != 0) {
@@ -137,16 +144,40 @@ public class MarketplaceAccountControllerImpl extends BaseController implements 
         return RestResponse.result(result);
     }
 
+    @Override
     public RestResponse<AccountDto> revokeOpenDatasetProvider(UUID key) {
         final AccountDto result = this.accountRepository.revokeOpenDatasetProvider(key);
 
         return RestResponse.result(result);
     }
 
+    @Override
     public RestResponse<AccountDto> refreshCustomerKycLevel(UUID key) {
         final AccountDto result = this.customerVerificationService.refreshCustomerKycLevel(key);
 
         return RestResponse.result(result);
+    }
+
+    @Override
+    public RestResponse<AccountDto> toggleTesterStatus(UUID key) {
+        try {
+            final AccountDto account = this.marketplaceUserService.toggleTesterStatus(this.currentUserKey(), key);
+
+            return RestResponse.result(account);
+        } catch (ServiceException ex) {
+            return RestResponse.failure(ex);
+        }
+    }
+
+    @Override
+    public RestResponse<Void> delete(UUID key, boolean accountDeleted, boolean fileSystemDeleted) {
+        try {
+            this.marketplaceUserService.delete(this.currentUserKey(), key, accountDeleted, fileSystemDeleted);
+
+            return RestResponse.success();
+        } catch (ServiceException ex) {
+            return RestResponse.failure(ex);
+        }
     }
 
     private enum EnumAccountSelection {

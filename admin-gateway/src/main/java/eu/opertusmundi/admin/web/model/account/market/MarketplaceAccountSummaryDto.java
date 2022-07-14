@@ -13,6 +13,7 @@ import eu.opertusmundi.common.model.account.CustomerDraftIndividualDto;
 import eu.opertusmundi.common.model.account.CustomerDraftProfessionalDto;
 import eu.opertusmundi.common.model.account.CustomerIndividualDto;
 import eu.opertusmundi.common.model.account.CustomerProfessionalDto;
+import eu.opertusmundi.common.model.account.EnumAccountActiveTask;
 import eu.opertusmundi.common.model.account.EnumActivationStatus;
 import eu.opertusmundi.common.model.account.EnumKycLevel;
 import lombok.Getter;
@@ -22,30 +23,32 @@ import lombok.Setter;
 @Setter
 public class MarketplaceAccountSummaryDto {
 
-    private EnumActivationStatus accountStatus;
-    private ZonedDateTime        activatedAt;
-    private boolean              consumer;
-    private BigDecimal           consumerFunds;
-    private EnumKycLevel         consumerKycLevel;
-    private String               consumerName;
-    private boolean              consumerUpdatePending;
-    private String               email;
-    private boolean              emailVerified;
-    private byte[]               image;
-    private String               imageMimeType;
-    private UUID                 key;
-    private String               locale;
-    private BigDecimal           pendingPayoutFunds;
-    private ZonedDateTime        pendingPayoutFundsUpdatedOn;
-    private boolean              provider;
-    private BigDecimal           providerFunds;
-    private EnumKycLevel         providerKycLevel;
-    private String               providerName;
-    private boolean              providerUpdatePending;
-    private ZonedDateTime        registeredOn;
-    private Set<EnumRole>        roles;
-    private EnumAccountType      type;
-    private String               userName;
+    private EnumActivationStatus  accountStatus;
+    private ZonedDateTime         activatedAt;
+    private EnumAccountActiveTask activeTask;
+    private boolean               consumer;
+    private BigDecimal            consumerFunds;
+    private EnumKycLevel          consumerKycLevel;
+    private String                consumerName;
+    private boolean               consumerUpdatePending;
+    private boolean               deleted;
+    private String                email;
+    private boolean               emailVerified;
+    private byte[]                image;
+    private String                imageMimeType;
+    private UUID                  key;
+    private String                locale;
+    private BigDecimal            pendingPayoutFunds;
+    private ZonedDateTime         pendingPayoutFundsUpdatedOn;
+    private boolean               provider;
+    private BigDecimal            providerFunds;
+    private EnumKycLevel          providerKycLevel;
+    private String                providerName;
+    private boolean               providerUpdatePending;
+    private ZonedDateTime         registeredOn;
+    private Set<EnumRole>         roles;
+    private EnumAccountType       type;
+    private String                userName;
 
     public static MarketplaceAccountSummaryDto from(AccountDto a) {
         final AccountProfileDto              profile = a.getProfile();
@@ -56,6 +59,7 @@ public class MarketplaceAccountSummaryDto {
 
         r.setAccountStatus(a.getActivationStatus());
         r.setActivatedAt(a.getActivatedAt());
+        r.setActiveTask(a.getActiveTask());
         r.setConsumer(c.isRegistered());
         if (r.isConsumer()) {
             r.setConsumerFunds(c.getCurrent().getWalletFunds());

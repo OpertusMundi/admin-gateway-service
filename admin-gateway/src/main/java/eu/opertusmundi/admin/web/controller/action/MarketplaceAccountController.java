@@ -68,4 +68,10 @@ public interface MarketplaceAccountController {
     @PutMapping(value = {"/action/marketplace/accounts/{key}/kyc"})
     RestResponse<AccountDto> refreshCustomerKycLevel(@PathVariable UUID key);
 
+    @PutMapping(value = {"/action/marketplace/accounts/{key}/tester"})
+    RestResponse<AccountDto> toggleTesterStatus(@PathVariable UUID key);
+
+    @DeleteMapping(value = {"/action/marketplace/accounts/{key}"})
+    RestResponse<Void> delete(@PathVariable UUID key, @RequestParam boolean accountDeleted, @RequestParam boolean fileSystemDeleted);
+
 }

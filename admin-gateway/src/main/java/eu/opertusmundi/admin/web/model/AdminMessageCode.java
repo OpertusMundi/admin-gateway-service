@@ -5,15 +5,18 @@ import eu.opertusmundi.common.model.MessageCode;
 public enum AdminMessageCode implements MessageCode {
     // Account error codes
     MarketplaceAccountExists,
-    
+
     IdpAccountAlreadyExists,
     IdpAccountCreateFailed,
     IdpAccountDeleteFailed,
-    
+
     CannotDeleteSelf,
     CannotRevokeLastAdmin,
     CannotUpdatePassword,
-    
+
+    AccountNotFound,
+    AccountIsNotTester,
+
     // Provider error codes
     ExternalProviderAlreadyExists,
     OpenDatasetProviderAlreadyExists,

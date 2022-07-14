@@ -27,5 +27,7 @@ public class ProcessInstanceDto {
     private Long          taskReviewCount;
     private Long          taskErrorCount;
     private List<String>  taskNames;
+    private String[]      variableNames;
+    private String[]      variableValues;
 
 }

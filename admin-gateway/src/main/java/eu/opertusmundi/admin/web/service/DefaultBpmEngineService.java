@@ -190,9 +190,11 @@ public class DefaultBpmEngineService implements BpmEngineService {
             "          hist.start_time_          as started_on, " +
             "          count(i.id_)              as incident_counter, " +
             "          count(tk)                 as task_counter, " +
-            "          count(tk) filter (where tk.task_def_key_ = 'task-review')        as task_review_counter, " +
-            "          count(tk) filter (where tk.task_def_key_ like '%-set-error')     as task_error_counter, " +
-            "          array_agg(DISTINCT tk.task_def_key_)                             as task_names " +
+            "          count(tk) filter (where tk.task_def_key_ = 'task-review')    as task_review_counter, " +
+            "          count(tk) filter (where tk.task_def_key_ like '%-set-error') as task_error_counter, " +
+            "          array_agg(DISTINCT tk.task_def_key_)                         as task_names, " +
+            "          array_agg(v.name_)                                           as variable_names, " +
+            "          array_agg(v.text_)                                           as variable_values " +
             "from      act_ru_execution ex " +
             "            inner join act_re_procdef def " +
             "              on ex.proc_def_id_ = def.id_ " +
@@ -204,6 +206,8 @@ public class DefaultBpmEngineService implements BpmEngineService {
             "              on i.proc_inst_id_ = ex.id_ and i.id_ = i.root_cause_incident_id_ " +
             "            left outer join act_ru_task tk " +
             "              on ex.id_ = tk.proc_inst_id_ " +
+            "            left outer join act_ru_variable v " +
+            "              on ex.proc_inst_id_ = v.proc_inst_id_ " +
             "where     ex.id_ = ex.proc_inst_id_ ";
 
         // Add filtering
