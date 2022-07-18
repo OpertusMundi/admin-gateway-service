@@ -1,6 +1,7 @@
 package eu.opertusmundi.admin.web.controller.action;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.MediaType;
@@ -14,10 +15,30 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import eu.opertusmundi.common.model.BaseResponse;
 import eu.opertusmundi.common.model.RestResponse;
+import eu.opertusmundi.common.model.message.EnumMessageStatus;
+import eu.opertusmundi.common.model.message.client.ClientContactDto;
 import eu.opertusmundi.common.model.message.client.ClientMessageCommandDto;
 
 @RequestMapping(value = "/action/messages", produces = MediaType.APPLICATION_JSON_VALUE)
 public interface MessageController {
+
+    /**
+     * Find contacts
+     *
+     * @param email
+     *
+     * @return An instance of {@link BaseResponse}
+     */
+    @GetMapping(value = "/helpdesk/contacts")
+    RestResponse<List<ClientContactDto>> findContacts(@RequestParam(name = "email") String email);
+
+    /**
+     * Count unassigned messages
+     *
+     * @return An instance of {@link BaseResponse}
+     */
+    @GetMapping(value = "/helpdesk/inbox/count")
+    RestResponse<?> countUnassignedMessages();
 
     /**
      * Find unassigned messages
@@ -40,13 +61,13 @@ public interface MessageController {
     );
 
     /**
-     * Count unassigned messages
+     * Count user new messages
      *
      * @return An instance of {@link BaseResponse}
      */
-    @GetMapping(value = "/helpdesk/inbox/count")
-    RestResponse<?> countUnassignedMessages();
-    
+    @GetMapping(value = "/user/inbox/count")
+    RestResponse<?> countUserNewMessages();
+
     /**
      * Get user messages
      *
@@ -64,17 +85,10 @@ public interface MessageController {
         @RequestParam(name = "size", required = false) Integer pageSize,
         @RequestParam(name = "dateFrom", required = false) ZonedDateTime dateFrom,
         @RequestParam(name = "dateTo", required = false) ZonedDateTime dateTo,
-        @RequestParam(name = "read", required = false) Boolean read
+        @RequestParam(name = "status", required = false, defaultValue = "ALL") EnumMessageStatus status,
+        @RequestParam(name = "contact", required = false) UUID contactKey
     );
-    
-    /**
-     * Count user new messages
-     *
-     * @return An instance of {@link BaseResponse}
-     */
-    @GetMapping(value = "/user/inbox/count")
-    RestResponse<?> countUserNewMessages();
-    
+
     /**
      * Assign message
      *
@@ -91,13 +105,13 @@ public interface MessageController {
 
     /**
      * Mark message as read
-     * 
+     *
      * @param messageKey
      * @return
      */
     @PutMapping(value = "/{messageKey}")
     RestResponse<?> readMessage(@PathVariable(name = "messageKey") UUID messageKey);
-    
+
     /**
      * Send a message to the platform user with the specified key
      *
@@ -119,7 +133,7 @@ public interface MessageController {
      */
     @PostMapping(value = "/thread/{threadKey}")
     RestResponse<?> replyToMessage(@PathVariable(name = "threadKey") UUID threadKey, @RequestBody ClientMessageCommandDto command);
-    
+
     /**
      * Get all thread messages
      *
@@ -129,5 +143,5 @@ public interface MessageController {
      */
     @GetMapping(value = "/thread/{threadKey}")
     RestResponse<?> getMessageThread(@PathVariable(name = "threadKey") UUID threadKey);
-    
+
 }
