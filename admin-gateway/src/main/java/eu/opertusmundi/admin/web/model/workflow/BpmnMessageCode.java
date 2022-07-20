@@ -4,6 +4,7 @@ import eu.opertusmundi.common.model.MessageCode;
 
 public enum BpmnMessageCode implements MessageCode {
     ProcessInstanceNotFound,
+    ProcessInstanceAlreadyExists,
     ActivityInstanceNotFound,
     ActivityInstanceNotActive,
     ActivityNotFound,

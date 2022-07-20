@@ -75,17 +75,15 @@ public class DefaultMarketplaceUserService implements MarketplaceUserService {
         ProcessInstanceDto instance    = this.bpmEngine.findInstance(businessKey);
 
         if (instance == null) {
-            // Set variables
             final Map<String, VariableValueDto> variables = BpmInstanceVariablesBuilder.builder()
-                    .variableAsString(EnumProcessInstanceVariable.START_USER_KEY.getValue(), startUserKey.toString())
-                    .variableAsInteger("userId", account.getId())
-                    .variableAsString("userKey", account.getKey().toString())
-                    .variableAsString("userParentKey", account.getParentKey().toString())
-                    .variableAsString("userName", account.getEmail())
-                    .variableAsBoolean("accountDeleted", accountDeleted)
-                    .variableAsBoolean("fileSystemDeleted", fileSystemDeleted)
-                    .build();
-
+                .variableAsString(EnumProcessInstanceVariable.START_USER_KEY.getValue(), startUserKey.toString())
+                .variableAsInteger("userId", account.getId())
+                .variableAsString("userKey", account.getKey().toString())
+                .variableAsString("userParentKey", account.getParentKey().toString())
+                .variableAsString("userName", account.getEmail())
+                .variableAsBoolean("accountDeleted", accountDeleted)
+                .variableAsBoolean("fileSystemDeleted", fileSystemDeleted)
+                .build();
 
             instance = this.bpmEngine.startProcessDefinitionByKey(EnumWorkflow.SYSTEM_MAINTENANCE_DELETE_USER, businessKey, variables);
         }
