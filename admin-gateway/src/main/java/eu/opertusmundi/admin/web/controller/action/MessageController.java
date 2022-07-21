@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import eu.opertusmundi.common.model.BaseResponse;
 import eu.opertusmundi.common.model.RestResponse;
-import eu.opertusmundi.common.model.message.EnumMessageStatus;
+import eu.opertusmundi.common.model.message.EnumMessageView;
 import eu.opertusmundi.common.model.message.client.ClientContactDto;
 import eu.opertusmundi.common.model.message.client.ClientMessageCommandDto;
 
@@ -85,7 +85,7 @@ public interface MessageController {
         @RequestParam(name = "size", required = false) Integer pageSize,
         @RequestParam(name = "dateFrom", required = false) ZonedDateTime dateFrom,
         @RequestParam(name = "dateTo", required = false) ZonedDateTime dateTo,
-        @RequestParam(name = "status", required = false, defaultValue = "ALL") EnumMessageStatus status,
+        @RequestParam(name = "view", required = false, defaultValue = "ALL") EnumMessageView view,
         @RequestParam(name = "contact", required = false) UUID contactKey
     );
 
