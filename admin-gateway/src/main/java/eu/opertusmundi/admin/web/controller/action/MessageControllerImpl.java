@@ -80,6 +80,15 @@ public class MessageControllerImpl extends BaseController implements MessageCont
     }
 
     @Override
+    public RestResponse<?> readThread(UUID threadKey) {
+        final ClientMessageThreadDto      thread   = this.messageService.readThread(this.currentUserKey(), threadKey);
+        final List<ClientContactDto>      contacts = this.messageService.findContacts(thread.getMessages());
+        final ClientMessageThreadResponse result   = new ClientMessageThreadResponse(thread, contacts);
+
+        return result;
+    }
+
+    @Override
     public RestResponse<?> sendMessage(UUID userKey, ClientMessageCommandDto clientMessage) {
         final ClientMessageDto result = this.messageService.sendMessage(this.currentUserKey(), userKey, clientMessage);
         return RestResponse.result(result);

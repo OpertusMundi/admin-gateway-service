@@ -113,6 +113,15 @@ public interface MessageController {
     RestResponse<?> readMessage(@PathVariable(name = "messageKey") UUID messageKey);
 
     /**
+     * Mark all messages of a thread as read
+     *
+     * @param threadKey
+     * @return
+     */
+    @PutMapping(value = "/thread/{threadKey}")
+    RestResponse<?> readThread(@PathVariable(name = "threadKey") UUID threadKey);
+
+    /**
      * Send a message to the platform user with the specified key
      *
      * @param userKey Recipient user unique key
