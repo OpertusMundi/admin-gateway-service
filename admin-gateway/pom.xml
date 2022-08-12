@@ -21,7 +21,7 @@
         <frontend-maven-plugin.version>1.8.0</frontend-maven-plugin.version>
         <spring-cloud.version>2021.0.1</spring-cloud.version>
         <commons-io.version>2.7</commons-io.version>
-        <org.camunda.bpm.version>7.13.0</org.camunda.bpm.version>
+        <org.camunda.bpm.version>7.17.0</org.camunda.bpm.version>
         <org.jadira.usertype.core.version>6.0.1.GA</org.jadira.usertype.core.version>
     </properties>
 
@@ -309,8 +309,7 @@
             <artifactId>commons-lang3</artifactId>
         </dependency>
 
-        <!-- Camunda dependencies (no engine is configured, instead we use
-            DTO definitions -->
+        <!-- Camunda dependencies (no engine is configured, instead we use DTO definitions -->
         <dependency>
             <groupId>org.camunda.bpm</groupId>
             <artifactId>camunda-engine</artifactId>

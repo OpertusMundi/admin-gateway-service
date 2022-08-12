@@ -616,14 +616,14 @@ public class DefaultBpmEngineService implements BpmEngineService {
     }
 
     @Override
-    public void completeTask(String businessKey, String taskName, Map<String, VariableValueDto> variables) {
+    public void completeTask(String businessKey, String taskDefinitionKey, Map<String, VariableValueDto> variables) {
         Assert.hasText(businessKey, "Expected a non-empty process instance business key");
-        Assert.hasText(taskName, "Expected a non-empty task name");
+        Assert.hasText(taskDefinitionKey, "Expected a non-empty task definition key");
         Assert.notNull(variables, "Expected a non-null collection of variables");
 
         try {
             // Find workflow instance
-            final TaskDto task = this.bpmClient.getObject().findTaskById(businessKey, taskName).stream()
+            final TaskDto task = this.bpmClient.getObject().getTasks(businessKey, taskDefinitionKey).stream()
                 .findFirst()
                 .orElse(null);
 
