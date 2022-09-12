@@ -15,11 +15,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -28,6 +28,7 @@ import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.switchuser.SwitchUserFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -40,7 +41,7 @@ import eu.opertusmundi.common.model.EnumAuthProvider;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true)
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class SecurityConfiguration {
 	
 	private static final String DEVELOPMENT_PROFILE = "development";
 	
@@ -59,11 +60,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired(required = false)
     ClientRegistrationRepository clientRegistrationRepository;
     
-    @Override
-    protected void configure(HttpSecurity security) throws Exception {
-        // Authorize requests:
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        final AuthenticationManagerBuilder authManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
+        authManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(new BCryptPasswordEncoder());
+        authManagerBuilder.eraseCredentials(true);
+        final AuthenticationManager authenticationManager = authManagerBuilder.build();
 
-        security.authorizeRequests()
+        http.authenticationManager(authenticationManager);
+        
+        http.authorizeRequests()
             // Configuration
             .antMatchers(
                 "/action/configuration"
@@ -88,7 +94,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         // Support form-based login
 
         if(this.authProviders.contains(EnumAuthProvider.Forms)) {
-            security.formLogin()
+            http.formLogin()
                 .loginPage("/login")
                 .failureUrl("/login?error=1")
                 .defaultSuccessUrl("/logged-in", true)
@@ -96,7 +102,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .passwordParameter("password");
         }
 
-        security.logout()
+        http.logout()
             .logoutUrl("/logout")
             .logoutSuccessUrl("/logged-out")
             .invalidateHttpSession(true)
@@ -104,7 +110,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .permitAll();
         
         // Configure CSRF
-        security.csrf()
+        http.csrf()
             .requireCsrfProtectionMatcher((HttpServletRequest req) -> {
                 if (this.csrfMethods.matcher(req.getMethod()).matches()) {
                     // Disable CSRF when development profile is active
@@ -114,19 +120,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
              });
         
         // Do not redirect unauthenticated requests (just respond with a status code)
-        security.exceptionHandling()
+        http.exceptionHandling()
             .authenticationEntryPoint(
                 new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
         
         // OAuth2 configuration
         if(this.authProviders.contains(EnumAuthProvider.OpertusMundi)) {
             if (clientRegistrationRepository != null) {
-                security.oauth2Login()
+                http.oauth2Login()
                     .userInfoEndpoint(userInfo -> userInfo.oidcUserService(this.oidcUserService()))
                     .failureUrl("/login?error=2");
             }
         } else {
-            security.oauth2Login().disable();
+            http.oauth2Login().disable();
         }
         
         // Handle CORS (Fix security errors)
@@ -139,18 +145,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         // the user is not authenticated (since there are no cookies in the request) and
         // reject it.
         if (this.isDevelopmentProfileActive()) {
-            security.cors();
+            http.cors();
         }
         
         // Add filters
-
-        security.addFilterAfter(new MappedDiagnosticContextFilter(), SwitchUserFilter.class);
-    }
-
-    @Override
-    protected void configure(AuthenticationManagerBuilder builder) throws Exception {
-        builder.userDetailsService(this.userDetailsService).passwordEncoder(new BCryptPasswordEncoder());
-        builder.eraseCredentials(true);
+        http.addFilterAfter(new MappedDiagnosticContextFilter(), SwitchUserFilter.class);
+        
+        return http.build();
     }
 
     private OAuth2UserService<OidcUserRequest, OidcUser> oidcUserService() {
