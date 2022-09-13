@@ -72,6 +72,11 @@ public interface MarketplaceAccountController {
     RestResponse<AccountDto> toggleTesterStatus(@PathVariable UUID key);
 
     @DeleteMapping(value = {"/action/marketplace/accounts/{key}"})
-    RestResponse<Void> delete(@PathVariable UUID key, @RequestParam boolean accountDeleted, @RequestParam boolean fileSystemDeleted);
+    RestResponse<Void> delete(
+        @PathVariable UUID key, 
+        @RequestParam boolean accountDeleted, 
+        @RequestParam boolean fileSystemDeleted,
+        @RequestParam boolean contractsDeleted
+    );
 
 }

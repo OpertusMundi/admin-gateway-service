@@ -29,6 +29,10 @@ public interface MarketplaceUserService {
      * {@code .quota} will be preserved.
      *
      * <p>
+     * If the parameter {@code contractsDeleted} is {@code true}, all provider
+     * contract templates will be deleted.
+     *
+     * <p>
      * If the parameter {@code accountDeleted} is {@code true}, the user will be
      * also deleted.
      *
@@ -36,8 +40,9 @@ public interface MarketplaceUserService {
      * @param deletedUserKey
      * @param accountDeleted
      * @param fileSystemDeleted
+     * @param contractsDeleted
      * @throws ServiceException
      */
-    void delete(UUID startUserKey, UUID deletedUserKey, boolean accountDeleted, boolean fileSystemDeleted) throws ServiceException;
+    void delete(UUID startUserKey, UUID deletedUserKey, boolean accountDeleted, boolean fileSystemDeleted, boolean contractsDeleted) throws ServiceException;
 
 }

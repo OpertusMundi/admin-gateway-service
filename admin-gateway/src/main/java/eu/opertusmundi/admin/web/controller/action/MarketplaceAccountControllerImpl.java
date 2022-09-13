@@ -170,9 +170,9 @@ public class MarketplaceAccountControllerImpl extends BaseController implements 
     }
 
     @Override
-    public RestResponse<Void> delete(UUID key, boolean accountDeleted, boolean fileSystemDeleted) {
+    public RestResponse<Void> delete(UUID key, boolean accountDeleted, boolean fileSystemDeleted, boolean contractsDeleted) {
         try {
-            this.marketplaceUserService.delete(this.currentUserKey(), key, accountDeleted, fileSystemDeleted);
+            this.marketplaceUserService.delete(this.currentUserKey(), key, accountDeleted, fileSystemDeleted, contractsDeleted);
 
             return RestResponse.success();
         } catch (ServiceException ex) {

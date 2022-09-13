@@ -56,7 +56,9 @@ public class DefaultMarketplaceUserService implements MarketplaceUserService {
 
     @Override
     @Transactional
-    public void delete(UUID startUserKey, UUID deletedUserKey, boolean accountDeleted, boolean fileSystemDeleted) throws ServiceException {
+    public void delete(
+        UUID startUserKey, UUID deletedUserKey, boolean accountDeleted, boolean fileSystemDeleted, boolean contractsDeleted
+    ) throws ServiceException {
         // Validate account
         final AccountEntity account = this.accountRepository.findOneByKey(deletedUserKey).orElse(null);
 
@@ -83,6 +85,7 @@ public class DefaultMarketplaceUserService implements MarketplaceUserService {
                 .variableAsString("userName", account.getEmail())
                 .variableAsBoolean("accountDeleted", accountDeleted)
                 .variableAsBoolean("fileSystemDeleted", fileSystemDeleted)
+                .variableAsBoolean("contractsDeleted", contractsDeleted)
                 .build();
 
             instance = this.bpmEngine.startProcessDefinitionByKey(EnumWorkflow.SYSTEM_MAINTENANCE_DELETE_USER, businessKey, variables);
