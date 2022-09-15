@@ -26,9 +26,12 @@ public class HistoryProcessInstanceDetailsDto {
     private HistoricProcessInstanceDto        instance;
     private AccountDto                        owner;
 
+    @JsonInclude(Include.NON_NULL)
+    private ProcessInstanceResource resource;
+
     @JsonInclude(Include.NON_EMPTY)
     private String bpmn2Xml;
-    
+
     @Setter(value = AccessLevel.PROTECTED)
     private List<VariableDto> variables = new ArrayList<>();
 

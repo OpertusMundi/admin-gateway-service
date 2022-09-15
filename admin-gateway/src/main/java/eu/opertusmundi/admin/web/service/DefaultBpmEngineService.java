@@ -51,6 +51,7 @@ import eu.opertusmundi.admin.web.model.workflow.IncidentDto;
 import eu.opertusmundi.admin.web.model.workflow.ProcessDefinitionHeaderDto;
 import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceDetailsDto;
 import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceDto;
+import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceResource;
 import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceTaskDto;
 import eu.opertusmundi.admin.web.model.workflow.VariableDto;
 import eu.opertusmundi.common.feign.client.BpmServerFeignClient;
@@ -72,6 +73,9 @@ public class DefaultBpmEngineService implements BpmEngineService {
 
     @Autowired
     private AccountRepository accountRepository;
+
+    @Autowired
+    private ProcessInstanceResourceResolver resourceResolver;
 
     @Autowired
     private ObjectProvider<BpmServerFeignClient> bpmClient;
@@ -441,10 +445,17 @@ public class DefaultBpmEngineService implements BpmEngineService {
             result.setOwner(startUser.orElse(null));
         }
 
-        final String processDefinitionId = result.getInstance().getProcessDefinitionId();
-        final String bpmn2Xml            = this.getBpmnXml(processDefinitionId);
+        final String processDefinitionId  = result.getInstance().getProcessDefinitionId();
+        final String processDefinitionKey = result.getInstance().getProcessDefinitionKey();
 
+        final String bpmn2Xml = this.getBpmnXml(processDefinitionId);
         result.setBpmn2Xml(bpmn2Xml);
+
+        // Get business key from result in case the method argument is null
+        final ProcessInstanceResource resource = this.resourceResolver.resolve(
+            processDefinitionKey, result.getInstance().getBusinessKey(), result.getVariables()
+        );
+        result.setResource(resource);
 
         return Optional.of(result);
     }
@@ -585,9 +596,17 @@ public class DefaultBpmEngineService implements BpmEngineService {
             result.setOwner(startUser.orElse(null));
         }
 
-        final String processDefinitionId = result.getInstance().getProcessDefinitionId();
-        final String bpmn2Xml            = this.getBpmnXml(processDefinitionId);
+        final String processDefinitionId  = result.getInstance().getProcessDefinitionId();
+        final String processDefinitionKey = result.getInstance().getProcessDefinitionKey();
 
+        final String bpmn2Xml = this.getBpmnXml(processDefinitionId);
+
+        // Get business key from result in case the method argument is null
+        final ProcessInstanceResource resource = this.resourceResolver.resolve(
+            processDefinitionKey, result.getInstance().getBusinessKey(), result.getVariables()
+        );
+        result.setResource(resource);
+        
         result.setBpmn2Xml(bpmn2Xml);
 
         return Optional.of(result);
