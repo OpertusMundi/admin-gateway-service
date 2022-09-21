@@ -27,13 +27,14 @@ import eu.opertusmundi.common.model.contract.helpdesk.EnumMasterContractSortFiel
 import eu.opertusmundi.common.model.contract.helpdesk.MasterContractCommandDto;
 import eu.opertusmundi.common.model.contract.helpdesk.MasterContractDto;
 import eu.opertusmundi.common.model.contract.helpdesk.MasterContractHistoryDto;
+import eu.opertusmundi.common.model.contract.helpdesk.MasterContractHistoryResult;
 
 @RequestMapping(value = "/action/contract", produces = MediaType.APPLICATION_JSON_VALUE)
 public interface ContractController {
 
     /**
      * Get all contracts
-     * 
+     *
      * @param page
      * @param size
      * @param orderBy
@@ -41,7 +42,7 @@ public interface ContractController {
      * @return
      */
     @GetMapping(value = {"/history"})
-    RestResponse<PageResultDto<MasterContractHistoryDto>> findAllHistory(
+    RestResponse<MasterContractHistoryResult> findAllHistory(
         @RequestParam(name = "page", defaultValue = "0") int page,
         @RequestParam(name = "size", defaultValue = "25") @Max(50) @Min(1) int size,
         @RequestParam(name = "title", required = false) String title,
@@ -49,10 +50,71 @@ public interface ContractController {
         @RequestParam(name = "orderBy", defaultValue = "MODIFIED_ON") EnumMasterContractSortField orderBy,
         @RequestParam(name = "order", defaultValue = "DESC") EnumSortingOrder order
     );
-    
+
+    /**
+     * Creates a new draft from an existing template.
+     *
+     * If a draft already exists, the existing record is returned
+     *
+     * @param id
+     * @return
+     */
+    @PostMapping(value = {"/history/{id}"})
+    RestResponse<MasterContractDto> createDraftForTemplate(
+        @PathVariable int id
+    );
+
+    /**
+     * Creates a new cloned draft from an existing template.
+     *
+     * <p>
+     * It will start as a new draft from version <b>1</b>.
+     *
+     * @param id
+     * @return
+     */
+    @PostMapping(value = {"/history/{id}/clone"})
+    RestResponse<MasterContractDto> cloneDraftFromTemplate(
+        @PathVariable int id
+    );
+
+    /**
+     * Deactivate contract template
+     *
+     * @param id
+     * @return
+     */
+    @DeleteMapping(value = {"/history/{id}"})
+    RestResponse<MasterContractHistoryDto> deactivate(
+        @PathVariable int id
+    );
+
+    /**
+     * Print master contract
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping(value = {"/history/{id}/print"})
+    ResponseEntity<StreamingResponseBody> print(@PathVariable int id);
+
+    /**
+     * Set history contract as the default template.
+     *
+     * <p>
+     * A contract must be <code>ACTIVE</code> to become the default contract.
+     *
+     * @param id
+     * @param contract
+     * @param validationResult
+     * @return
+     */
+    @PostMapping(value = {"/history/{id}/set-default"})
+    RestResponse<MasterContractDto> setDefaultContract(@PathVariable int id);
+
     /**
      * Get all contract templates
-     * 
+     *
      * @param page
      * @param size
      * @param orderBy
@@ -66,64 +128,27 @@ public interface ContractController {
         @RequestParam(name = "orderBy", defaultValue = "MODIFIED_ON") EnumMasterContractSortField orderBy,
         @RequestParam(name = "order", defaultValue = "DESC") EnumSortingOrder order
     );
-    
+
     /**
      * Get a contract template by id
-     * 
+     *
      * @param id
      * @return
      */
     @GetMapping(value = {"/templates/{id}"})
-	RestResponse<?> findOne(
+    RestResponse<?> findOne(
         @PathVariable int id
     );
 
     /**
-     * Creates a new draft from an existing template.
-     * 
-     * If a draft already exists, the existing record is returned
-     * 
-     * @param id
+     * Get all contract drafts
+     *
+     * @param page
+     * @param size
+     * @param orderBy
+     * @param order
      * @return
      */
-    @PostMapping(value = {"/history/{id}"})
-    RestResponse<MasterContractDto> createDraftForTemplate(
-        @PathVariable int id
-    );
-    
-    /**
-     * Creates a new cloned draft from an existing template.
-     * 
-     * It will start as a new draft from version 1
-     * 
-     * @param id
-     * @return
-     */
-    @PostMapping(value = {"/history/clone/{id}"})
-    RestResponse<MasterContractDto> createClonedDraftFromTemplate(
-        @PathVariable int id
-    );
-    
-    /**
-     * Deactivate contract template
-     * 
-     * @param id
-     * @return
-     */
-    @DeleteMapping(value = {"/history/{id}"})
-    RestResponse<MasterContractHistoryDto> deactivate(
-        @PathVariable int id
-    );
-    
-	/**
-	 * Get all contract drafts
-	 * 
-	 * @param page
-	 * @param size
-	 * @param orderBy
-	 * @param order
-	 * @return
-	 */
     @GetMapping(value = {"/drafts"})
     RestResponse<PageResultDto<MasterContractDto>> findAllDrafts(
         @RequestParam(name = "page", defaultValue = "0") int page,
@@ -132,9 +157,22 @@ public interface ContractController {
         @RequestParam(name = "order", defaultValue = "DESC") EnumSortingOrder order
     );
 
+	/**
+	 * Create new contract draft
+	 *
+	 * @param contract
+	 * @param validationResult
+	 * @return
+	 */
+    @PostMapping(value = {"/drafts"})
+    RestResponse<MasterContractDto> createDraft(
+        @Valid @RequestBody MasterContractCommandDto command,
+        BindingResult validationResult
+    );
+
     /**
      * Get a contract draft by id
-     * 
+     *
      * @param id
      * @return
      */
@@ -143,22 +181,9 @@ public interface ContractController {
         @PathVariable int id
     );
 
-	/**
-	 * Create new contract draft
-	 * 
-	 * @param contract
-	 * @param validationResult
-	 * @return
-	 */
-    @PostMapping(value = {"/drafts"})
-    RestResponse<MasterContractDto> createDraft(
-        @Valid @RequestBody MasterContractCommandDto command, 
-        BindingResult validationResult
-    );
-
     /**
      * Update existing contract draft
-     * 
+     *
      * @param id
      * @param contract
      * @param validationResult
@@ -166,42 +191,28 @@ public interface ContractController {
      */
     @PostMapping(value = {"/drafts/{id}"})
     RestResponse<MasterContractDto> updateDraft(
-        @PathVariable int id, 
+        @PathVariable int id,
         @Valid @RequestBody MasterContractCommandDto contract,
         BindingResult validationResult
     );
-    
+
     /**
      * Delete contract draft
-     * 
+     *
      * @param id
      * @return
      */
     @DeleteMapping(value = {"/drafts/{id}"})
-    RestResponse<Void> deleteDraft(
-        @PathVariable int id
-    );
+    RestResponse<Void> deleteDraft(@PathVariable int id);
 
     /**
      * Publish contract draft
-     * 
+     *
      * @param id
      * @param state
      * @return
      */
     @PutMapping(value = {"/drafts/{id}"})
-    RestResponse<MasterContractDto> publishDraft(
-        @PathVariable int id
-    );
-    
-    /**
-     * Print master contract 
-     * 
-     * @param id
-     * @return
-     */
-    @GetMapping(value = {"/print/{id}"})
-    ResponseEntity<StreamingResponseBody> print(
-            @PathVariable int id);
+    RestResponse<MasterContractDto> publishDraft(@PathVariable int id);
 
 }

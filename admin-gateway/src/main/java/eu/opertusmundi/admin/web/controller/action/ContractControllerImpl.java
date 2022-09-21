@@ -23,19 +23,19 @@ import eu.opertusmundi.common.model.contract.helpdesk.EnumMasterContractSortFiel
 import eu.opertusmundi.common.model.contract.helpdesk.MasterContractCommandDto;
 import eu.opertusmundi.common.model.contract.helpdesk.MasterContractDto;
 import eu.opertusmundi.common.model.contract.helpdesk.MasterContractHistoryDto;
+import eu.opertusmundi.common.model.contract.helpdesk.MasterContractHistoryResult;
 import eu.opertusmundi.common.model.contract.helpdesk.MasterContractQueryDto;
 import eu.opertusmundi.common.service.contract.MasterTemplateContractService;
 
 @RestController
 @Secured({"ROLE_ADMIN", "ROLE_USER"})
 public class ContractControllerImpl extends BaseController implements ContractController {
-   
+
     @Autowired
     private MasterTemplateContractService masterService;
-    
 
     @Override
-    public RestResponse<PageResultDto<MasterContractHistoryDto>> findAllHistory(
+    public RestResponse<MasterContractHistoryResult> findAllHistory(
         int page,
         int size,
         String title,
@@ -52,11 +52,44 @@ public class ContractControllerImpl extends BaseController implements ContractCo
             .order(order)
             .build();
 
-        final PageResultDto<MasterContractHistoryDto> result = masterService.findAllHistory(query);
+        final MasterContractHistoryResult result = masterService.findAllHistory(query);
 
         return RestResponse.result(result);
     }
-    
+
+    @Override
+    public RestResponse<MasterContractDto> createDraftForTemplate(int id) {
+        try {
+            final MasterContractDto result = this.masterService.createForTemplate(this.currentUserId(), id);
+
+            return RestResponse.result(result);
+        } catch (final ApplicationException ex) {
+            return RestResponse.error(ex.getCode(), ex.getMessage());
+        }
+    }
+
+    @Override
+    public RestResponse<MasterContractDto> cloneDraftFromTemplate(int id) {
+        try {
+            final MasterContractDto result = this.masterService.cloneFromTemplate(this.currentUserId(), id);
+
+            return RestResponse.result(result);
+        } catch (final ApplicationException ex) {
+            return RestResponse.error(ex.getCode(), ex.getMessage());
+        }
+    }
+
+    @Override
+    public RestResponse<MasterContractHistoryDto> deactivate(int id) {
+        try {
+            final MasterContractHistoryDto result = this.masterService.deactivate(id);
+
+            return RestResponse.result(result);
+        } catch (final ApplicationException ex) {
+            return RestResponse.error(ex.getCode(), ex.getMessage());
+        }
+    }
+
     @Override
     public RestResponse<PageResultDto<MasterContractDto>> findAll(
         int page,
@@ -86,39 +119,6 @@ public class ContractControllerImpl extends BaseController implements ContractCo
 
         return RestResponse.result(result);
     }
-    
-    @Override
-    public RestResponse<MasterContractDto> createDraftForTemplate(int id) {
-        try {
-            final MasterContractDto result = this.masterService.createForTemplate(this.currentUserId(), id);
-
-            return RestResponse.result(result);
-        } catch (final ApplicationException ex) {
-            return RestResponse.error(ex.getCode(), ex.getMessage());
-        }
-    }
-    
-    @Override
-    public RestResponse<MasterContractDto> createClonedDraftFromTemplate(int id) {
-        try {
-            final MasterContractDto result = this.masterService.cloneFromTemplate(this.currentUserId(), id);
-
-            return RestResponse.result(result);
-        } catch (final ApplicationException ex) {
-            return RestResponse.error(ex.getCode(), ex.getMessage());
-        }
-    }   
-
-    @Override
-    public RestResponse<MasterContractHistoryDto> deactivate(int id) {
-        try {
-            final MasterContractHistoryDto result = this.masterService.deactivate(id);
-
-            return RestResponse.result(result);
-        } catch (final ApplicationException ex) {
-            return RestResponse.error(ex.getCode(), ex.getMessage());
-        }
-    }
 
     @Override
     public RestResponse<PageResultDto<MasterContractDto>> findAllDrafts(
@@ -129,7 +129,7 @@ public class ContractControllerImpl extends BaseController implements ContractCo
     ) {
         final PageResultDto<MasterContractDto> result = this.masterService.findAllDrafts(page, size, orderBy, order);
 
-        return RestResponse.result(result);       
+        return RestResponse.result(result);
     }
 
     @Override
@@ -199,7 +199,7 @@ public class ContractControllerImpl extends BaseController implements ContractCo
             return RestResponse.error(ex.getCode(), ex.getMessage());
         }
     }
-    
+
     @Override
     public ResponseEntity<StreamingResponseBody> print(int id){
         byte[] data = null;
@@ -208,11 +208,22 @@ public class ContractControllerImpl extends BaseController implements ContractCo
         } catch (IOException e1) {
             e1.printStackTrace();
         }
-        InputStream inputStream = new ByteArrayInputStream(data); 
+        InputStream inputStream = new ByteArrayInputStream(data);
         final StreamingResponseBody stream = out -> {
            IOUtils.copyLarge(inputStream, out);
-            
+
         };
         return new ResponseEntity<StreamingResponseBody>(stream, HttpStatus.OK);
+    }
+
+    @Override
+    public RestResponse<MasterContractDto> setDefaultContract(int id) {
+        try {
+            final MasterContractDto result = this.masterService.setDefaultContract(id);
+
+            return RestResponse.result(result);
+        } catch (final ApplicationException ex) {
+            return RestResponse.error(ex.getCode(), ex.getMessage());
+        }
     }
 }
