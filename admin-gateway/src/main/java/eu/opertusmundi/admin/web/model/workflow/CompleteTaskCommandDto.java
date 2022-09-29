@@ -12,8 +12,10 @@ import lombok.Setter;
     use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "taskName", visible = true
 )
 @JsonSubTypes({
-    @Type(name = TaskNameConstants.PUBLISH_CATALOGUE_ASSET_SET_ERROR, value = SetPublishErrorTaskCommandDto.class),
-    @Type(name = TaskNameConstants.PUBLISH_USER_SERVICE_SET_ERROR,    value = SetPublishErrorTaskCommandDto.class),
+    @Type(name = TaskNameConstants.CONSUMER_REGISTRATION_SET_ERROR,   value = SetErrorTaskCommandDto.class),
+    @Type(name = TaskNameConstants.PROVIDER_REGISTRATION_SET_ERROR,   value = SetErrorTaskCommandDto.class),
+    @Type(name = TaskNameConstants.PUBLISH_CATALOGUE_ASSET_SET_ERROR, value = SetErrorTaskCommandDto.class),
+    @Type(name = TaskNameConstants.PUBLISH_USER_SERVICE_SET_ERROR,    value = SetErrorTaskCommandDto.class),
 })
 @Getter
 @Setter
