@@ -45,6 +45,7 @@ public interface ContractController {
     RestResponse<MasterContractHistoryResult> findAllHistory(
         @RequestParam(name = "page", defaultValue = "0") int page,
         @RequestParam(name = "size", defaultValue = "25") @Max(50) @Min(1) int size,
+        @RequestParam(name = "defaultContract", required = false) String defaultContract,
         @RequestParam(name = "title", required = false) String title,
         @RequestParam(name = "status", required = false) Set<EnumContractStatus> status,
         @RequestParam(name = "orderBy", defaultValue = "MODIFIED_ON") EnumMasterContractSortField orderBy,

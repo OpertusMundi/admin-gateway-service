@@ -38,6 +38,7 @@ public class ContractControllerImpl extends BaseController implements ContractCo
     public RestResponse<MasterContractHistoryResult> findAllHistory(
         int page,
         int size,
+        String defaultContract,
         String title,
         Set<EnumContractStatus> status,
         EnumMasterContractSortField orderBy,
@@ -46,6 +47,7 @@ public class ContractControllerImpl extends BaseController implements ContractCo
         final MasterContractQueryDto query = MasterContractQueryDto.builder()
             .page(page)
             .size(size)
+            .defaultContract(defaultContract == null ? null : Boolean.parseBoolean(defaultContract))
             .title(title)
             .status(status)
             .orderBy(orderBy)
