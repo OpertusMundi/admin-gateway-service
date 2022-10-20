@@ -83,6 +83,8 @@ public class DefaultMarketplaceUserService implements MarketplaceUserService {
                 .variableAsString("userKey", account.getKey().toString())
                 .variableAsString("userParentKey", account.getParentKey().toString())
                 .variableAsString("userName", account.getEmail())
+                .variableAsString("userType", account.getType().toString())
+                .variableAsString("userGeodataShard", account.getProfile().getGeodataShard())
                 .variableAsBoolean("accountDeleted", accountDeleted)
                 .variableAsBoolean("fileSystemDeleted", fileSystemDeleted)
                 .variableAsBoolean("contractsDeleted", contractsDeleted)
