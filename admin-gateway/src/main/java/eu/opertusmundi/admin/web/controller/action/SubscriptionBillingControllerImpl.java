@@ -27,7 +27,6 @@ import eu.opertusmundi.common.repository.SubscriptionBillingBatchRepository;
 import eu.opertusmundi.common.service.SubscriptionBillingService;
 
 @RestController
-@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 public class SubscriptionBillingControllerImpl extends BaseController implements SubscriptionBillingController {
 
     @Autowired
@@ -37,6 +36,7 @@ public class SubscriptionBillingControllerImpl extends BaseController implements
     private SubscriptionBillingService subscriptionBillingService;
 
     @Override
+    @Secured({ "ROLE_ADMIN", "ROLE_USER" })
     public RestResponse<PageResultDto<SubscriptionBillingBatchDto>> findAll(
         int page, int size, Set<EnumSubscriptionBillingBatchStatus> status,
         EnumSubscriptionBillingBatchSortField orderBy, EnumSortingOrder order
@@ -53,6 +53,8 @@ public class SubscriptionBillingControllerImpl extends BaseController implements
         return RestResponse.result(result);
     }
 
+    @Override
+    @Secured({ "ROLE_ADMIN", "ROLE_USER" })
     public RestResponse<SubscriptionBillingBatchDto> findOne(UUID key) {
         final Optional<SubscriptionBillingBatchDto> r = this.subscriptionBillingBatchRepository.findOneObjectByKey(key);
         if (r.isPresent()) {
@@ -62,6 +64,7 @@ public class SubscriptionBillingControllerImpl extends BaseController implements
     }
 
     @Override
+    @Secured({ "ROLE_ADMIN" })
     public RestResponse<SubscriptionBillingBatchDto> create(SubscriptionBillingBatchCommandDto command, BindingResult validationResult) {
         try {
             command.setUserId(this.currentUserId());
