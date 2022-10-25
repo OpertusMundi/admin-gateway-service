@@ -19,12 +19,12 @@ import lombok.Setter;
 public class ConfigurationDto {
 
     private List<EnumAuthProvider> authProviders;
-    
+
     @JsonInclude(Include.NON_NULL)
     private BingMapsConfigurationDto bingMaps;
 
     private String clientId;
-    
+
     @JsonInclude(Include.NON_EMPTY)
     private final List<ContractIconDto> contractIcons = new ArrayList<>();
 
@@ -44,5 +44,7 @@ public class ConfigurationDto {
 
     @JsonInclude(Include.NON_EMPTY)
     private List<ProcessDefinitionHeaderDto> processDefinitions;
+
+    private int quotationMinOffset;
 
 }

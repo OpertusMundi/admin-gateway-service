@@ -44,6 +44,13 @@ public class ConfigurationControllerImpl extends BaseController implements Confi
     @Value("${opertusmundi.contract.icons}")
     private String iconFolder;
 
+    /**
+     * Offset in days after the first day of the current month, at which a
+     * quotation may be created
+     */
+    @Value("${opertusmundi.subscription-billing.quotation-min-offset:25}")
+    private int quotationMinOffset;
+    
     @Autowired
     private MapConfiguration mapConfiguration;
 
@@ -81,6 +88,7 @@ public class ConfigurationControllerImpl extends BaseController implements Confi
         config.setMap(this.mapConfiguration.getDefaults());
         config.setOsm(this.mapConfiguration.getOsm());
         config.setProcessDefinitions(this.bpmEngineService.getProcessDefinitions());
+        config.setQuotationMinOffset(quotationMinOffset);
 
         for (final EnumDataProvider p : EnumDataProvider.values()) {
             config.getExternalProviders().add(ExternalDataProviderDto.of(p, p.getName(), p.getRequiredRole()));
