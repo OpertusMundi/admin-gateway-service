@@ -48,7 +48,7 @@ public class ConfigurationControllerImpl extends BaseController implements Confi
      * Offset in days after the first day of the current month, at which a
      * quotation may be created
      */
-    @Value("${opertusmundi.subscription-billing.quotation-min-offset:25}")
+    @Value("${opertusmundi.subscription-billing.quotation-min-offset:5}")
     private int quotationMinOffset;
     
     @Autowired
