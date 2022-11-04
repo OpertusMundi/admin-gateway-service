@@ -15,6 +15,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.opertusmundi.common.model.EnumSortingOrder;
+import eu.opertusmundi.common.model.EnumView;
 import eu.opertusmundi.common.model.PageResultDto;
 import eu.opertusmundi.common.model.RestResponse;
 import eu.opertusmundi.common.model.account.AccountSubscriptionDto;
@@ -151,16 +152,18 @@ public class ConsumerControllerImpl extends BaseController implements ConsumerCo
     @Override
     public RestResponse<PageResultDto<SubscriptionBillingDto>> findSubscriptionBillingRecords(
         int page, int size,
-        UUID consumerKey, Integer subscriptionId, Set<EnumSubscriptionBillingStatus> status, EnumSubscriptionBillingSortField orderBy,
+        UUID consumerKey, UUID subscriptionKey, Set<EnumSubscriptionBillingStatus> status, EnumSubscriptionBillingSortField orderBy,
         EnumSortingOrder order
     ) {
         final Direction   direction   = order == EnumSortingOrder.DESC ? Direction.DESC : Direction.ASC;
         final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, orderBy.getValue()));
 
-        final Page<SubscriptionBillingDto> p = this.subscriptionBillingRepository.findAllObjectsByConsumer(
+        final Page<SubscriptionBillingDto> p = this.subscriptionBillingRepository.findAllObjects(
+            EnumView.HELPDESK,
+            true,
             consumerKey, 
             null /* providerKey */,
-            subscriptionId,
+            subscriptionKey,
             status, 
             pageRequest 
         );

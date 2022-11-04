@@ -67,7 +67,7 @@ public interface ConsumerController {
         @RequestParam(name = "page", defaultValue = "0") int page,
         @RequestParam(name = "size", defaultValue = "25") @Max(100) @Min(1) int size,
         @RequestParam(name = "consumerKey", required = true) UUID consumerKey,
-        @RequestParam(name = "subscriptionId", required = false) Integer subscriptionId,
+        @RequestParam(name = "subscriptionKey", required = false) UUID subscriptionKey,
         @RequestParam(name = "status", required = false) Set<EnumSubscriptionBillingStatus> status,
         @RequestParam(name = "orderBy", defaultValue = "CREATED_ON") EnumSubscriptionBillingSortField orderBy,
         @RequestParam(name = "order", defaultValue = "DESC") EnumSortingOrder order
