@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
 
+import eu.opertusmundi.admin.web.model.workflow.DeploymentDto;
 import eu.opertusmundi.admin.web.model.workflow.EnumIncidentSortField;
 import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceHistorySortField;
 import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceSortField;
@@ -23,6 +24,23 @@ import eu.opertusmundi.common.model.ServiceException;
 
 public interface BpmEngineService {
 
+    /**
+     * Queries for deployments
+     * 
+     * @param sortOrder
+     * @param sortBy
+     * @return
+     */
+    List<DeploymentDto> getDeployments(String sortOrder, String sortBy);
+    
+    /**
+     * Delete deployment
+     * 
+     * @param id
+     * @param cascade
+     */
+    void deleteDeployment(String id, boolean cascade);
+    
     /**
      * Queries for process definitions
      *

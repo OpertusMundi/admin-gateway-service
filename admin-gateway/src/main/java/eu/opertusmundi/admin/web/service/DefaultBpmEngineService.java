@@ -1,7 +1,6 @@
 package eu.opertusmundi.admin.web.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -13,24 +12,19 @@ import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
-import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.ModificationDto;
 import org.camunda.bpm.engine.rest.dto.VariableValueDto;
-import org.camunda.bpm.engine.rest.dto.externaltask.SetRetriesForExternalTasksDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricActivityInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricIncidentDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricVariableInstanceDto;
-import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.modification.CancellationInstructionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.modification.ProcessInstanceModificationInstructionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.modification.StartBeforeInstructionDto;
-import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -42,6 +36,7 @@ import eu.opertusmundi.admin.web.model.mapper.ProcessInstanceHistoryRowMapper;
 import eu.opertusmundi.admin.web.model.mapper.ProcessInstanceRowMapper;
 import eu.opertusmundi.admin.web.model.mapper.ProcessInstanceTaskRowMapper;
 import eu.opertusmundi.admin.web.model.workflow.BpmnMessageCode;
+import eu.opertusmundi.admin.web.model.workflow.DeploymentDto;
 import eu.opertusmundi.admin.web.model.workflow.EnumIncidentSortField;
 import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceHistorySortField;
 import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceSortField;
@@ -54,7 +49,6 @@ import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceDto;
 import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceResource;
 import eu.opertusmundi.admin.web.model.workflow.ProcessInstanceTaskDto;
 import eu.opertusmundi.admin.web.model.workflow.VariableDto;
-import eu.opertusmundi.common.feign.client.BpmServerFeignClient;
 import eu.opertusmundi.common.model.BasicMessageCode;
 import eu.opertusmundi.common.model.EnumSortingOrder;
 import eu.opertusmundi.common.model.PageResultDto;
@@ -62,6 +56,7 @@ import eu.opertusmundi.common.model.ServiceException;
 import eu.opertusmundi.common.model.account.AccountDto;
 import eu.opertusmundi.common.model.workflow.EnumProcessInstanceVariable;
 import eu.opertusmundi.common.repository.AccountRepository;
+import eu.opertusmundi.common.util.BpmEngineUtils;
 import feign.FeignException;
 
 @Service
@@ -78,7 +73,7 @@ public class DefaultBpmEngineService implements BpmEngineService {
     private ProcessInstanceResourceResolver resourceResolver;
 
     @Autowired
-    private ObjectProvider<BpmServerFeignClient> bpmClient;
+    private BpmEngineUtils bpmEngineUtils;
 
     @Autowired
     @Qualifier("camundaDataSource")
@@ -92,6 +87,20 @@ public class DefaultBpmEngineService implements BpmEngineService {
     }
 
     @Override
+    public List<DeploymentDto> getDeployments(String sortOrder, String sortBy) {
+        var result = this.bpmEngineUtils.getDeployments(sortOrder, sortBy).stream()
+            .map(DeploymentDto::from)
+            .toList();
+
+        return result;
+    }
+    
+    @Override
+    public void deleteDeployment(String id, boolean cascade) {
+        this.bpmEngineUtils.deleteDeployment(id, cascade);
+    }
+    
+    @Override
     public List<ProcessDefinitionHeaderDto> getProcessDefinitions() {
         try {
             final ProcessDefinitionQueryDto query = new ProcessDefinitionQueryDto();
@@ -99,7 +108,7 @@ public class DefaultBpmEngineService implements BpmEngineService {
             query.setSortBy("name");
             query.setSortOrder("asc");
 
-            final List<ProcessDefinitionHeaderDto> result = this.bpmClient.getObject()
+            final List<ProcessDefinitionHeaderDto> result = this.bpmEngineUtils
                 .getProcessDefinitions(query, 0, 1000)
                 .stream()
                 .map(ProcessDefinitionHeaderDto::from)
@@ -116,9 +125,9 @@ public class DefaultBpmEngineService implements BpmEngineService {
     @Override
     public String getBpmnXml(String processDefinitionId) {
         try {
-            final ProcessDefinitionDiagramDto result = this.bpmClient.getObject().getBpmnXml(processDefinitionId).getBody();
+            final String result = this.bpmEngineUtils.getBpmnXml(processDefinitionId);
 
-            return result == null ? null : result.getBpmn20Xml();
+            return result;
         } catch (final Exception ex) {
             logger.error(String.format("Failed to load process BPMN 2.0 XML [processDefinitionId=%s]", processDefinitionId), ex);
         }
@@ -128,9 +137,9 @@ public class DefaultBpmEngineService implements BpmEngineService {
 
     @Override
     public Long countProcessInstances() {
-        final CountResultDto result = this.bpmClient.getObject().countProcessInstances();
+        final long result = this.bpmEngineUtils.countProcessInstances();
 
-        return result.getCount();
+        return result;
     }
 
     @Override
@@ -267,9 +276,9 @@ public class DefaultBpmEngineService implements BpmEngineService {
 
     @Override
     public Long countProcessInstanceTasks() {
-        final CountResultDto result = this.bpmClient.getObject().countProcessInstanceTasks();
+        final long result = this.bpmEngineUtils.countProcessInstanceTasks();
 
-        return result.getCount();
+        return result;
     }
 
     @Override
@@ -397,10 +406,9 @@ public class DefaultBpmEngineService implements BpmEngineService {
 
     @Override
     public Optional<ProcessInstanceDetailsDto> getProcessInstance(String businessKey, String processInstanceId) {
-        final BpmServerFeignClient      client = this.bpmClient.getObject();
         final ProcessInstanceDetailsDto result = new ProcessInstanceDetailsDto();
 
-        final List<HistoricProcessInstanceDto> processInstances = client.getHistoryProcessInstances(
+        final List<HistoricProcessInstanceDto> processInstances = this.bpmEngineUtils.findHistoryInstances(
             null,
             businessKey,
             processInstanceId
@@ -420,20 +428,20 @@ public class DefaultBpmEngineService implements BpmEngineService {
         // key
         processInstanceId = result.getInstance().getId();
 
-        final Map<String, VariableValueDto> variables = client.getProcessInstanceVariables(processInstanceId);
+        final Map<String, VariableValueDto> variables = this.bpmEngineUtils.getProcessInstanceVariables(processInstanceId);
         variables.keySet().stream().map(k -> VariableDto.from(k, variables.get(k))).forEach(result.getVariables()::add);
 
-        final List<HistoricActivityInstanceDto> activities = client
+        final List<HistoricActivityInstanceDto> activities = this.bpmEngineUtils
             .getHistoryProcessInstanceActivityInstances(processInstanceId);
         activities.sort(this::compareActivities);
         result.setActivities(activities);
 
-        final List<org.camunda.bpm.engine.rest.dto.runtime.IncidentDto> incidents = client
+        final List<org.camunda.bpm.engine.rest.dto.runtime.IncidentDto> incidents = this.bpmEngineUtils
             .getIncidents(null, null, processInstanceId, null, null, null);
         result.setIncidents(incidents);
 
         result.getIncidents().forEach(i -> {
-            final String details = client.getExternalTaskErrorDetails(i.getConfiguration());
+            final String details = this.bpmEngineUtils.getExternalTaskErrorDetails(i.getConfiguration());
             result.getErrorDetails().put(i.getActivityId(), details);
         });
 
@@ -552,7 +560,7 @@ public class DefaultBpmEngineService implements BpmEngineService {
     ) {
         final HistoryProcessInstanceDetailsDto result = new HistoryProcessInstanceDetailsDto();
 
-        final List<HistoricProcessInstanceDto> processInstances = this.bpmClient.getObject().getHistoryProcessInstances(
+        final List<HistoricProcessInstanceDto> processInstances = this.bpmEngineUtils.findHistoryInstances(
             null,
             businessKey,
             processInstanceId
@@ -566,21 +574,21 @@ public class DefaultBpmEngineService implements BpmEngineService {
         // key
         processInstanceId = result.getInstance().getId();
 
-        final List<HistoricVariableInstanceDto> variables = this.bpmClient.getObject()
+        final List<HistoricVariableInstanceDto> variables = this.bpmEngineUtils
             .getHistoryProcessInstanceVariables(processInstanceId);
         variables.stream().map(VariableDto::from).forEach(result.getVariables()::add);
 
-        final List<HistoricActivityInstanceDto> activities = this.bpmClient.getObject()
+        final List<HistoricActivityInstanceDto> activities = this.bpmEngineUtils
             .getHistoryProcessInstanceActivityInstances(processInstanceId);
         activities.sort(this::compareActivities);
         result.setActivities(activities);
 
-        final List<HistoricIncidentDto> incidents = this.bpmClient.getObject()
+        final List<HistoricIncidentDto> incidents = this.bpmEngineUtils
             .getHistoryIncidents(processInstanceId);
         result.setIncidents(incidents);
 
         result.getIncidents().forEach(i -> {
-            final String details = this.bpmClient.getObject().getHistoryExternalTaskLogErrorDetails(i.getHistoryConfiguration());
+            final String details = this.bpmEngineUtils.getHistoryExternalTaskLogErrorDetails(i.getHistoryConfiguration());
             result.getErrorDetails().put(i.getActivityId(), details);
         });
 
@@ -615,15 +623,7 @@ public class DefaultBpmEngineService implements BpmEngineService {
     @Override
     public void retryExternalTask(String processInstanceId, String externalTaskId) {
         try {
-            final SetRetriesForExternalTasksDto request            = new SetRetriesForExternalTasksDto();
-            final List<String>                  processInstanceIds = Arrays.asList(processInstanceId);
-            final List<String>                  externalTaskIds    = Arrays.asList(externalTaskId);
-
-            request.setProcessInstanceIds(processInstanceIds);
-            request.setExternalTaskIds(externalTaskIds);
-            request.setRetries(1);
-
-            this.bpmClient.getObject().setExternalTaskRetries(request);
+            this.bpmEngineUtils.retryExternalTask(processInstanceId, externalTaskId, 1);
         } catch (final FeignException ex) {
             logger.error(String.format(
                 "Failed to retry external task [processInstance=%s, externalTask=%s",
@@ -642,19 +642,14 @@ public class DefaultBpmEngineService implements BpmEngineService {
 
         try {
             // Find workflow instance
-            final TaskDto task = this.bpmClient.getObject().getTasks(businessKey, taskDefinitionKey).stream()
-                .findFirst()
-                .orElse(null);
+            final TaskDto task = this.bpmEngineUtils.findTask(businessKey, taskDefinitionKey).orElse(null);
 
             if (task == null) {
                 throw new ServiceException(BasicMessageCode.BpmServiceError, "Task was not found");
             }
 
             // Complete task
-            final CompleteTaskDto options = new CompleteTaskDto();
-            options.setVariables(variables);
-
-            this.bpmClient.getObject().completeTask(task.getId(), options);
+            this.bpmEngineUtils.completeTask(task.getId(), variables);
         }
         catch (ServiceException ex) {
             throw ex;
@@ -665,14 +660,12 @@ public class DefaultBpmEngineService implements BpmEngineService {
 
     @Override
     public void deleteProcessInstance(String processInstanceId) {
-        this.bpmClient.getObject().deleteProcessInstance(processInstanceId);
+        this.bpmEngineUtils.deleteProcessInstance(processInstanceId);
     }
 
     @Override
     public Long countIncidents() {
-        final CountResultDto result = this.bpmClient.getObject().countIncidents();
-
-        return result.getCount();
+        return this.bpmEngineUtils.countIncidents();
     }
 
     @Override
@@ -803,7 +796,7 @@ public class DefaultBpmEngineService implements BpmEngineService {
 
             modification.setInstructions(instructions);
 
-            this.bpmClient.getObject().modifyProcessInstance(processInstanceId, modification);
+            this.bpmEngineUtils.modifyProcessInstance(processInstanceId, modification);
         } catch (ServiceException ex) {
             throw ex;
         } catch (Exception ex) {
