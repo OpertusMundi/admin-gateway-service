@@ -38,6 +38,22 @@ public class WorkflowControllerImpl implements WorkflowController {
     @Autowired
     private WorkflowTaskService workflowTaskService;
 
+    public RestResponse<?> getDeployments(EnumSortingOrder sortOrder, String sortBy) {
+        final var result = this.bpmEngineService.getDeployments(sortOrder.name().toLowerCase(), sortBy);
+
+        return RestResponse.result(result);
+    }
+    
+    public BaseResponse deleteDeployment(String id) {
+        try {
+            this.bpmEngineService.deleteDeployment(id, false);
+
+            return RestResponse.success();
+        } catch (Exception ex) {
+            return RestResponse.failure(BasicMessageCode.InternalServerError, ex.getMessage());
+        }
+    }
+
     @Override
     public RestResponse<?> getProcessDefinitions() {
         final List<ProcessDefinitionHeaderDto> result = this.bpmEngineService.getProcessDefinitions();

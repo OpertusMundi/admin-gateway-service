@@ -29,6 +29,25 @@ import eu.opertusmundi.common.model.RestResponse;
 public interface WorkflowController {
 
     /**
+     * Get deployments
+     *
+     * @param sortOrder
+     * @param sortBy
+     * @return
+     */
+    @GetMapping(value = "/workflows/deployments")
+    RestResponse<?> getDeployments(@RequestParam EnumSortingOrder sortOrder, @RequestParam String sortBy);
+    
+    /**
+     * Delete deployment
+     *
+     * @param id
+     * @return
+     */
+    @DeleteMapping(value = "/workflows/deployments/{id}")
+    BaseResponse deleteDeployment(@PathVariable String id);
+    
+    /**
      * Get process definitions
      *
      * @param processInstanceId
