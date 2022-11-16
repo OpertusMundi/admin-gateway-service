@@ -3,6 +3,7 @@ package eu.opertusmundi.admin.web.controller.action;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
@@ -25,6 +27,7 @@ import eu.opertusmundi.common.model.contract.helpdesk.MasterContractDto;
 import eu.opertusmundi.common.model.contract.helpdesk.MasterContractHistoryDto;
 import eu.opertusmundi.common.model.contract.helpdesk.MasterContractHistoryResult;
 import eu.opertusmundi.common.model.contract.helpdesk.MasterContractQueryDto;
+import eu.opertusmundi.common.model.message.client.ClientContactDto;
 import eu.opertusmundi.common.service.contract.MasterTemplateContractService;
 
 @RestController
@@ -34,6 +37,12 @@ public class ContractControllerImpl extends BaseController implements ContractCo
     @Autowired
     private MasterTemplateContractService masterService;
 
+    @Override
+    public RestResponse<List<ClientContactDto>> findProviders(@RequestParam String email) {
+        final List<ClientContactDto> result = this.masterService.findProviders(email);
+        return RestResponse.result(result);
+    }
+    
     @Override
     public RestResponse<MasterContractHistoryResult> findAllHistory(
         int page,

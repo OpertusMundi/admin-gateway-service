@@ -1,5 +1,6 @@
 package eu.opertusmundi.admin.web.controller.action;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.validation.Valid;
@@ -28,10 +29,20 @@ import eu.opertusmundi.common.model.contract.helpdesk.MasterContractCommandDto;
 import eu.opertusmundi.common.model.contract.helpdesk.MasterContractDto;
 import eu.opertusmundi.common.model.contract.helpdesk.MasterContractHistoryDto;
 import eu.opertusmundi.common.model.contract.helpdesk.MasterContractHistoryResult;
+import eu.opertusmundi.common.model.message.client.ClientContactDto;
 
 @RequestMapping(value = "/action/contract", produces = MediaType.APPLICATION_JSON_VALUE)
 public interface ContractController {
 
+    /**
+     * Find providers
+     * 
+     * @param email
+     * @return
+     */
+    @GetMapping(value = "/providers")
+    RestResponse<List<ClientContactDto>> findProviders(@RequestParam String email);
+    
     /**
      * Get all contracts
      *
