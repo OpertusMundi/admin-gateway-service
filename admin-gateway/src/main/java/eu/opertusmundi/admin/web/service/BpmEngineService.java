@@ -26,21 +26,21 @@ public interface BpmEngineService {
 
     /**
      * Queries for deployments
-     * 
+     *
      * @param sortOrder
      * @param sortBy
      * @return
      */
     List<DeploymentDto> getDeployments(String sortOrder, String sortBy);
-    
+
     /**
      * Delete deployment
-     * 
+     *
      * @param id
      * @param cascade
      */
     void deleteDeployment(String id, boolean cascade);
-    
+
     /**
      * Queries for process definitions
      *
@@ -59,9 +59,23 @@ public interface BpmEngineService {
     /**
      * Queries for the number of process instances
      *
+     * <p>
+     * See {@link BpmEngineService#countProcessInstances(String)}
+     *
      * @return
      */
-    Long countProcessInstances();
+    default Long countProcessInstances() {
+        return this.countProcessInstances(null);
+    }
+
+    /**
+     * Queries for the number of process instances
+     *
+     * @param deploymentId
+     *
+     * @return
+     */
+    Long countProcessInstances(String deploymentId);
 
     /**
      * Queries for process instances that fulfill given parameters

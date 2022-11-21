@@ -20,6 +20,9 @@ public enum AdminMessageCode implements MessageCode {
     // Provider error codes
     ExternalProviderAlreadyExists,
     OpenDatasetProviderAlreadyExists,
+
+    // Workflow error codes
+    WorkflowDeploymentHasActiveInstances,
     ;
 
     @Override

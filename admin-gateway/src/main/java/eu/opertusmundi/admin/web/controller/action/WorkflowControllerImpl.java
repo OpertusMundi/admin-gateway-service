@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RestController;
 
+import eu.opertusmundi.admin.web.model.AdminMessageCode;
 import eu.opertusmundi.admin.web.model.workflow.CompleteTaskCommandDto;
 import eu.opertusmundi.admin.web.model.workflow.EnumIncidentSortField;
 import eu.opertusmundi.admin.web.model.workflow.EnumProcessInstanceHistorySortField;
@@ -43,9 +44,17 @@ public class WorkflowControllerImpl implements WorkflowController {
 
         return RestResponse.result(result);
     }
-    
+
     public BaseResponse deleteDeployment(String id) {
         try {
+            var count = this.bpmEngineService.countProcessInstances(id);
+            if (count > 0) {
+                return RestResponse.error(
+                    AdminMessageCode.WorkflowDeploymentHasActiveInstances,
+                    String.format("There are %d active instance(s) for the selected deployment" ,  count)
+                );
+            }
+
             this.bpmEngineService.deleteDeployment(id, false);
 
             return RestResponse.success();

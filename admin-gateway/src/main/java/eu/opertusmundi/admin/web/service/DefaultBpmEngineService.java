@@ -94,12 +94,12 @@ public class DefaultBpmEngineService implements BpmEngineService {
 
         return result;
     }
-    
+
     @Override
     public void deleteDeployment(String id, boolean cascade) {
         this.bpmEngineUtils.deleteDeployment(id, cascade);
     }
-    
+
     @Override
     public List<ProcessDefinitionHeaderDto> getProcessDefinitions() {
         try {
@@ -136,8 +136,8 @@ public class DefaultBpmEngineService implements BpmEngineService {
     }
 
     @Override
-    public Long countProcessInstances() {
-        final long result = this.bpmEngineUtils.countProcessInstances();
+    public Long countProcessInstances(String deploymentId) {
+        final long result = this.bpmEngineUtils.countProcessInstances(deploymentId);
 
         return result;
     }
@@ -614,7 +614,7 @@ public class DefaultBpmEngineService implements BpmEngineService {
             processDefinitionKey, result.getInstance().getBusinessKey(), result.getVariables()
         );
         result.setResource(resource);
-        
+
         result.setBpmn2Xml(bpmn2Xml);
 
         return Optional.of(result);
