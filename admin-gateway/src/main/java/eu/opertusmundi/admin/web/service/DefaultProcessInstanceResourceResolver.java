@@ -12,9 +12,15 @@ import eu.opertusmundi.common.model.account.AccountDto;
 import eu.opertusmundi.common.model.asset.AssetDraftDto;
 import eu.opertusmundi.common.model.asset.service.UserServiceDto;
 import eu.opertusmundi.common.model.catalogue.client.CatalogueItemDetailsDto;
+import eu.opertusmundi.common.model.order.HelpdeskOrderDto;
+import eu.opertusmundi.common.model.payment.PayOutDto;
+import eu.opertusmundi.common.model.payment.helpdesk.HelpdeskPayInDto;
 import eu.opertusmundi.common.model.workflow.EnumProcessInstanceResource;
 import eu.opertusmundi.common.model.workflow.EnumWorkflow;
 import eu.opertusmundi.common.repository.AccountRepository;
+import eu.opertusmundi.common.repository.OrderRepository;
+import eu.opertusmundi.common.repository.PayInRepository;
+import eu.opertusmundi.common.repository.PayOutRepository;
 import eu.opertusmundi.common.service.CatalogueService;
 import eu.opertusmundi.common.service.ProviderAssetService;
 import eu.opertusmundi.common.service.UserServiceService;
@@ -22,20 +28,29 @@ import eu.opertusmundi.common.service.UserServiceService;
 @Service
 public class DefaultProcessInstanceResourceResolver implements ProcessInstanceResourceResolver {
 
-    private final AccountRepository accountRepository;
-    private final CatalogueService catalogueService;
+    private final AccountRepository    accountRepository;
+    private final CatalogueService     catalogueService;
+    private final OrderRepository      orderRepository;
+    private final PayInRepository      payInRepository;
+    private final PayOutRepository     payOutRepository;
     private final ProviderAssetService providerAssetService;
-    private final UserServiceService userServiceService;
+    private final UserServiceService   userServiceService;
 
     @Autowired
     public DefaultProcessInstanceResourceResolver(
-        AccountRepository accountRepository,
-        CatalogueService catalogueService,
+        AccountRepository    accountRepository,
+        CatalogueService     catalogueService,
+        OrderRepository      orderRepository,
+        PayInRepository      payInRepository,
+        PayOutRepository     payOutRepository,
         ProviderAssetService providerAssetService,
-        UserServiceService userServiceService
+        UserServiceService   userServiceService
     ) {
         this.accountRepository    = accountRepository;
         this.catalogueService     = catalogueService;
+        this.orderRepository      = orderRepository;
+        this.payInRepository      = payInRepository;
+        this.payOutRepository     = payOutRepository;
         this.providerAssetService = providerAssetService;
         this.userServiceService   = userServiceService;
     }
@@ -52,6 +67,9 @@ public class DefaultProcessInstanceResourceResolver implements ProcessInstanceRe
             case ASSET -> resolveCatalogueAsset(workflow, businessKey, variables);
             case CONSUMER, PROVIDER -> resolveConsumerRegistration(workflow, businessKey, variables);
             case DRAFT -> resolveDraft(workflow, businessKey, variables);
+            case ORDER -> resolveOrder(workflow, businessKey, variables);
+            case PAYIN -> resolvePayIn(workflow, businessKey, variables);
+            case PAYOUT -> resolvePayOut(workflow, businessKey, variables);
             case USER_SERVICE -> resolveUserService(workflow, businessKey, variables);
             default -> null;
         };
@@ -95,6 +113,27 @@ public class DefaultProcessInstanceResourceResolver implements ProcessInstanceRe
     private ProcessInstanceResource resolveDraft(EnumWorkflow workflow, String businessKey, List<VariableDto> variables) {
         final UUID          draftKey = UUID.fromString(businessKey);
         final AssetDraftDto resource = this.providerAssetService.findOneDraft(draftKey);
+
+        return ProcessInstanceResource.of(workflow.getResourceType(), resource);
+    }
+    
+    private ProcessInstanceResource resolveOrder(EnumWorkflow workflow, String businessKey, List<VariableDto> variables) {
+        final UUID             orderKey = UUID.fromString(businessKey);
+        final HelpdeskOrderDto resource = this.orderRepository.findOrderObjectByKey(orderKey).orElse(null);
+
+        return ProcessInstanceResource.of(workflow.getResourceType(), resource);
+    }
+
+    private ProcessInstanceResource resolvePayIn(EnumWorkflow workflow, String businessKey, List<VariableDto> variables) {
+        final UUID             payInKey = UUID.fromString(businessKey);
+        final HelpdeskPayInDto resource = this.payInRepository.findOneObjectByKey(payInKey).orElse(null);
+
+        return ProcessInstanceResource.of(workflow.getResourceType(), resource);
+    }
+    
+    private ProcessInstanceResource resolvePayOut(EnumWorkflow workflow, String businessKey, List<VariableDto> variables) {
+        final UUID      payOutKey = UUID.fromString(businessKey);
+        final PayOutDto resource  = this.payOutRepository.findOneObjectByKey(payOutKey, true).orElse(null);
 
         return ProcessInstanceResource.of(workflow.getResourceType(), resource);
     }
