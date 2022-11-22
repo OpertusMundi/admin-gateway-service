@@ -57,7 +57,10 @@ public class DefaultProcessInstanceResourceResolver implements ProcessInstanceRe
 
     @Override
     public ProcessInstanceResource resolve(String workflowKey, String businessKey, List<VariableDto> variables) {
-        final EnumWorkflow                workflow     = EnumWorkflow.fromKey(workflowKey);
+        final EnumWorkflow workflow = EnumWorkflow.fromKey(workflowKey);
+        if (workflow == null) {
+            return null;
+        }
         final EnumProcessInstanceResource resourceType = workflow.getResourceType();
         if (resourceType == null) {
             return null;
