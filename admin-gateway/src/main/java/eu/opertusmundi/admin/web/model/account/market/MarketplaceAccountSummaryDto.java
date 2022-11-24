@@ -30,6 +30,7 @@ public class MarketplaceAccountSummaryDto {
     private BigDecimal            consumerFunds;
     private EnumKycLevel          consumerKycLevel;
     private String                consumerName;
+    private String                consumerProcessInstance;
     private boolean               consumerUpdatePending;
     private boolean               deleted;
     private String                email;
@@ -44,6 +45,7 @@ public class MarketplaceAccountSummaryDto {
     private BigDecimal            providerFunds;
     private EnumKycLevel          providerKycLevel;
     private String                providerName;
+    private String                providerProcessInstance;
     private boolean               providerUpdatePending;
     private ZonedDateTime         registeredOn;
     private Set<EnumRole>         roles;
@@ -86,7 +88,10 @@ public class MarketplaceAccountSummaryDto {
                     // No action
             }
         }
-        r.setConsumerUpdatePending(c.getDraft() != null);
+        if (c.getDraft() != null) {
+            r.setConsumerProcessInstance(c.getDraft().getKey().toString());
+            r.setConsumerUpdatePending(true);
+        }
         r.setEmail(a.getEmail());
         r.setEmailVerified(a.isEmailVerified());
         r.setImage(profile.getImage());
@@ -103,7 +108,10 @@ public class MarketplaceAccountSummaryDto {
         } else if (p.getDraft() != null) {
             r.setProviderName(p.getDraft().getName());
         }
-        r.setProviderUpdatePending(p.getDraft() != null);
+        if (p.getDraft() != null) {
+            r.setProviderProcessInstance(p.getDraft().getKey().toString());
+            r.setProviderUpdatePending(true);
+        }
         r.setRegisteredOn(a.getRegisteredAt());
         r.setRoles(a.getRoles());
         r.setType(a.getType());
