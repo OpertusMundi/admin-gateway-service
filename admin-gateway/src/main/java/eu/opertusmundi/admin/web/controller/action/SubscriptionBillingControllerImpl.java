@@ -23,17 +23,26 @@ import eu.opertusmundi.common.model.payment.EnumSubscriptionBillingBatchStatus;
 import eu.opertusmundi.common.model.payment.PaymentException;
 import eu.opertusmundi.common.model.payment.SubscriptionBillingBatchCommandDto;
 import eu.opertusmundi.common.model.payment.SubscriptionBillingBatchDto;
+import eu.opertusmundi.common.model.pricing.PerCallPricingModelCommandDto;
+import eu.opertusmundi.common.model.pricing.QuotationException;
 import eu.opertusmundi.common.repository.SubscriptionBillingBatchRepository;
 import eu.opertusmundi.common.service.SubscriptionBillingService;
 
 @RestController
 public class SubscriptionBillingControllerImpl extends BaseController implements SubscriptionBillingController {
 
-    @Autowired
     private SubscriptionBillingBatchRepository subscriptionBillingBatchRepository;
+    private SubscriptionBillingService         subscriptionBillingService;
 
     @Autowired
-    private SubscriptionBillingService subscriptionBillingService;
+    public SubscriptionBillingControllerImpl(
+
+        SubscriptionBillingBatchRepository subscriptionBillingBatchRepository,
+        SubscriptionBillingService subscriptionBillingService
+    ) {
+        this.subscriptionBillingBatchRepository = subscriptionBillingBatchRepository;
+        this.subscriptionBillingService         = subscriptionBillingService;
+    }
 
     @Override
     @Secured({ "ROLE_ADMIN", "ROLE_USER" })
@@ -79,6 +88,32 @@ public class SubscriptionBillingControllerImpl extends BaseController implements
         } catch (PaymentException ex) {
             return RestResponse.error(ex.getCode(), ex.getMessage());
         }
+    }
+
+    @Override
+    @Secured({ "ROLE_ADMIN" })
+    public RestResponse<PerCallPricingModelCommandDto> getPrivateServicePricingModel() {
+        var model = this.subscriptionBillingService.getPrivateServicePricingModel();
+        return RestResponse.result(model);
+    }
+
+    @Override
+    @Secured({ "ROLE_ADMIN" })
+    public RestResponse<PerCallPricingModelCommandDto> setPrivateServicePricingModel(
+        PerCallPricingModelCommandDto model, BindingResult validationResult
+    ) {
+        try {
+            model.validate();
+        } catch (QuotationException ex) {
+            validationResult.reject(ex.getCode().toString(), ex.getMessage());
+        }
+
+        if (validationResult.hasErrors()) {
+            return RestResponse.invalid(validationResult.getFieldErrors(), validationResult.getGlobalErrors());
+        }
+
+        this.subscriptionBillingService.setPrivateServicePricingModel(this.currentUserId(), model);
+        return RestResponse.success();
     }
 
 }

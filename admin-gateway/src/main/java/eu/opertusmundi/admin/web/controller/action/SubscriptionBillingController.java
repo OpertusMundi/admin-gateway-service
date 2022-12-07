@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,6 +25,7 @@ import eu.opertusmundi.common.model.payment.EnumSubscriptionBillingBatchSortFiel
 import eu.opertusmundi.common.model.payment.EnumSubscriptionBillingBatchStatus;
 import eu.opertusmundi.common.model.payment.SubscriptionBillingBatchCommandDto;
 import eu.opertusmundi.common.model.payment.SubscriptionBillingBatchDto;
+import eu.opertusmundi.common.model.pricing.PerCallPricingModelCommandDto;
 
 @RequestMapping(value = "/action/subscription-billing", produces = MediaType.APPLICATION_JSON_VALUE)
 public interface SubscriptionBillingController {
@@ -49,4 +51,14 @@ public interface SubscriptionBillingController {
         BindingResult validationResult
     );
 
+    @GetMapping(value = { "/default-pricing-model" })
+    RestResponse<PerCallPricingModelCommandDto> getPrivateServicePricingModel();
+    
+    @PutMapping(value = { "/default-pricing-model" })
+    @Validated
+    RestResponse<PerCallPricingModelCommandDto> setPrivateServicePricingModel(
+        @RequestBody @Valid PerCallPricingModelCommandDto model,
+        BindingResult validationResult
+    );
+    
 }
