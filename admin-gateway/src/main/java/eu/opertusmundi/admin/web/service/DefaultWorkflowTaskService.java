@@ -112,7 +112,12 @@ public class DefaultWorkflowTaskService implements WorkflowTaskService {
         final String draftKey     = getVariableAsString(instance, "draftKey");
         final String publisherKey = getVariableAsString(instance, "publisherKey");
 
-        draftRepository.setErrorMessage(UUID.fromString(publisherKey), UUID.fromString(draftKey), message);
+        draftRepository.setErrorMessage(
+            command.getHelpdeskUserKey(),
+            UUID.fromString(publisherKey),
+            UUID.fromString(draftKey),
+            message
+        );
 
         final Map<String, VariableValueDto> variables = BpmInstanceVariablesBuilder.builder()
             .variableAsString(EnumProcessInstanceVariable.HELPDESK_ERROR_MESSAGE.getValue(), message)
@@ -136,7 +141,12 @@ public class DefaultWorkflowTaskService implements WorkflowTaskService {
         final String serviceKey = getVariableAsString(instance, "serviceKey");
         final String ownerKey   = getVariableAsString(instance, "ownerKey");
 
-        userServiceRepository.setErrorMessage(UUID.fromString(ownerKey), UUID.fromString(serviceKey), message);
+        userServiceRepository.setErrorMessage(
+            command.getHelpdeskUserKey(),
+            UUID.fromString(ownerKey),
+            UUID.fromString(serviceKey),
+            message
+        );
 
         final Map<String, VariableValueDto> variables = BpmInstanceVariablesBuilder.builder()
             .variableAsString(EnumProcessInstanceVariable.HELPDESK_ERROR_MESSAGE.getValue(), message)

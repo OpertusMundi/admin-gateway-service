@@ -31,7 +31,7 @@ import eu.opertusmundi.common.model.RestResponse;
 import eu.opertusmundi.common.model.ServiceException;
 
 @RestController
-public class WorkflowControllerImpl implements WorkflowController {
+public class WorkflowControllerImpl extends BaseController implements WorkflowController {
 
     @Autowired
     private BpmEngineService bpmEngineService;
@@ -191,6 +191,7 @@ public class WorkflowControllerImpl implements WorkflowController {
     public BaseResponse completeTask(String processInstanceId, CompleteTaskCommandDto command, BindingResult validationResult) {
         try {
             command.setProcessInstanceId(processInstanceId);
+            command.setHelpdeskUserKey(currentUserKey());
 
             if (validationResult.hasErrors()) {
                 return RestResponse.invalid(validationResult.getFieldErrors());

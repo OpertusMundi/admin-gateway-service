@@ -1,5 +1,7 @@
 package eu.opertusmundi.admin.web.model.workflow;
 
+import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
@@ -20,6 +22,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CompleteTaskCommandDto {
+
+    @JsonIgnore
+    protected UUID helpdeskUserKey;
 
     @JsonIgnore
     protected String processInstanceId;

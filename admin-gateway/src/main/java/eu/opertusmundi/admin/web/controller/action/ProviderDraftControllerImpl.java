@@ -32,7 +32,7 @@ import eu.opertusmundi.common.service.AssetDraftException;
 import eu.opertusmundi.common.service.ProviderAssetService;
 
 @RestController
-public class ProviderDraftControllerImpl implements ProviderDraftController {
+public class ProviderDraftControllerImpl extends BaseController implements ProviderDraftController {
 
     private static final Logger logger = LoggerFactory.getLogger(ProviderDraftControllerImpl.class);
 
@@ -84,12 +84,9 @@ public class ProviderDraftControllerImpl implements ProviderDraftController {
             command.setDraftKey(draftKey);
             command.setOwnerKey(providerKey);
             command.setPublisherKey(providerKey);
+            command.setReviewerKey(currentUserKey());
 
-            if (command.isRejected()) {
-                this.providerAssetService.rejectHelpDesk(providerKey, draftKey, command.getReason());
-            } else {
-                this.providerAssetService.acceptHelpDesk(providerKey, draftKey);
-            }
+            this.providerAssetService.reviewHelpDesk(command);
 
             return RestResponse.success();
         } catch (final AssetDraftException ex) {
@@ -156,5 +153,4 @@ public class ProviderDraftControllerImpl implements ProviderDraftController {
 
         return new ResponseEntity<StreamingResponseBody>(stream, HttpStatus.OK);
     }
-    
 }
