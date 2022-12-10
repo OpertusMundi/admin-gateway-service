@@ -46,7 +46,7 @@ public class ProviderDraftControllerImpl extends BaseController implements Provi
     ) {
         try {
             final PageResultDto<AssetDraftDto> result = this.providerAssetService.findAllDraft(
-                providerKey, providerKey, status, null, null, pageIndex, pageSize, orderBy, order
+                providerKey, providerKey, status, null, null, null, pageIndex, pageSize, orderBy, order
             );
 
 			return RestResponse.result(result);
