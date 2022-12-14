@@ -21,33 +21,33 @@ import org.springframework.web.bind.annotation.RequestParam;
 import eu.opertusmundi.common.model.EnumSortingOrder;
 import eu.opertusmundi.common.model.PageResultDto;
 import eu.opertusmundi.common.model.RestResponse;
-import eu.opertusmundi.common.model.payment.EnumSubscriptionBillingBatchSortField;
-import eu.opertusmundi.common.model.payment.EnumSubscriptionBillingBatchStatus;
-import eu.opertusmundi.common.model.payment.SubscriptionBillingBatchCommandDto;
-import eu.opertusmundi.common.model.payment.SubscriptionBillingBatchDto;
+import eu.opertusmundi.common.model.payment.EnumServiceBillingBatchSortField;
+import eu.opertusmundi.common.model.payment.EnumServiceBillingBatchStatus;
+import eu.opertusmundi.common.model.payment.ServiceBillingBatchCommandDto;
+import eu.opertusmundi.common.model.payment.ServiceBillingBatchDto;
 import eu.opertusmundi.common.model.pricing.PerCallPricingModelCommandDto;
 
-@RequestMapping(value = "/action/subscription-billing", produces = MediaType.APPLICATION_JSON_VALUE)
-public interface SubscriptionBillingController {
+@RequestMapping(value = "/action/service-billing", produces = MediaType.APPLICATION_JSON_VALUE)
+public interface ServiceBillingController {
 
     @GetMapping(value = { "/quotations" })
-    RestResponse<PageResultDto<SubscriptionBillingBatchDto>> findAll(
+    RestResponse<PageResultDto<ServiceBillingBatchDto>> findAll(
         @RequestParam(name = "page", defaultValue = "0") int page,
         @RequestParam(name = "size", defaultValue = "25") @Max(100) @Min(1) int size,
-        @RequestParam(name = "status", required = false) Set<EnumSubscriptionBillingBatchStatus> status,
-        @RequestParam(name = "orderBy", defaultValue = "UPDATED_ON") EnumSubscriptionBillingBatchSortField orderBy,
+        @RequestParam(name = "status", required = false) Set<EnumServiceBillingBatchStatus> status,
+        @RequestParam(name = "orderBy", defaultValue = "UPDATED_ON") EnumServiceBillingBatchSortField orderBy,
         @RequestParam(name = "order", defaultValue = "DESC") EnumSortingOrder order
     );
 
     @GetMapping(value = { "/quotations/{key}" })
-    RestResponse<SubscriptionBillingBatchDto> findOne(
+    RestResponse<ServiceBillingBatchDto> findOne(
         @PathVariable(name = "key") UUID key
     );
 
     @PostMapping(value = { "/quotations" })
     @Validated
-    RestResponse<SubscriptionBillingBatchDto> create(
-        @RequestBody @Valid SubscriptionBillingBatchCommandDto command,
+    RestResponse<ServiceBillingBatchDto> create(
+        @RequestBody @Valid ServiceBillingBatchCommandDto command,
         BindingResult validationResult
     );
 

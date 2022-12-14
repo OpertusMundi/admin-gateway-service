@@ -18,54 +18,53 @@ import org.springframework.web.bind.annotation.RestController;
 import eu.opertusmundi.common.model.EnumSortingOrder;
 import eu.opertusmundi.common.model.PageResultDto;
 import eu.opertusmundi.common.model.RestResponse;
-import eu.opertusmundi.common.model.payment.EnumSubscriptionBillingBatchSortField;
-import eu.opertusmundi.common.model.payment.EnumSubscriptionBillingBatchStatus;
+import eu.opertusmundi.common.model.payment.EnumServiceBillingBatchSortField;
+import eu.opertusmundi.common.model.payment.EnumServiceBillingBatchStatus;
 import eu.opertusmundi.common.model.payment.PaymentException;
-import eu.opertusmundi.common.model.payment.SubscriptionBillingBatchCommandDto;
-import eu.opertusmundi.common.model.payment.SubscriptionBillingBatchDto;
+import eu.opertusmundi.common.model.payment.ServiceBillingBatchCommandDto;
+import eu.opertusmundi.common.model.payment.ServiceBillingBatchDto;
 import eu.opertusmundi.common.model.pricing.PerCallPricingModelCommandDto;
 import eu.opertusmundi.common.model.pricing.QuotationException;
-import eu.opertusmundi.common.repository.SubscriptionBillingBatchRepository;
-import eu.opertusmundi.common.service.SubscriptionBillingService;
+import eu.opertusmundi.common.repository.ServiceBillingBatchRepository;
+import eu.opertusmundi.common.service.ServiceBillingService;
 
 @RestController
-public class SubscriptionBillingControllerImpl extends BaseController implements SubscriptionBillingController {
+public class ServiceBillingControllerImpl extends BaseController implements ServiceBillingController {
 
-    private SubscriptionBillingBatchRepository subscriptionBillingBatchRepository;
-    private SubscriptionBillingService         subscriptionBillingService;
+    private ServiceBillingBatchRepository ServiceBillingBatchRepository;
+    private ServiceBillingService              serviceBillingService;
 
     @Autowired
-    public SubscriptionBillingControllerImpl(
-
-        SubscriptionBillingBatchRepository subscriptionBillingBatchRepository,
-        SubscriptionBillingService subscriptionBillingService
+    public ServiceBillingControllerImpl(
+        ServiceBillingBatchRepository ServiceBillingBatchRepository,
+        ServiceBillingService serviceBillingService
     ) {
-        this.subscriptionBillingBatchRepository = subscriptionBillingBatchRepository;
-        this.subscriptionBillingService         = subscriptionBillingService;
+        this.ServiceBillingBatchRepository = ServiceBillingBatchRepository;
+        this.serviceBillingService              = serviceBillingService;
     }
 
     @Override
     @Secured({ "ROLE_ADMIN", "ROLE_USER" })
-    public RestResponse<PageResultDto<SubscriptionBillingBatchDto>> findAll(
-        int page, int size, Set<EnumSubscriptionBillingBatchStatus> status,
-        EnumSubscriptionBillingBatchSortField orderBy, EnumSortingOrder order
+    public RestResponse<PageResultDto<ServiceBillingBatchDto>> findAll(
+        int page, int size, Set<EnumServiceBillingBatchStatus> status,
+        EnumServiceBillingBatchSortField orderBy, EnumSortingOrder order
     ) {
         final Direction   direction    = order == EnumSortingOrder.DESC ? Direction.DESC : Direction.ASC;
         final PageRequest pageRequest  = PageRequest.of(page, size, Sort.by(direction, orderBy.getValue()));
 
-        final Page<SubscriptionBillingBatchDto> p = this.subscriptionBillingBatchRepository.findAllObjects(status, pageRequest);
+        final Page<ServiceBillingBatchDto> p = this.ServiceBillingBatchRepository.findAllObjects(status, pageRequest);
 
         final long count = p.getTotalElements();
-        final List<SubscriptionBillingBatchDto> records = p.stream().collect(Collectors.toList());
-        final PageResultDto<SubscriptionBillingBatchDto> result = PageResultDto.of(page, size, records, count);
+        final List<ServiceBillingBatchDto> records = p.stream().collect(Collectors.toList());
+        final PageResultDto<ServiceBillingBatchDto> result = PageResultDto.of(page, size, records, count);
 
         return RestResponse.result(result);
     }
 
     @Override
     @Secured({ "ROLE_ADMIN", "ROLE_USER" })
-    public RestResponse<SubscriptionBillingBatchDto> findOne(UUID key) {
-        final Optional<SubscriptionBillingBatchDto> r = this.subscriptionBillingBatchRepository.findOneObjectByKey(key);
+    public RestResponse<ServiceBillingBatchDto> findOne(UUID key) {
+        final Optional<ServiceBillingBatchDto> r = this.ServiceBillingBatchRepository.findOneObjectByKey(key);
         if (r.isPresent()) {
             return RestResponse.result(r.get());
         }
@@ -74,7 +73,7 @@ public class SubscriptionBillingControllerImpl extends BaseController implements
 
     @Override
     @Secured({ "ROLE_ADMIN" })
-    public RestResponse<SubscriptionBillingBatchDto> create(SubscriptionBillingBatchCommandDto command, BindingResult validationResult) {
+    public RestResponse<ServiceBillingBatchDto> create(ServiceBillingBatchCommandDto command, BindingResult validationResult) {
         try {
             command.setUserId(this.currentUserId());
 
@@ -82,7 +81,7 @@ public class SubscriptionBillingControllerImpl extends BaseController implements
                 return RestResponse.invalid(validationResult.getFieldErrors(), validationResult.getGlobalErrors());
             }
 
-            final SubscriptionBillingBatchDto batch = this.subscriptionBillingService.start(command);
+            final ServiceBillingBatchDto batch = this.serviceBillingService.start(command);
 
             return RestResponse.result(batch);
         } catch (PaymentException ex) {
@@ -93,7 +92,7 @@ public class SubscriptionBillingControllerImpl extends BaseController implements
     @Override
     @Secured({ "ROLE_ADMIN" })
     public RestResponse<PerCallPricingModelCommandDto> getPrivateServicePricingModel() {
-        var model = this.subscriptionBillingService.getPrivateServicePricingModel();
+        var model = this.serviceBillingService.getPrivateServicePricingModel();
         return RestResponse.result(model);
     }
 
@@ -112,7 +111,7 @@ public class SubscriptionBillingControllerImpl extends BaseController implements
             return RestResponse.invalid(validationResult.getFieldErrors(), validationResult.getGlobalErrors());
         }
 
-        this.subscriptionBillingService.setPrivateServicePricingModel(this.currentUserId(), model);
+        this.serviceBillingService.setPrivateServicePricingModel(this.currentUserId(), model);
         return RestResponse.success();
     }
 
