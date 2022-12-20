@@ -136,7 +136,7 @@ public class ConsumerControllerImpl extends BaseController implements ConsumerCo
         final PageResultDto<AccountSubscriptionDto> result = PageResultDto.of(page, size, records, count);
 
         final String[]                      pid    = result.getItems().stream().map(a -> a.getAssetId()).distinct().toArray(String[]::new);
-        final List<CatalogueItemDetailsDto> assets = pid.length == 0 ? Collections.emptyList() : this.catalogueService.findAllById(pid);
+        final List<CatalogueItemDetailsDto> assets = pid.length == 0 ? Collections.emptyList() : this.catalogueService.findAllHistoryAndPublishedById(pid);
 
         // Add catalogue items to records
         result.getItems().forEach(r -> {
@@ -208,7 +208,7 @@ public class ConsumerControllerImpl extends BaseController implements ConsumerCo
             .distinct()
             .toArray(String[]::new);
 
-        final List<CatalogueItemDetailsDto> assets = pid.length == 0 ? Collections.emptyList() : this.catalogueService.findAllById(pid);
+        final List<CatalogueItemDetailsDto> assets = pid.length == 0 ? Collections.emptyList() : this.catalogueService.findAllHistoryAndPublishedById(pid);
 
         // Add catalogue items to records
         result.getItems().stream()
