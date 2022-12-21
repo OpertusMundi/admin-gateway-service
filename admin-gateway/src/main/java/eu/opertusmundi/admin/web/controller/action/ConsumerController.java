@@ -77,7 +77,7 @@ public interface ConsumerController {
     );
     
     @GetMapping(value = { "/service-billing" })
-    RestResponse<PageResultDto<HelpdeskServiceBillingDto>> findSubscriptionBillingRecords(
+    RestResponse<PageResultDto<HelpdeskServiceBillingDto>> findServiceBillingRecords(
         @RequestParam(name = "page", defaultValue = "0") int page,
         @RequestParam(name = "size", defaultValue = "25") @Max(100) @Min(1) int size,
         @RequestParam(name = "ownerKey", required = true) UUID ownerKey,

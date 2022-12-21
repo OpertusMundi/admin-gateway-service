@@ -178,7 +178,7 @@ public class ConsumerControllerImpl extends BaseController implements ConsumerCo
     }
 
     @Override
-    public RestResponse<PageResultDto<HelpdeskServiceBillingDto>> findSubscriptionBillingRecords(
+    public RestResponse<PageResultDto<HelpdeskServiceBillingDto>> findServiceBillingRecords(
         int page, int size,
         UUID ownerKey, UUID serviceKey,
         Set<EnumPayoffStatus> status, EnumBillableServiceType type,
