@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -104,5 +105,15 @@ public interface ProviderDraftController {
     ResponseEntity<StreamingResponseBody> getContractAnnex(
         @PathVariable UUID draftKey, @PathVariable String annexKey, HttpServletResponse response
     ) throws IOException;
+
+    /**
+     * Delete catalogue draft item
+     *
+     * @param providerKey The provider unique key
+     * @param draftKey The draft unique key
+     * @return
+     */
+    @DeleteMapping(value = "/provider/{providerKey}/drafts/{draftKey}")
+    BaseResponse deleteDraft(@PathVariable UUID providerKey, @PathVariable UUID draftKey);
 
 }

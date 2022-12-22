@@ -153,4 +153,19 @@ public class ProviderDraftControllerImpl extends BaseController implements Provi
 
         return new ResponseEntity<StreamingResponseBody>(stream, HttpStatus.OK);
     }
+    
+    @Override
+    public BaseResponse deleteDraft(UUID providerKey, UUID draftKey) {
+        try {
+            this.providerAssetService.deleteDraft(providerKey, providerKey, draftKey);
+
+            return RestResponse.success();
+        } catch (final AssetDraftException ex) {
+            return RestResponse.error(ex.getCode(), ex.getMessage());
+        } catch (final Exception ex) {
+            logger.error("Operation has failed", ex);
+        }
+
+        return RestResponse.failure();
+    }
 }
