@@ -1,21 +1,35 @@
 package eu.opertusmundi.admin.web.controller.action;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import eu.opertusmundi.admin.web.model.ResourceNotFoundException;
 import eu.opertusmundi.common.model.EnumSortingOrder;
 import eu.opertusmundi.common.model.PageResultDto;
 import eu.opertusmundi.common.model.RestResponse;
@@ -38,6 +52,7 @@ import eu.opertusmundi.common.model.payment.helpdesk.HelpdeskPayInDto;
 import eu.opertusmundi.common.repository.OrderRepository;
 import eu.opertusmundi.common.repository.PayInRepository;
 import eu.opertusmundi.common.repository.PayOutRepository;
+import eu.opertusmundi.common.service.invoice.InvoiceFileManager;
 import eu.opertusmundi.common.service.mangopay.PaymentService;
 
 @RestController
@@ -55,6 +70,9 @@ public class BillingControllerImpl extends BaseController implements BillingCont
 
     @Autowired
     private PaymentService paymentService;
+
+    @Autowired
+    private InvoiceFileManager invoiceFileManager;
 
     @Override
     public RestResponse<AccountDto> refreshUserWallets(UUID userKey) {
@@ -130,6 +148,34 @@ public class BillingControllerImpl extends BaseController implements BillingCont
             return RestResponse.result(r.get());
         }
         return RestResponse.notFound();
+    }
+    
+    @Override
+    public ResponseEntity<StreamingResponseBody> downloadInvoice(@PathVariable UUID key, HttpServletResponse response) throws IOException {
+        final HelpdeskPayInDto p = this.payInRepository.findOneObjectByKey(key).orElse(null);
+        if (p == null || !p.isInvoicePrinted()) {
+            throw new ResourceNotFoundException("Invoice file was not found");
+        }
+
+        final Path path = invoiceFileManager.resolvePath(p.getConsumerId(), p.getReferenceNumber());
+        final File file = path.toFile();
+
+        String contentType = Files.probeContentType(path);
+        if (contentType == null) {
+            contentType = "application/octet-stream";
+        }
+
+        response.setHeader("Content-Disposition", String.format("attachment; filename=%s", file.getName()));
+        response.setHeader("Content-Type", contentType);
+        response.setHeader("Content-Length", Long.toString(file.length()));
+
+        final StreamingResponseBody stream = out -> {
+            try (InputStream inputStream = new FileInputStream(file)) {
+                IOUtils.copyLarge(inputStream, out);
+            }
+        };
+
+        return new ResponseEntity<StreamingResponseBody>(stream, HttpStatus.OK);
     }
 
     @Override

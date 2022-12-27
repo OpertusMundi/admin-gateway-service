@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
+import eu.opertusmundi.admin.web.model.ResourceNotFoundException;
 import eu.opertusmundi.common.model.BaseResponse;
 import eu.opertusmundi.common.model.BasicMessageCode;
 import eu.opertusmundi.common.model.DebugRestResponse;
@@ -43,7 +44,7 @@ public class RestControllerAdvice {
     private MessageSource messageSource;
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ExceptionHandler({HttpMessageNotReadableException.class, ResourceNotFoundException.class})
     @ApiResponse(
         responseCode = "400",
         description = "Bad Request",
