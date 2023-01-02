@@ -19,6 +19,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
         eu.opertusmundi.admin.web.service._Marker.class,
         eu.opertusmundi.admin.web.validation._Marker.class,
         eu.opertusmundi.admin.web.controller._Marker.class,
+        eu.opertusmundi.admin.web.support._Marker.class,
     }
 )
 @EntityScan(
