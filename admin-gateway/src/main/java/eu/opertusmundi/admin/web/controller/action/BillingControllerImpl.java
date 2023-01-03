@@ -53,30 +53,44 @@ import eu.opertusmundi.common.repository.OrderRepository;
 import eu.opertusmundi.common.repository.PayInRepository;
 import eu.opertusmundi.common.repository.PayOutRepository;
 import eu.opertusmundi.common.service.invoice.InvoiceFileManager;
-import eu.opertusmundi.common.service.mangopay.PaymentService;
+import eu.opertusmundi.common.service.mangopay.PayOutService;
+import eu.opertusmundi.common.service.mangopay.TransferService;
+import eu.opertusmundi.common.service.mangopay.WalletService;
 
 @RestController
 @Secured({ "ROLE_ADMIN", "ROLE_USER" })
 public class BillingControllerImpl extends BaseController implements BillingController {
 
-    @Autowired
-    private OrderRepository orderRepository;
-
-    @Autowired
-    private PayInRepository payInRepository;
-
-    @Autowired
-    private PayOutRepository payOutRepository;
-
-    @Autowired
-    private PaymentService paymentService;
-
-    @Autowired
     private InvoiceFileManager invoiceFileManager;
+    private OrderRepository    orderRepository;
+    private PayInRepository    payInRepository;
+    private PayOutRepository   payOutRepository;
+    private PayOutService      payoutService;
+    private TransferService    transferService;
+    private WalletService      walletService;
 
+    @Autowired
+    public BillingControllerImpl(
+        InvoiceFileManager invoiceFileManager,
+        OrderRepository    orderRepository,
+        PayInRepository    payInRepository,
+        PayOutRepository   payOutRepository,
+        PayOutService      payoutService,
+        TransferService    transferService,
+        WalletService      walletService
+    ) {
+        this.invoiceFileManager = invoiceFileManager;
+        this.orderRepository    = orderRepository;
+        this.payInRepository    = payInRepository;
+        this.payOutRepository   = payOutRepository;
+        this.payoutService      = payoutService;
+        this.transferService    = transferService;
+        this.walletService      = walletService;
+    }
+    
     @Override
     public RestResponse<AccountDto> refreshUserWallets(UUID userKey) {
-        final AccountDto account = this.paymentService.refreshUserWallets(userKey);
+        final AccountDto account = this.walletService.refreshUserWallets(userKey);
 
         return RestResponse.result(account);
     }
@@ -204,7 +218,7 @@ public class BillingControllerImpl extends BaseController implements BillingCont
     @Override
     public RestResponse<?> createTransfer(UUID key) {
         try {
-            final List<TransferDto> transfers = this.paymentService.createTransfer(this.currentUserKey(), key);
+            final List<TransferDto> transfers = this.transferService.createTransfer(this.currentUserKey(), key);
 
             return RestResponse.result(transfers);
         } catch (PaymentException ex) {
@@ -256,7 +270,7 @@ public class BillingControllerImpl extends BaseController implements BillingCont
                 return RestResponse.invalid(validationResult.getFieldErrors(), validationResult.getGlobalErrors());
             }
 
-            final PayOutDto payOut = this.paymentService.createPayOutAtOpertusMundi(command);
+            final PayOutDto payOut = this.payoutService.createPayOutAtOpertusMundi(command);
 
             return RestResponse.result(payOut);
         } catch (PaymentException ex) {
