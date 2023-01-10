@@ -28,6 +28,7 @@ import eu.opertusmundi.common.model.account.helpdesk.EnumMarketplaceAccountSortF
 import eu.opertusmundi.common.model.account.helpdesk.ExternalProviderCommandDto;
 import eu.opertusmundi.common.repository.AccountRepository;
 import eu.opertusmundi.common.service.mangopay.CustomerVerificationService;
+import eu.opertusmundi.common.service.mangopay.WalletService;
 
 @RestController
 @Secured({ "ROLE_ADMIN" })
@@ -36,11 +37,14 @@ public class MarketplaceAccountControllerImpl extends BaseController implements 
 	@Autowired
 	private AccountRepository accountRepository;
 
-	@Autowired
+    @Autowired
     private CustomerVerificationService customerVerificationService;
 
     @Autowired
     private MarketplaceUserService marketplaceUserService;
+
+    @Autowired
+    private WalletService walletService;
 
 	@Override
 	public RestResponse<PageResultDto<MarketplaceAccountSummaryDto>> find(
@@ -154,6 +158,13 @@ public class MarketplaceAccountControllerImpl extends BaseController implements 
     @Override
     public RestResponse<AccountDto> refreshCustomerKycLevel(UUID key) {
         final AccountDto result = this.customerVerificationService.refreshCustomerKycLevel(key);
+
+        return RestResponse.result(result);
+    }
+
+    @Override
+    public RestResponse<AccountDto> refreshCustomerWalletFunds(UUID key) {
+        final var result = this.walletService.refreshUserWallets(key);
 
         return RestResponse.result(result);
     }
