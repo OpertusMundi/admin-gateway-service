@@ -21,6 +21,7 @@ import eu.opertusmundi.common.repository.AccountRepository;
 import eu.opertusmundi.common.repository.OrderRepository;
 import eu.opertusmundi.common.repository.PayInRepository;
 import eu.opertusmundi.common.repository.PayOutRepository;
+import eu.opertusmundi.common.repository.RefundRepository;
 import eu.opertusmundi.common.service.CatalogueService;
 import eu.opertusmundi.common.service.ProviderAssetService;
 import eu.opertusmundi.common.service.UserServiceService;
@@ -33,6 +34,7 @@ public class DefaultProcessInstanceResourceResolver implements ProcessInstanceRe
     private final OrderRepository      orderRepository;
     private final PayInRepository      payInRepository;
     private final PayOutRepository     payOutRepository;
+    private final RefundRepository     refundRepository;
     private final ProviderAssetService providerAssetService;
     private final UserServiceService   userServiceService;
 
@@ -44,6 +46,7 @@ public class DefaultProcessInstanceResourceResolver implements ProcessInstanceRe
         PayInRepository      payInRepository,
         PayOutRepository     payOutRepository,
         ProviderAssetService providerAssetService,
+        RefundRepository     refundRepository,
         UserServiceService   userServiceService
     ) {
         this.accountRepository    = accountRepository;
@@ -52,6 +55,7 @@ public class DefaultProcessInstanceResourceResolver implements ProcessInstanceRe
         this.payInRepository      = payInRepository;
         this.payOutRepository     = payOutRepository;
         this.providerAssetService = providerAssetService;
+        this.refundRepository     = refundRepository;
         this.userServiceService   = userServiceService;
     }
 
@@ -73,6 +77,7 @@ public class DefaultProcessInstanceResourceResolver implements ProcessInstanceRe
             case ORDER -> resolveOrder(workflow, businessKey, variables);
             case PAYIN -> resolvePayIn(workflow, businessKey, variables);
             case PAYOUT -> resolvePayOut(workflow, businessKey, variables);
+            case REFUND -> resolveRefund(workflow, businessKey, variables);
             case USER_SERVICE -> resolveUserService(workflow, businessKey, variables);
             default -> null;
         };
@@ -92,7 +97,7 @@ public class DefaultProcessInstanceResourceResolver implements ProcessInstanceRe
         }
         return ProcessInstanceResource.of(workflow.getResourceType(), resource);
     }
-    
+
     private ProcessInstanceResource resolveConsumerRegistration(EnumWorkflow workflow, String businessKey, List<VariableDto> variables) {
         final String userKeyVariableValue = variables.stream()
             .filter(v -> v.getName().equalsIgnoreCase("userKey"))
@@ -119,7 +124,7 @@ public class DefaultProcessInstanceResourceResolver implements ProcessInstanceRe
 
         return ProcessInstanceResource.of(workflow.getResourceType(), resource);
     }
-    
+
     private ProcessInstanceResource resolveOrder(EnumWorkflow workflow, String businessKey, List<VariableDto> variables) {
         final UUID             orderKey = UUID.fromString(businessKey);
         final HelpdeskOrderDto resource = this.orderRepository.findOrderObjectByKey(orderKey).orElse(null);
@@ -133,14 +138,34 @@ public class DefaultProcessInstanceResourceResolver implements ProcessInstanceRe
 
         return ProcessInstanceResource.of(workflow.getResourceType(), resource);
     }
-    
+
     private ProcessInstanceResource resolvePayOut(EnumWorkflow workflow, String businessKey, List<VariableDto> variables) {
         final UUID      payOutKey = UUID.fromString(businessKey);
         final PayOutDto resource  = this.payOutRepository.findOneObjectByKey(payOutKey, true).orElse(null);
 
         return ProcessInstanceResource.of(workflow.getResourceType(), resource);
     }
-    
+
+    private ProcessInstanceResource resolveRefund(EnumWorkflow workflow, String businessKey, List<VariableDto> variables) {
+        // Refund business key format is REFUND::<Event Type>::<Refund Id>
+        final var tokens       = businessKey.split("::");
+        final var refundId     = tokens[2];
+        final var refundEntity = this.refundRepository.findOneByTransactionId(refundId).orElse(null);
+        if (refundEntity == null) {
+            return null;
+        }
+        final var    transactionType = refundEntity.getInitialTransactionType();
+        final var    transactionId   = refundEntity.getInitialTransactionId();
+        final Object resource        = switch (transactionType) {
+             case PAYIN    -> this.payInRepository.findOneObjectByTransactionId(transactionId).orElse(null);
+             case TRANSFER -> this.payInRepository.findOneObjectPayInItemByTransferId(transactionId).orElse(null);
+             case PAYOUT   -> this.payOutRepository.findOneObjectByTransactionId(transactionId).orElse(null);
+             default       -> null;
+         };
+
+        return ProcessInstanceResource.of(workflow.getResourceType(), resource);
+    }
+
     private ProcessInstanceResource resolveUserService(EnumWorkflow workflow, String businessKey, List<VariableDto> variables) {
         final String serviceKeyAsString = switch(workflow) {
             case PUBLISH_USER_SERVICE -> businessKey;
