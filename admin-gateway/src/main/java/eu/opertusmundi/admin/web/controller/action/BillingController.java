@@ -29,14 +29,20 @@ import eu.opertusmundi.common.model.account.AccountDto;
 import eu.opertusmundi.common.model.order.EnumOrderSortField;
 import eu.opertusmundi.common.model.order.EnumOrderStatus;
 import eu.opertusmundi.common.model.order.OrderDto;
+import eu.opertusmundi.common.model.payment.DisputeDto;
+import eu.opertusmundi.common.model.payment.EnumDisputeSortField;
+import eu.opertusmundi.common.model.payment.EnumDisputeStatus;
 import eu.opertusmundi.common.model.payment.EnumPayInSortField;
 import eu.opertusmundi.common.model.payment.EnumPayOutSortField;
+import eu.opertusmundi.common.model.payment.EnumRefundReasonType;
+import eu.opertusmundi.common.model.payment.EnumRefundSortField;
 import eu.opertusmundi.common.model.payment.EnumTransactionStatus;
 import eu.opertusmundi.common.model.payment.EnumTransferSortField;
 import eu.opertusmundi.common.model.payment.PayInDto;
 import eu.opertusmundi.common.model.payment.PayInItemDto;
 import eu.opertusmundi.common.model.payment.PayOutCommandDto;
 import eu.opertusmundi.common.model.payment.PayOutDto;
+import eu.opertusmundi.common.model.payment.RefundDto;
 
 @RequestMapping(value = "/action/billing", produces = MediaType.APPLICATION_JSON_VALUE)
 public interface BillingController {
@@ -120,4 +126,21 @@ public interface BillingController {
         BindingResult validationResult
     );
 
+    @GetMapping(value = { "/refunds" })
+    RestResponse<PageResultDto<RefundDto>> findRefunds(
+        @RequestParam(name = "page", defaultValue = "0") int page,
+        @RequestParam(name = "size", defaultValue = "25") @Max(100) @Min(1) int size,
+        @RequestParam(name = "reason", required = false) Set<EnumRefundReasonType> reason,
+        @RequestParam(name = "orderBy", defaultValue = "CREATED_ON") EnumRefundSortField orderBy,
+        @RequestParam(name = "order", defaultValue = "DESC") EnumSortingOrder order
+    );
+    
+    @GetMapping(value = { "/disputes" })
+    RestResponse<PageResultDto<DisputeDto>> findDisputes(
+        @RequestParam(name = "page", defaultValue = "0") int page,
+        @RequestParam(name = "size", defaultValue = "25") @Max(100) @Min(1) int size,
+        @RequestParam(name = "status", required = false) Set<EnumDisputeStatus> status,
+        @RequestParam(name = "orderBy", defaultValue = "CREATED_ON") EnumDisputeSortField orderBy,
+        @RequestParam(name = "order", defaultValue = "DESC") EnumSortingOrder order
+    );
 }

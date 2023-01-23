@@ -24,6 +24,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,8 +39,13 @@ import eu.opertusmundi.common.model.order.EnumOrderSortField;
 import eu.opertusmundi.common.model.order.EnumOrderStatus;
 import eu.opertusmundi.common.model.order.HelpdeskOrderDto;
 import eu.opertusmundi.common.model.order.OrderDto;
+import eu.opertusmundi.common.model.payment.DisputeDto;
+import eu.opertusmundi.common.model.payment.EnumDisputeSortField;
+import eu.opertusmundi.common.model.payment.EnumDisputeStatus;
 import eu.opertusmundi.common.model.payment.EnumPayInSortField;
 import eu.opertusmundi.common.model.payment.EnumPayOutSortField;
+import eu.opertusmundi.common.model.payment.EnumRefundReasonType;
+import eu.opertusmundi.common.model.payment.EnumRefundSortField;
 import eu.opertusmundi.common.model.payment.EnumTransactionStatus;
 import eu.opertusmundi.common.model.payment.EnumTransferSortField;
 import eu.opertusmundi.common.model.payment.PayInDto;
@@ -47,11 +53,14 @@ import eu.opertusmundi.common.model.payment.PayInItemDto;
 import eu.opertusmundi.common.model.payment.PayOutCommandDto;
 import eu.opertusmundi.common.model.payment.PayOutDto;
 import eu.opertusmundi.common.model.payment.PaymentException;
+import eu.opertusmundi.common.model.payment.RefundDto;
 import eu.opertusmundi.common.model.payment.TransferDto;
 import eu.opertusmundi.common.model.payment.helpdesk.HelpdeskPayInDto;
+import eu.opertusmundi.common.repository.DisputeRepository;
 import eu.opertusmundi.common.repository.OrderRepository;
 import eu.opertusmundi.common.repository.PayInRepository;
 import eu.opertusmundi.common.repository.PayOutRepository;
+import eu.opertusmundi.common.repository.RefundRepository;
 import eu.opertusmundi.common.service.invoice.InvoiceFileManager;
 import eu.opertusmundi.common.service.mangopay.PayOutService;
 import eu.opertusmundi.common.service.mangopay.TransferService;
@@ -61,33 +70,39 @@ import eu.opertusmundi.common.service.mangopay.WalletService;
 @Secured({ "ROLE_ADMIN", "ROLE_USER" })
 public class BillingControllerImpl extends BaseController implements BillingController {
 
-    private InvoiceFileManager invoiceFileManager;
-    private OrderRepository    orderRepository;
-    private PayInRepository    payInRepository;
-    private PayOutRepository   payOutRepository;
-    private PayOutService      payoutService;
-    private TransferService    transferService;
-    private WalletService      walletService;
+    private final DisputeRepository  disputeRepository;
+    private final InvoiceFileManager invoiceFileManager;
+    private final OrderRepository    orderRepository;
+    private final PayInRepository    payInRepository;
+    private final PayOutRepository   payOutRepository;
+    private final PayOutService      payoutService;
+    private final RefundRepository   refundRepository;
+    private final TransferService    transferService;
+    private final WalletService      walletService;
 
     @Autowired
     public BillingControllerImpl(
+        DisputeRepository  disputeRepository,
         InvoiceFileManager invoiceFileManager,
         OrderRepository    orderRepository,
         PayInRepository    payInRepository,
         PayOutRepository   payOutRepository,
         PayOutService      payoutService,
+        RefundRepository   refundRepository,
         TransferService    transferService,
         WalletService      walletService
     ) {
+        this.disputeRepository  = disputeRepository;
         this.invoiceFileManager = invoiceFileManager;
         this.orderRepository    = orderRepository;
         this.payInRepository    = payInRepository;
         this.payOutRepository   = payOutRepository;
         this.payoutService      = payoutService;
+        this.refundRepository   = refundRepository;
         this.transferService    = transferService;
         this.walletService      = walletService;
     }
-    
+
     @Override
     public RestResponse<AccountDto> refreshUserWallets(UUID userKey) {
         final AccountDto account = this.walletService.refreshUserWallets(userKey);
@@ -163,7 +178,7 @@ public class BillingControllerImpl extends BaseController implements BillingCont
         }
         return RestResponse.notFound();
     }
-    
+
     @Override
     public ResponseEntity<StreamingResponseBody> downloadInvoice(@PathVariable UUID key, HttpServletResponse response) throws IOException {
         final HelpdeskPayInDto p = this.payInRepository.findOneObjectByKey(key).orElse(null);
@@ -276,6 +291,48 @@ public class BillingControllerImpl extends BaseController implements BillingCont
         } catch (PaymentException ex) {
             return RestResponse.error(ex.getCode(), ex.getMessage());
         }
+    }
+
+    @Override
+    public RestResponse<PageResultDto<RefundDto>> findRefunds(
+        int page, int size,
+        Set<EnumRefundReasonType> reason,
+        EnumRefundSortField orderBy, EnumSortingOrder order
+    ) {
+        final Direction   direction   = order == EnumSortingOrder.DESC ? Direction.DESC : Direction.ASC;
+        final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, orderBy.getValue()));
+
+        final Page<RefundDto> p = this.refundRepository.findAllObjects(
+            CollectionUtils.isEmpty(reason) ? null : reason,
+            pageRequest
+        );
+
+        final long                     count   = p.getTotalElements();
+        final List<RefundDto>          records = p.stream().collect(Collectors.toList());
+        final PageResultDto<RefundDto> result  = PageResultDto.of(page, size, records, count);
+
+        return RestResponse.result(result);
+    }
+
+    @Override
+    public RestResponse<PageResultDto<DisputeDto>> findDisputes(
+        int page, int size,
+        Set<EnumDisputeStatus> status,
+        EnumDisputeSortField orderBy, EnumSortingOrder order
+    ) {
+        final Direction   direction   = order == EnumSortingOrder.DESC ? Direction.DESC : Direction.ASC;
+        final PageRequest pageRequest = PageRequest.of(page, size, Sort.by(direction, orderBy.getValue()));
+
+        final Page<DisputeDto> p = this.disputeRepository.findAllObjects(
+            CollectionUtils.isEmpty(status) ? null : status,
+            pageRequest
+        );
+
+        final long                      count   = p.getTotalElements();
+        final List<DisputeDto>          records = p.stream().collect(Collectors.toList());
+        final PageResultDto<DisputeDto> result  = PageResultDto.of(page, size, records, count);
+
+        return RestResponse.result(result);
     }
 
 }
