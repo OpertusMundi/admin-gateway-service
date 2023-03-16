@@ -8,19 +8,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import eu.opertusmundi.admin.test.support.BaseIntegrationTest;
+
 @SpringBootTest
-@ActiveProfiles("testing")
 @AutoConfigureMockMvc
-class HomeControllerTests {
+class HomeControllerTests extends BaseIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    // Verifying HTTP Request Matching
-
 
     @Test
     void whenValidRootUrlAndMethodAndContentType_thenReturns302() throws Exception {
